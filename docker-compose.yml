@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: coin-sensor-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: coin_sensor
+      MYSQL_USER: coin_user
+      MYSQL_PASSWORD: coin_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: coin-sensor-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  app:
+    build: .
+    container_name: coin-sensor-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DEV_MYSQL_URL=jdbc:mysql://mysql:3306/coin_sensor?useSSL=false&serverTimezone=Asia/Seoul
+      - MYSQL_USERNAME=coin_user
+      - MYSQL_PASSWORD=coin_password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mysql_data:
+  redis_data:
