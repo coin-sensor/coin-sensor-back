@@ -18,4 +18,8 @@ public class Timeframe {
     
     @Column(name = "timeframe_label", nullable = false)
     private String timeframeLabel;
+    
+    public Timeframe(String timeframeLabel) {
+        this.timeframeLabel = timeframeLabel;
+    }
 }

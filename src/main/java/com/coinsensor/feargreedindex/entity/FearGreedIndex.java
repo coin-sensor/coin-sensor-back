@@ -34,4 +34,13 @@ public class FearGreedIndex {
     
     @Column(name = "news_score")
     private Double newsScore;
+    
+    public FearGreedIndex(LocalDateTime createdAt, Long fearGreedValue, Double volatilityScore, Double dominanceScore, Double sentimentScore, Double newsScore) {
+        this.createdAt = createdAt;
+        this.fearGreedValue = fearGreedValue;
+        this.volatilityScore = volatilityScore;
+        this.dominanceScore = dominanceScore;
+        this.sentimentScore = sentimentScore;
+        this.newsScore = newsScore;
+    }
 }

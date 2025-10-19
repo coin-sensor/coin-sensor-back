@@ -22,4 +22,9 @@ public class ChatRoom {
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    public ChatRoom(String roomName, LocalDateTime createdAt) {
+        this.roomName = roomName;
+        this.createdAt = createdAt;
+    }
 }

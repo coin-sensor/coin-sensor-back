@@ -23,4 +23,9 @@ public class VoteOption {
     
     @Column(nullable = false)
     private String name;
+    
+    public VoteOption(VoteTopic voteTopic, String name) {
+        this.voteTopic = voteTopic;
+        this.name = name;
+    }
 }

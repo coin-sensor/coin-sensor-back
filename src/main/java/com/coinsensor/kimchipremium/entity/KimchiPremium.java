@@ -28,4 +28,11 @@ public class KimchiPremium {
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    public KimchiPremium(Double binanceBtcUsdt, Double upbitBtcKrw, Double kimchiPremium, LocalDateTime createdAt) {
+        this.binanceBtcUsdt = binanceBtcUsdt;
+        this.upbitBtcKrw = upbitBtcKrw;
+        this.kimchiPremium = kimchiPremium;
+        this.createdAt = createdAt;
+    }
 }

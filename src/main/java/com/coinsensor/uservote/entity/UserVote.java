@@ -34,4 +34,11 @@ public class UserVote {
     
     @Column(name = "voted_at", nullable = false)
     private LocalDateTime votedAt;
+    
+    public UserVote(VoteTopic voteTopic, VoteOption voteOption, User user, LocalDateTime votedAt) {
+        this.voteTopic = voteTopic;
+        this.voteOption = voteOption;
+        this.user = user;
+        this.votedAt = votedAt;
+    }
 }

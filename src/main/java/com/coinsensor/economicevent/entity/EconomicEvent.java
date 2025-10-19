@@ -39,6 +39,16 @@ public class EconomicEvent {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
+    public EconomicEvent(String eventName, String country, Importance importance, LocalDateTime eventTime, String description, String relatedAssets, LocalDateTime createdAt) {
+        this.eventName = eventName;
+        this.country = country;
+        this.importance = importance;
+        this.eventTime = eventTime;
+        this.description = description;
+        this.relatedAssets = relatedAssets;
+        this.createdAt = createdAt;
+    }
+    
     public enum Importance {
         low, medium, high
     }

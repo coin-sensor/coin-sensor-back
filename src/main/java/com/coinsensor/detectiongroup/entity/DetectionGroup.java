@@ -30,4 +30,11 @@ public class DetectionGroup {
     
     @Column(columnDefinition = "TEXT", nullable = false)
     private String summary;
+    
+    public DetectionGroup(DetectionCriteria detectionCriteria, LocalDateTime detectedAt, Long detectionCount, String summary) {
+        this.detectionCriteria = detectionCriteria;
+        this.detectedAt = detectedAt;
+        this.detectionCount = detectionCount;
+        this.summary = summary;
+    }
 }

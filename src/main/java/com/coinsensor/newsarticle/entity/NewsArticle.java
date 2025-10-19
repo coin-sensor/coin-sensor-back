@@ -45,6 +45,18 @@ public class NewsArticle {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
+    public NewsArticle(String title, String summary, String content, String sourceName, String sourceUrl, LocalDateTime publishedAt, String relatedTicker, Sentiment sentiment, LocalDateTime createdAt) {
+        this.title = title;
+        this.summary = summary;
+        this.content = content;
+        this.sourceName = sourceName;
+        this.sourceUrl = sourceUrl;
+        this.publishedAt = publishedAt;
+        this.relatedTicker = relatedTicker;
+        this.sentiment = sentiment;
+        this.createdAt = createdAt;
+    }
+    
     public enum Sentiment {
         positive, neutral, negative
     }

@@ -36,4 +36,12 @@ public class DetectedCoin {
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    public DetectedCoin(DetectionGroup detectionGroup, Coin coin, Double volatility, Double volume, LocalDateTime createdAt) {
+        this.detectionGroup = detectionGroup;
+        this.coin = coin;
+        this.volatility = volatility;
+        this.volume = volume;
+        this.createdAt = createdAt;
+    }
 }

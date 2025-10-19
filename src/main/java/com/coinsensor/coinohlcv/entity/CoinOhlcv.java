@@ -50,4 +50,17 @@ public class CoinOhlcv {
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    public CoinOhlcv(Coin coin, Timeframe timeframe, Double open, Double high, Double low, Double close, Double volume, Double quoteVolume, Integer tradesCount, LocalDateTime createdAt) {
+        this.coin = coin;
+        this.timeframe = timeframe;
+        this.open = open;
+        this.high = high;
+        this.low = low;
+        this.close = close;
+        this.volume = volume;
+        this.quoteVolume = quoteVolume;
+        this.tradesCount = tradesCount;
+        this.createdAt = createdAt;
+    }
 }

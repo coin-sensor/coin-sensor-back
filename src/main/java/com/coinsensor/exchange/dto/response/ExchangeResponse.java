@@ -10,13 +10,11 @@ import lombok.*;
 public class ExchangeResponse {
     private Long exchangeId;
     private String name;
-    private String country;
     
     public static ExchangeResponse from(Exchange entity) {
         return ExchangeResponse.builder()
                 .exchangeId(entity.getExchangeId())
                 .name(entity.getName())
-                .country(entity.getCountry())
                 .build();
     }
 }

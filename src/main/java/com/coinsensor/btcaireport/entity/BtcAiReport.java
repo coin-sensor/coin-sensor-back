@@ -37,6 +37,15 @@ public class BtcAiReport {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
+    public BtcAiReport(LocalDate reportDate, String summaryText, TrendPrediction trendPrediction, Boolean isVolatilityAlert, String recommendation, LocalDateTime createdAt) {
+        this.reportDate = reportDate;
+        this.summaryText = summaryText;
+        this.trendPrediction = trendPrediction;
+        this.isVolatilityAlert = isVolatilityAlert;
+        this.recommendation = recommendation;
+        this.createdAt = createdAt;
+    }
+    
     public enum TrendPrediction {
         bullish, bearish, neutral
     }

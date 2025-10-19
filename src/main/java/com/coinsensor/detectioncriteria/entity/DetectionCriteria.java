@@ -26,4 +26,10 @@ public class DetectionCriteria {
     
     @Column(nullable = false)
     private Double volume;
+    
+    public DetectionCriteria(Timeframe timeframe, Double volatility, Double volume) {
+        this.timeframe = timeframe;
+        this.volatility = volatility;
+        this.volume = volume;
+    }
 }

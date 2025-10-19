@@ -19,6 +19,7 @@ public class Exchange {
     @Column(nullable = false)
     private String name;
     
-    @Column(nullable = false)
-    private String country;
+    public Exchange(String name) {
+        this.name = name;
+    }
 }

@@ -25,4 +25,10 @@ public class VoteTopic {
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    public VoteTopic(String title, Boolean isActive, LocalDateTime createdAt) {
+        this.title = title;
+        this.isActive = isActive;
+        this.createdAt = createdAt;
+    }
 }

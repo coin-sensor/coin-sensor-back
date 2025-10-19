@@ -34,4 +34,13 @@ public class User {
     
     @Column(nullable = false)
     private String role;
+    
+    public User(String uuid, String ipAddress, Boolean isBanned, LocalDateTime lastActive, String nickname, String role) {
+        this.uuid = uuid;
+        this.ipAddress = ipAddress;
+        this.isBanned = isBanned;
+        this.lastActive = lastActive;
+        this.nickname = nickname;
+        this.role = role;
+    }
 }

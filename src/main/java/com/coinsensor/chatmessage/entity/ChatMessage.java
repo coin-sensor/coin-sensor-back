@@ -38,4 +38,13 @@ public class ChatMessage {
     
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    
+    public ChatMessage(ChatRoom chatRoom, User user, String nickname, String message, Boolean isDeleted, LocalDateTime createdAt) {
+        this.chatRoom = chatRoom;
+        this.user = user;
+        this.nickname = nickname;
+        this.message = message;
+        this.isDeleted = isDeleted;
+        this.createdAt = createdAt;
+    }
 }
