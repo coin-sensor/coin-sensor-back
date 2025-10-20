@@ -1,5 +1,7 @@
 package com.coinsensor.common.config;
 
+import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
+import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchange.repository.ExchangeRepository;
 import com.coinsensor.timeframe.entity.Timeframe;
@@ -19,6 +21,7 @@ public class DataInitializer {
     
     private final ExchangeRepository exchangeRepository;
     private final TimeframeRepository timeframeRepository;
+    private final DetectionCriteriaRepository detectionCriteriaRepository;
 
     
     @EventListener(ApplicationReadyEvent.class)
@@ -38,6 +41,20 @@ public class DataInitializer {
                 timeframeRepository.save(new Timeframe(tf));
             }
             log.info("초기 타임프레임 데이터 생성: {}", timeframes);
+        }
+        
+        if (detectionCriteriaRepository.count() == 0) {
+            Timeframe tf1m = timeframeRepository.findByTimeframeLabel("1m").orElseThrow();
+            Timeframe tf5m = timeframeRepository.findByTimeframeLabel("5m").orElseThrow();
+            Timeframe tf1h = timeframeRepository.findByTimeframeLabel("1h").orElseThrow();
+            Timeframe tf4h = timeframeRepository.findByTimeframeLabel("4h").orElseThrow();
+
+            detectionCriteriaRepository.save(new DetectionCriteria(tf1m, 1.0, 2.0));
+            detectionCriteriaRepository.save(new DetectionCriteria(tf5m, 1.0, 2.0));
+            detectionCriteriaRepository.save(new DetectionCriteria(tf1h, 3.0, 2.0));
+            detectionCriteriaRepository.save(new DetectionCriteria(tf4h, 5.0, 2.0));
+            
+            log.info("초기 감지 기준 데이터 생성 완료");
         }
     }
 }
