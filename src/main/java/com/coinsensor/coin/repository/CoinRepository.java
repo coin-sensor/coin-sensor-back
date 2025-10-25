@@ -11,9 +11,9 @@ import java.util.Optional;
 public interface CoinRepository extends JpaRepository<Coin, Long> {
     Optional<Coin> findByCoinTicker(String coinTicker);
     
-    @Query("SELECT DISTINCT c FROM Coin c JOIN ExchangeCoin ec ON c.coinId = ec.coin.coinId WHERE ec.exchangeType = 'spot' AND ec.isActive = true")
-    List<Coin> findSpotCoins();
+    @Query("SELECT ec FROM ExchangeCoin ec JOIN FETCH ec.coin WHERE ec.exchangeType = 'spot' AND ec.isActive = true")
+    List<com.coinsensor.exchangecoin.entity.ExchangeCoin> findSpotExchangeCoins();
     
-    @Query("SELECT DISTINCT c FROM Coin c JOIN ExchangeCoin ec ON c.coinId = ec.coin.coinId WHERE ec.exchangeType = 'future' AND ec.isActive = true")
-    List<Coin> findFutureCoins();
+    @Query("SELECT ec FROM ExchangeCoin ec JOIN FETCH ec.coin WHERE ec.exchangeType = 'future' AND ec.isActive = true")
+    List<com.coinsensor.exchangecoin.entity.ExchangeCoin> findFutureExchangeCoins();
 }

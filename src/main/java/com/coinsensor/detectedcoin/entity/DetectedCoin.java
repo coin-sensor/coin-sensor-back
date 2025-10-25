@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import com.coinsensor.coin.entity.Coin;
 import com.coinsensor.detectiongroup.entity.DetectionGroup;
+import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 
 @Entity
 @Table(name = "detected_coins")
@@ -28,6 +29,10 @@ public class DetectedCoin {
     @JoinColumn(name = "coin_id", nullable = false)
     private Coin coin;
     
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "exchange_coin_id", nullable = false)
+    private ExchangeCoin exchangeCoin;
+    
     @Column(nullable = false)
     private Double volatility;
     
@@ -37,9 +42,10 @@ public class DetectedCoin {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
-    public DetectedCoin(DetectionGroup detectionGroup, Coin coin, Double volatility, Double volume, LocalDateTime createdAt) {
+    public DetectedCoin(DetectionGroup detectionGroup, Coin coin, ExchangeCoin exchangeCoin, Double volatility, Double volume, LocalDateTime createdAt) {
         this.detectionGroup = detectionGroup;
         this.coin = coin;
+        this.exchangeCoin = exchangeCoin;
         this.volatility = volatility;
         this.volume = volume;
         this.createdAt = createdAt;

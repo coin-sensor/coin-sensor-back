@@ -8,6 +8,7 @@ import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
 import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
 import com.coinsensor.detectiongroup.entity.DetectionGroup;
 import com.coinsensor.detectiongroup.repository.DetectionGroupRepository;
+import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +42,10 @@ public class CoinDetectionService {
     
     private void detectSpotCoins(DetectionCriteria criteria) {
         List<DetectedCoin> detectedCoins = new ArrayList<>();
-        List<Coin> coins = coinRepository.findSpotCoins();
+        List<ExchangeCoin> exchangeCoins = coinRepository.findSpotExchangeCoins();
         
-        for (Coin coin : coins) {
+        for (ExchangeCoin exchangeCoin : exchangeCoins) {
+            Coin coin = exchangeCoin.getCoin();
             
             try {
                 String response = webClient.get()
@@ -74,6 +76,7 @@ public class CoinDetectionService {
 
                     DetectedCoin detected = DetectedCoin.builder()
                             .coin(coin)
+                            .exchangeCoin(exchangeCoin)
                             .volatility(Math.round(priceChangePercent * 10.0) / 10.0)
                             .volume(Math.round(volumeRatio * 10.0) / 10.0)
                             .createdAt(LocalDateTime.now())
@@ -117,6 +120,7 @@ public class CoinDetectionService {
                 detected = DetectedCoin.builder()
                         .detectionGroup(group)
                         .coin(detected.getCoin())
+                        .exchangeCoin(detected.getExchangeCoin())
                         .volatility(detected.getVolatility())
                         .volume(detected.getVolume())
                         .createdAt(detected.getCreatedAt())
@@ -130,9 +134,10 @@ public class CoinDetectionService {
     
     private void detectFutureCoins(DetectionCriteria criteria) {
         List<DetectedCoin> detectedCoins = new ArrayList<>();
-        List<Coin> coins = coinRepository.findFutureCoins();
+        List<ExchangeCoin> exchangeCoins = coinRepository.findFutureExchangeCoins();
         
-        for (Coin coin : coins) {
+        for (ExchangeCoin exchangeCoin : exchangeCoins) {
+            Coin coin = exchangeCoin.getCoin();
             
             try {
                 String response = webClient.get()
@@ -163,6 +168,7 @@ public class CoinDetectionService {
 
                     DetectedCoin detected = DetectedCoin.builder()
                             .coin(coin)
+                            .exchangeCoin(exchangeCoin)
                             .volatility(Math.round(priceChangePercent * 10.0) / 10.0)
                             .volume(Math.round(volumeRatio * 10.0) / 10.0)
                             .createdAt(LocalDateTime.now())
@@ -206,6 +212,7 @@ public class CoinDetectionService {
                 detected = DetectedCoin.builder()
                         .detectionGroup(group)
                         .coin(detected.getCoin())
+                        .exchangeCoin(detected.getExchangeCoin())
                         .volatility(detected.getVolatility())
                         .volume(detected.getVolume())
                         .createdAt(detected.getCreatedAt())

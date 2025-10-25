@@ -2,6 +2,7 @@ package com.coinsensor.exchangecoin.entity;
 
 import com.coinsensor.coin.entity.Coin;
 import com.coinsensor.exchange.entity.Exchange;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +36,12 @@ public class ExchangeCoin {
     private ExchangeType exchangeType;
     
     public enum ExchangeType {
-        spot, future
+        spot, future;
+        
+        @JsonCreator
+        public static ExchangeType fromString(String value) {
+            return valueOf(value.toLowerCase());
+        }
     }
+
 }
