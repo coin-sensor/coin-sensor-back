@@ -2,6 +2,7 @@ package com.coinsensor.detectedcoin.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.coinsensor.coin.entity.Coin;
@@ -33,8 +34,8 @@ public class DetectedCoin {
     @JoinColumn(name = "exchange_coin_id", nullable = false)
     private ExchangeCoin exchangeCoin;
     
-    @Column(nullable = false)
-    private Double volatility;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal volatility;
     
     @Column(nullable = false)
     private Double volume;
@@ -42,7 +43,7 @@ public class DetectedCoin {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
-    public DetectedCoin(DetectionGroup detectionGroup, Coin coin, ExchangeCoin exchangeCoin, Double volatility, Double volume, LocalDateTime createdAt) {
+    public DetectedCoin(DetectionGroup detectionGroup, Coin coin, ExchangeCoin exchangeCoin, BigDecimal volatility, Double volume, LocalDateTime createdAt) {
         this.detectionGroup = detectionGroup;
         this.coin = coin;
         this.exchangeCoin = exchangeCoin;

@@ -6,6 +6,7 @@ import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchange.repository.ExchangeRepository;
 import com.coinsensor.timeframe.entity.Timeframe;
 import com.coinsensor.timeframe.repository.TimeframeRepository;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -49,10 +50,10 @@ public class DataInitializer {
             Timeframe tf1h = timeframeRepository.findByTimeframeLabel("1h").orElseThrow();
             Timeframe tf4h = timeframeRepository.findByTimeframeLabel("4h").orElseThrow();
 
-            detectionCriteriaRepository.save(new DetectionCriteria(tf1m, 1.0, 2.0));
-            detectionCriteriaRepository.save(new DetectionCriteria(tf5m, 1.0, 2.0));
-            detectionCriteriaRepository.save(new DetectionCriteria(tf1h, 3.0, 2.0));
-            detectionCriteriaRepository.save(new DetectionCriteria(tf4h, 5.0, 2.0));
+            detectionCriteriaRepository.save(new DetectionCriteria(tf1m, BigDecimal.valueOf(1.00), 2.0));
+            detectionCriteriaRepository.save(new DetectionCriteria(tf5m, BigDecimal.valueOf(1.00), 2.0));
+            detectionCriteriaRepository.save(new DetectionCriteria(tf1h, BigDecimal.valueOf(3.00), 2.0));
+            detectionCriteriaRepository.save(new DetectionCriteria(tf4h, BigDecimal.valueOf(5.00), 2.0));
             
             log.info("초기 감지 기준 데이터 생성 완료");
         }

@@ -3,6 +3,7 @@ package com.coinsensor.detectedcoin.dto.response;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin.ExchangeType;
 import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 public class DetectedCoinResponse {
     private Long detectedCoinId;
     private String coinTicker;
-    private Double volatility;
+    private BigDecimal volatility;
     private Double volume;
     private LocalDateTime createdAt;
     private ExchangeType exchangeType;

@@ -1,6 +1,8 @@
 package com.coinsensor.detectedcoin.service;
 
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
+import com.coinsensor.detectedcoin.dto.response.DetectedCoinGroupResponse;
+import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin.ExchangeType;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,7 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
     @Override
     public List<DetectedCoinResponse> getVolatileCoins() {
         return detectedCoinRepository.findAll().stream()
-                .sorted((a, b) -> Double.compare(b.getVolatility(), a.getVolatility()))
+                .sorted((a, b) -> b.getVolatility().compareTo(a.getVolatility()))
                 .limit(20)
                 .map(DetectedCoinResponse::from)
                 .toList();
@@ -42,5 +44,26 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
                 .stream()
                 .map(DetectedCoinResponse::from)
                 .toList();
+    }
+    
+    @Override
+    public DetectedCoinGroupResponse getDetectedCoinGroupByTimeAndType(ExchangeType exchangeType) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime = now.withSecond(0).withNano(0);
+        LocalDateTime endTime = startTime.plusMinutes(1);
+        
+        List<DetectedCoin> detectedCoins = detectedCoinRepository.findByDetectionTimeRangeAndExchangeType(startTime, endTime, exchangeType);
+        
+        if (detectedCoins.isEmpty()) {
+            return null;
+        }
+        
+        DetectedCoin firstCoin = detectedCoins.get(0);
+        return DetectedCoinGroupResponse.builder()
+                .criteriaVolatility(firstCoin.getDetectionGroup().getDetectionCriteria().getVolatility())
+                .criteriaVolume(firstCoin.getDetectionGroup().getDetectionCriteria().getVolume())
+                .detectedAt(firstCoin.getDetectionGroup().getDetectedAt())
+                .coins(detectedCoins.stream().map(DetectedCoinResponse::from).toList())
+                .build();
     }
 }

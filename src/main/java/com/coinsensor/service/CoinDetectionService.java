@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -71,13 +73,13 @@ public class CoinDetectionService {
                 double priceChangePercent = (highPrice / lowPrice - 1) * 100;
                 double volumeRatio = prevVolume > 0 ? currentVolume / prevVolume : 0;
                 
-                if (priceChangePercent >= criteria.getVolatility() && volumeRatio >= criteria.getVolume()) {
+                if (priceChangePercent >= criteria.getVolatility().doubleValue() && volumeRatio >= criteria.getVolume()) {
                     if (closePrice < openPrice) priceChangePercent *= -1;
 
                     DetectedCoin detected = DetectedCoin.builder()
                             .coin(coin)
                             .exchangeCoin(exchangeCoin)
-                            .volatility(Math.round(priceChangePercent * 10.0) / 10.0)
+                            .volatility(BigDecimal.valueOf(priceChangePercent).setScale(2, RoundingMode.HALF_UP))
                             .volume(Math.round(volumeRatio * 10.0) / 10.0)
                             .createdAt(LocalDateTime.now())
                             .build();
@@ -163,13 +165,13 @@ public class CoinDetectionService {
                 double priceChangePercent = (highPrice / lowPrice - 1) * 100;
                 double volumeRatio = prevVolume > 0 ? currentVolume / prevVolume : 0;
                 
-                if (priceChangePercent >= criteria.getVolatility() && volumeRatio >= criteria.getVolume()) {
+                if (priceChangePercent >= criteria.getVolatility().doubleValue() && volumeRatio >= criteria.getVolume()) {
                     if (closePrice < openPrice) priceChangePercent *= -1;
 
                     DetectedCoin detected = DetectedCoin.builder()
                             .coin(coin)
                             .exchangeCoin(exchangeCoin)
-                            .volatility(Math.round(priceChangePercent * 10.0) / 10.0)
+                            .volatility(BigDecimal.valueOf(priceChangePercent).setScale(2, RoundingMode.HALF_UP))
                             .volume(Math.round(volumeRatio * 10.0) / 10.0)
                             .createdAt(LocalDateTime.now())
                             .build();
