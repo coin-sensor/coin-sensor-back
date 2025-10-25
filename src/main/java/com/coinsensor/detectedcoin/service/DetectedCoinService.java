@@ -9,5 +9,5 @@ public interface DetectedCoinService {
     List<DetectedCoinResponse> getAbnormalCoins();
     List<DetectedCoinResponse> getVolatileCoins();
     List<DetectedCoinResponse> getDetectedCoinsByTimeAndType(ExchangeType exchangeType);
-    DetectedCoinGroupResponse getDetectedCoinGroupByTimeAndType(ExchangeType exchangeType);
+    DetectedCoinGroupResponse getDetectedCoinGroupByTimeAndType(String timeframeLabel, ExchangeType exchangeType);
 }

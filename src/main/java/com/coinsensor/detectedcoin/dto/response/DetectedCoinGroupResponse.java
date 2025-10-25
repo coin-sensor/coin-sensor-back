@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class DetectedCoinGroupResponse {
+    private String timeframeLabel;
     private BigDecimal criteriaVolatility;
     private Double criteriaVolume;
     private LocalDateTime detectedAt;

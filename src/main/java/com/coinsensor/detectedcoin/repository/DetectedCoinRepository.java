@@ -23,4 +23,20 @@ public interface DetectedCoinRepository extends JpaRepository<DetectedCoin, Long
         @Param("endTime") LocalDateTime endTime,
         @Param("exchangeType") ExchangeType exchangeType
     );
+    
+    @Query("SELECT dc FROM DetectedCoin dc " +
+           "JOIN FETCH dc.exchangeCoin ec " +
+           "JOIN FETCH dc.detectionGroup dg " +
+           "JOIN FETCH dg.detectionCriteria dcr " +
+           "JOIN FETCH dcr.timeframe tf " +
+           "WHERE dg.detectedAt >= :startTime " +
+           "AND dg.detectedAt < :endTime " +
+           "AND ec.exchangeType = :exchangeType " +
+           "AND tf.timeframeLabel = :timeframeLabel")
+    List<DetectedCoin> findByTimeframeAndExchangeType(
+        @Param("startTime") LocalDateTime startTime,
+        @Param("endTime") LocalDateTime endTime,
+        @Param("timeframeLabel") String timeframeLabel,
+        @Param("exchangeType") ExchangeType exchangeType
+    );
 }

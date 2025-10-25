@@ -35,7 +35,7 @@ public class DetectedCoinController {
     
     @GetMapping("/detected-group")
     public ResponseEntity<DetectedCoinGroupResponse> getDetectedCoinGroup(
-            @RequestParam ExchangeType exchangeType) {
-        return ResponseEntity.ok(detectedCoinService.getDetectedCoinGroupByTimeAndType(exchangeType));
+            @RequestParam String timeframeLabel, @RequestParam ExchangeType exchangeType) {
+        return ResponseEntity.ok(detectedCoinService.getDetectedCoinGroupByTimeAndType(timeframeLabel, exchangeType));
     }
 }

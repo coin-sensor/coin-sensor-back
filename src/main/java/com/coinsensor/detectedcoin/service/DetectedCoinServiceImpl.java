@@ -47,12 +47,12 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
     }
     
     @Override
-    public DetectedCoinGroupResponse getDetectedCoinGroupByTimeAndType(ExchangeType exchangeType) {
+    public DetectedCoinGroupResponse getDetectedCoinGroupByTimeAndType(String timeframeLabel, ExchangeType exchangeType) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.withSecond(0).withNano(0);
         LocalDateTime endTime = startTime.plusMinutes(1);
         
-        List<DetectedCoin> detectedCoins = detectedCoinRepository.findByDetectionTimeRangeAndExchangeType(startTime, endTime, exchangeType);
+        List<DetectedCoin> detectedCoins = detectedCoinRepository.findByTimeframeAndExchangeType(startTime, endTime, timeframeLabel, exchangeType);
         
         if (detectedCoins.isEmpty()) {
             return null;
@@ -60,6 +60,7 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
         
         DetectedCoin firstCoin = detectedCoins.get(0);
         return DetectedCoinGroupResponse.builder()
+                .timeframeLabel(firstCoin.getDetectionGroup().getDetectionCriteria().getTimeframe().getTimeframeLabel())
                 .criteriaVolatility(firstCoin.getDetectionGroup().getDetectionCriteria().getVolatility())
                 .criteriaVolume(firstCoin.getDetectionGroup().getDetectionCriteria().getVolume())
                 .detectedAt(firstCoin.getDetectionGroup().getDetectedAt())
