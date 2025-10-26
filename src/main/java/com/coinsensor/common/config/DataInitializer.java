@@ -4,6 +4,8 @@ import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
 import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchange.repository.ExchangeRepository;
+import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
+import com.coinsensor.scheduler.BinanceCoinScheduler;
 import com.coinsensor.timeframe.entity.Timeframe;
 import com.coinsensor.timeframe.repository.TimeframeRepository;
 import java.math.BigDecimal;
@@ -23,17 +25,20 @@ public class DataInitializer {
     private final ExchangeRepository exchangeRepository;
     private final TimeframeRepository timeframeRepository;
     private final DetectionCriteriaRepository detectionCriteriaRepository;
+    private final ExchangeCoinRepository exchangeCoinRepository;
+    private final BinanceCoinScheduler binanceCoinScheduler;
 
     
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void initData() {
-        if (!exchangeRepository.existsByName("binance")) {
-            Exchange binance = Exchange.builder()
-                    .name("binance")
-                    .build();
-            exchangeRepository.save(binance);
-            log.info("초기 거래소 데이터 생성: binance");
+        if (exchangeRepository.count() == 0) {
+            exchangeRepository.save(new Exchange("binance", Exchange.ExchangeType.spot));
+            exchangeRepository.save(new Exchange("binance", Exchange.ExchangeType.future));
+            exchangeRepository.save(new Exchange("upbit", Exchange.ExchangeType.spot));
+            exchangeRepository.save(new Exchange("bithumb", Exchange.ExchangeType.spot));
+
+            log.info("초기 거래소 데이터 생성 완료");
         }
         
         if (timeframeRepository.count() == 0) {
@@ -56,6 +61,12 @@ public class DataInitializer {
             detectionCriteriaRepository.save(new DetectionCriteria(tf4h, BigDecimal.valueOf(5.00), 2.0));
             
             log.info("초기 감지 기준 데이터 생성 완료");
+        }
+
+        if (exchangeCoinRepository.count() == 0) {
+            binanceCoinScheduler.syncBinanceCoins();
+
+            log.info("초기 바이낸스 코인 데이터 생성 완료");
         }
     }
 }

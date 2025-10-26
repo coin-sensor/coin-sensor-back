@@ -30,18 +30,5 @@ public class ExchangeCoin {
     
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "exchange_type", nullable = false)
-    private ExchangeType exchangeType;
-    
-    public enum ExchangeType {
-        spot, future;
-        
-        @JsonCreator
-        public static ExchangeType fromString(String value) {
-            return valueOf(value.toLowerCase());
-        }
-    }
 
 }

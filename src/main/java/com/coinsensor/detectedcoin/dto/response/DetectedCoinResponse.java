@@ -1,7 +1,6 @@
 package com.coinsensor.detectedcoin.dto.response;
 
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
-import com.coinsensor.exchangecoin.entity.ExchangeCoin.ExchangeType;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,7 +15,6 @@ public class DetectedCoinResponse {
     private BigDecimal volatility;
     private Double volume;
     private LocalDateTime createdAt;
-    private ExchangeType exchangeType;
     
     public static DetectedCoinResponse from(DetectedCoin detectedCoin) {
         return DetectedCoinResponse.builder()
@@ -25,7 +23,6 @@ public class DetectedCoinResponse {
                 .volatility(detectedCoin.getVolatility())
                 .volume(detectedCoin.getVolume())
                 .createdAt(detectedCoin.getCreatedAt())
-                .exchangeType(detectedCoin.getExchangeCoin().getExchangeType())
                 .build();
     }
 }

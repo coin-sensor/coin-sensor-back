@@ -1,5 +1,6 @@
 package com.coinsensor.exchange.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +20,21 @@ public class Exchange {
     @Column(nullable = false)
     private String name;
     
-    public Exchange(String name) {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "exchange_type", nullable = false)
+    private ExchangeType exchangeType;
+    
+    public enum ExchangeType {
+        spot, future;
+        
+        @JsonCreator
+        public static ExchangeType fromString(String value) {
+            return valueOf(value.toLowerCase());
+        }
+    }
+    
+    public Exchange(String name, ExchangeType exchangeType) {
         this.name = name;
+        this.exchangeType = exchangeType;
     }
 }

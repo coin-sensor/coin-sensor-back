@@ -10,6 +10,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class DetectedCoinGroupResponse {
+    private String exchangeName;
+    private String exchangeType;
     private String timeframeLabel;
     private BigDecimal criteriaVolatility;
     private Double criteriaVolume;

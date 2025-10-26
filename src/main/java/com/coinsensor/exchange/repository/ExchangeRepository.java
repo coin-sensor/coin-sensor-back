@@ -12,4 +12,6 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
     boolean existsByName(String name);
 
     Optional<Exchange> findByName(String name);
+    
+    Optional<Exchange> findByNameAndExchangeType(String name, Exchange.ExchangeType exchangeType);
 }

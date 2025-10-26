@@ -8,7 +8,9 @@ import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
 import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
 import com.coinsensor.detectiongroup.entity.DetectionGroup;
 import com.coinsensor.detectiongroup.repository.DetectionGroupRepository;
+import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
+import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,7 @@ import java.util.Locale;
 public class CoinDetectionService {
     
     private final DetectionCriteriaRepository detectionCriteriaRepository;
-    private final CoinRepository coinRepository;
+    private final ExchangeCoinRepository exchangeCoinRepository;
     private final DetectionGroupRepository detectionGroupRepository;
     private final DetectedCoinRepository detectedCoinRepository;
     private final WebClient webClient;
@@ -38,13 +40,13 @@ public class CoinDetectionService {
     
     @Transactional
     public void detectAbnormalCoins(DetectionCriteria criteria) {
-        detectSpotCoins(criteria);
-        detectFutureCoins(criteria);
+        detectBinanceSpotCoins(criteria);
+        detectBinanceFutureCoins(criteria);
     }
     
-    private void detectSpotCoins(DetectionCriteria criteria) {
+    private void detectBinanceSpotCoins(DetectionCriteria criteria) {
         List<DetectedCoin> detectedCoins = new ArrayList<>();
-        List<ExchangeCoin> exchangeCoins = coinRepository.findSpotExchangeCoins();
+        List<ExchangeCoin> exchangeCoins = exchangeCoinRepository.findByExchange_NameAndExchangeTypeAndIsActive("binance", Exchange.ExchangeType.spot, true);
         
         for (ExchangeCoin exchangeCoin : exchangeCoins) {
             Coin coin = exchangeCoin.getCoin();
@@ -98,7 +100,7 @@ public class CoinDetectionService {
             
             StringBuilder summary = new StringBuilder();
             summary.append(String.format("🚨 %s 🚨\n\n", timestamp));
-            summary.append(String.format("기준 : %s (현물), 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
+            summary.append(String.format("기준 : (binance spot), %s, 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
                     criteria.getTimeframe().getTimeframeLabel(),
                     criteria.getVolatility(),
                     criteria.getVolume()));
@@ -110,8 +112,10 @@ public class CoinDetectionService {
                         detected.getVolume()));
             }
             
+            Exchange exchange = exchangeCoins.get(0).getExchange();
             DetectionGroup group = DetectionGroup.builder()
                     .detectionCriteria(criteria)
+                    .exchange(exchange)
                     .detectedAt(LocalDateTime.now())
                     .detectionCount((long) detectedCoins.size())
                     .summary(summary.toString())
@@ -134,9 +138,9 @@ public class CoinDetectionService {
         }
     }
     
-    private void detectFutureCoins(DetectionCriteria criteria) {
+    private void detectBinanceFutureCoins(DetectionCriteria criteria) {
         List<DetectedCoin> detectedCoins = new ArrayList<>();
-        List<ExchangeCoin> exchangeCoins = coinRepository.findFutureExchangeCoins();
+        List<ExchangeCoin> exchangeCoins = exchangeCoinRepository.findByExchange_NameAndExchangeTypeAndIsActive("binance", Exchange.ExchangeType.future, true);
         
         for (ExchangeCoin exchangeCoin : exchangeCoins) {
             Coin coin = exchangeCoin.getCoin();
@@ -190,7 +194,7 @@ public class CoinDetectionService {
             
             StringBuilder summary = new StringBuilder();
             summary.append(String.format("🚨 %s 🚨\n\n", timestamp));
-            summary.append(String.format("기준 : %s (선물), 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
+            summary.append(String.format("기준 : (binance future), %s, 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
                     criteria.getTimeframe().getTimeframeLabel(),
                     criteria.getVolatility(),
                     criteria.getVolume()));
@@ -202,8 +206,10 @@ public class CoinDetectionService {
                         detected.getVolume()));
             }
             
+            Exchange exchange = exchangeCoins.get(0).getExchange();
             DetectionGroup group = DetectionGroup.builder()
                     .detectionCriteria(criteria)
+                    .exchange(exchange)
                     .detectedAt(LocalDateTime.now())
                     .detectionCount((long) detectedCoins.size())
                     .summary(summary.toString())

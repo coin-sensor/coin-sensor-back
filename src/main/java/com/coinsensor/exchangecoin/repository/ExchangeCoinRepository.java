@@ -1,15 +1,21 @@
 package com.coinsensor.exchangecoin.repository;
 
+import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
 public interface ExchangeCoinRepository extends JpaRepository<ExchangeCoin, Long> {
-    boolean existsByExchange_ExchangeIdAndCoin_CoinTickerAndExchangeType(
-            Long exchangeId, String coinTicker, ExchangeCoin.ExchangeType exchangeType);
+    boolean existsByExchange_ExchangeIdAndCoin_CoinTicker(Long exchangeId, String coinTicker);
+    List<ExchangeCoin> findByExchange_ExchangeId(Long exchangeId);
     
-    List<ExchangeCoin> findByExchange_ExchangeIdAndExchangeType(
-            Long exchangeId, ExchangeCoin.ExchangeType exchangeType);
+    @Query("SELECT ec FROM ExchangeCoin ec JOIN FETCH ec.exchange e JOIN FETCH ec.coin WHERE e.name = :exchangeName AND e.exchangeType = :exchangeType AND ec.isActive = :isActive")
+    List<ExchangeCoin> findByExchange_NameAndExchangeTypeAndIsActive(
+            @Param("exchangeName") String exchangeName, 
+            @Param("exchangeType") Exchange.ExchangeType exchangeType, 
+            @Param("isActive") Boolean isActive);
 }

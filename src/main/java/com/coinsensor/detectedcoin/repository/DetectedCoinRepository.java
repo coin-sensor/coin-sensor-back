@@ -1,7 +1,7 @@
 package com.coinsensor.detectedcoin.repository;
 
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
-import com.coinsensor.exchangecoin.entity.ExchangeCoin.ExchangeType;
+import com.coinsensor.exchange.entity.Exchange;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,30 +13,18 @@ import java.util.List;
 public interface DetectedCoinRepository extends JpaRepository<DetectedCoin, Long> {
     
     @Query("SELECT dc FROM DetectedCoin dc " +
-           "JOIN FETCH dc.exchangeCoin ec " +
            "JOIN FETCH dc.detectionGroup dg " +
-           "WHERE dg.detectedAt >= :startTime " +
-           "AND dg.detectedAt < :endTime " +
-           "AND ec.exchangeType = :exchangeType")
-    List<DetectedCoin> findByDetectionTimeRangeAndExchangeType(
+           "JOIN FETCH dg.exchange e " +
+           "WHERE e.name = :exchangeName " +
+           "AND e.exchangeType = :exchangeType " +
+           "AND dg.detectedAt >= :startTime " +
+           "AND dg.detectedAt < :endTime")
+    List<DetectedCoin> findByExchangeNameAndTypeAndTime(
+        @Param("exchangeName") String exchangeName,
+        @Param("exchangeType") Exchange.ExchangeType exchangeType,
         @Param("startTime") LocalDateTime startTime,
-        @Param("endTime") LocalDateTime endTime,
-        @Param("exchangeType") ExchangeType exchangeType
+        @Param("endTime") LocalDateTime endTime
     );
     
-    @Query("SELECT dc FROM DetectedCoin dc " +
-           "JOIN FETCH dc.exchangeCoin ec " +
-           "JOIN FETCH dc.detectionGroup dg " +
-           "JOIN FETCH dg.detectionCriteria dcr " +
-           "JOIN FETCH dcr.timeframe tf " +
-           "WHERE dg.detectedAt >= :startTime " +
-           "AND dg.detectedAt < :endTime " +
-           "AND ec.exchangeType = :exchangeType " +
-           "AND tf.timeframeLabel = :timeframeLabel")
-    List<DetectedCoin> findByTimeframeAndExchangeType(
-        @Param("startTime") LocalDateTime startTime,
-        @Param("endTime") LocalDateTime endTime,
-        @Param("timeframeLabel") String timeframeLabel,
-        @Param("exchangeType") ExchangeType exchangeType
-    );
+    List<DetectedCoin> findByDetectionGroup_DetectionGroupId(Long detectionGroupId);
 }

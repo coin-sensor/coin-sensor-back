@@ -38,9 +38,10 @@ public class BinanceCoinScheduler {
     private void syncSpotCoins() {
         log.info("바이낸스 현물 코인 정보 동기화 시작");
         
-        Exchange binance = exchangeRepository.findByName("binance")
+        Exchange binanceSpot = exchangeRepository.findByNameAndExchangeType("binance", Exchange.ExchangeType.spot)
                 .orElseGet(() -> exchangeRepository.save(Exchange.builder()
                         .name("binance")
+                        .exchangeType(Exchange.ExchangeType.spot)
                         .build()));
         
         try {
@@ -68,8 +69,8 @@ public class BinanceCoinScheduler {
                 
                 activeTickers.add(coinTicker);
                 
-                if (!exchangeCoinRepository.existsByExchange_ExchangeIdAndCoin_CoinTickerAndExchangeType(
-                        binance.getExchangeId(), coinTicker, ExchangeCoin.ExchangeType.spot)) {
+                if (!exchangeCoinRepository.existsByExchange_ExchangeIdAndCoin_CoinTicker(
+                        binanceSpot.getExchangeId(), coinTicker)) {
                     
                     Coin coin = coinRepository.findByCoinTicker(coinTicker)
                             .orElseGet(() -> coinRepository.save(Coin.builder()
@@ -78,10 +79,9 @@ public class BinanceCoinScheduler {
                                     .build()));
                     
                     ExchangeCoin exchangeCoin = ExchangeCoin.builder()
-                            .exchange(binance)
+                            .exchange(binanceSpot)
                             .coin(coin)
                             .isActive(true)
-                            .exchangeType(ExchangeCoin.ExchangeType.spot)
                             .build();
                     exchangeCoinRepository.save(exchangeCoin);
                     newCoins++;
@@ -90,7 +90,7 @@ public class BinanceCoinScheduler {
             
             // 상폐된 코인 비활성화
             int deactivated = exchangeCoinRepository
-                    .findByExchange_ExchangeIdAndExchangeType(binance.getExchangeId(), ExchangeCoin.ExchangeType.spot)
+                    .findByExchange_ExchangeId(binanceSpot.getExchangeId())
                     .stream()
                     .filter(ec -> ec.getIsActive() && !activeTickers.contains(ec.getCoin().getCoinTicker()))
                     .peek(ec -> {
@@ -110,9 +110,10 @@ public class BinanceCoinScheduler {
     private void syncFuturesCoins() {
         log.info("바이낸스 선물 코인 정보 동기화 시작");
         
-        Exchange binance = exchangeRepository.findByName("binance")
+        Exchange binanceFuture = exchangeRepository.findByNameAndExchangeType("binance", Exchange.ExchangeType.future)
                 .orElseGet(() -> exchangeRepository.save(Exchange.builder()
                         .name("binance")
+                        .exchangeType(Exchange.ExchangeType.future)
                         .build()));
         
         try {
@@ -143,8 +144,8 @@ public class BinanceCoinScheduler {
                 
                 activeTickers.add(coinTicker);
                 
-                if (!exchangeCoinRepository.existsByExchange_ExchangeIdAndCoin_CoinTickerAndExchangeType(
-                        binance.getExchangeId(), coinTicker, ExchangeCoin.ExchangeType.future)) {
+                if (!exchangeCoinRepository.existsByExchange_ExchangeIdAndCoin_CoinTicker(
+                        binanceFuture.getExchangeId(), coinTicker)) {
                     
                     Coin coin = coinRepository.findByCoinTicker(coinTicker)
                             .orElseGet(() -> coinRepository.save(Coin.builder()
@@ -153,10 +154,9 @@ public class BinanceCoinScheduler {
                                     .build()));
                     
                     ExchangeCoin exchangeCoin = ExchangeCoin.builder()
-                            .exchange(binance)
+                            .exchange(binanceFuture)
                             .coin(coin)
                             .isActive(true)
-                            .exchangeType(ExchangeCoin.ExchangeType.future)
                             .build();
                     exchangeCoinRepository.save(exchangeCoin);
                     newCoins++;
@@ -164,7 +164,7 @@ public class BinanceCoinScheduler {
             }
             
             int deactivated = exchangeCoinRepository
-                    .findByExchange_ExchangeIdAndExchangeType(binance.getExchangeId(), ExchangeCoin.ExchangeType.future)
+                    .findByExchange_ExchangeId(binanceFuture.getExchangeId())
                     .stream()
                     .filter(ec -> ec.getIsActive() && !activeTickers.contains(ec.getCoin().getCoinTicker()))
                     .peek(ec -> {

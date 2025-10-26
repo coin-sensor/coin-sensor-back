@@ -4,7 +4,8 @@ import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinGroupResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
-import com.coinsensor.exchangecoin.entity.ExchangeCoin.ExchangeType;
+import com.coinsensor.detectiongroup.repository.DetectionGroupRepository;
+import com.coinsensor.exchange.entity.Exchange;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 public class DetectedCoinServiceImpl implements DetectedCoinService {
     
     private final DetectedCoinRepository detectedCoinRepository;
+    private final DetectionGroupRepository detectionGroupRepository;
     
     @Override
     public List<DetectedCoinResponse> getAbnormalCoins() {
@@ -35,36 +37,39 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
     }
     
     @Override
-    public List<DetectedCoinResponse> getDetectedCoinsByTimeAndType(ExchangeType exchangeType) {
+    public List<DetectedCoinResponse> getDetectedCoinsByTimeAndType(String exchangeName, String exchangeType) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.withSecond(0).withNano(0);
         LocalDateTime endTime = startTime.plusMinutes(1);
         
-        return detectedCoinRepository.findByDetectionTimeRangeAndExchangeType(startTime, endTime, exchangeType)
+        Exchange.ExchangeType type = Exchange.ExchangeType.valueOf(exchangeType);
+        return detectedCoinRepository.findByExchangeNameAndTypeAndTime(exchangeName, type, startTime, endTime)
                 .stream()
                 .map(DetectedCoinResponse::from)
                 .toList();
     }
     
     @Override
-    public DetectedCoinGroupResponse getDetectedCoinGroupByTimeAndType(String timeframeLabel, ExchangeType exchangeType) {
+    public DetectedCoinGroupResponse getDetectedCoinGroupByTimeAndType(String exchangeName, String timeframeLabel, String exchangeType) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.withSecond(0).withNano(0);
         LocalDateTime endTime = startTime.plusMinutes(1);
         
-        List<DetectedCoin> detectedCoins = detectedCoinRepository.findByTimeframeAndExchangeType(startTime, endTime, timeframeLabel, exchangeType);
-        
-        if (detectedCoins.isEmpty()) {
-            return null;
-        }
-        
-        DetectedCoin firstCoin = detectedCoins.get(0);
-        return DetectedCoinGroupResponse.builder()
-                .timeframeLabel(firstCoin.getDetectionGroup().getDetectionCriteria().getTimeframe().getTimeframeLabel())
-                .criteriaVolatility(firstCoin.getDetectionGroup().getDetectionCriteria().getVolatility())
-                .criteriaVolume(firstCoin.getDetectionGroup().getDetectionCriteria().getVolume())
-                .detectedAt(firstCoin.getDetectionGroup().getDetectedAt())
-                .coins(detectedCoins.stream().map(DetectedCoinResponse::from).toList())
-                .build();
+        Exchange.ExchangeType type = Exchange.ExchangeType.valueOf(exchangeType);
+        return detectionGroupRepository.findByExchangeAndTimeframeAndTime(
+                exchangeName, type, timeframeLabel, startTime, endTime)
+                .map(group -> {
+                    List<DetectedCoin> detectedCoins = detectedCoinRepository.findByDetectionGroup_DetectionGroupId(group.getDetectionGroupId());
+                    return DetectedCoinGroupResponse.builder()
+                            .exchangeName(group.getExchange().getName())
+                            .exchangeType(group.getExchange().getExchangeType().name())
+                            .timeframeLabel(group.getDetectionCriteria().getTimeframe().getTimeframeLabel())
+                            .criteriaVolatility(group.getDetectionCriteria().getVolatility())
+                            .criteriaVolume(group.getDetectionCriteria().getVolume())
+                            .detectedAt(group.getDetectedAt())
+                            .coins(detectedCoins.stream().map(DetectedCoinResponse::from).toList())
+                            .build();
+                })
+                .orElse(null);
     }
 }

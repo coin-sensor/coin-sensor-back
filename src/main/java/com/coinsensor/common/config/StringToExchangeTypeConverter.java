@@ -1,14 +1,15 @@
 package com.coinsensor.common.config;
 
-import com.coinsensor.exchangecoin.entity.ExchangeCoin.ExchangeType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import com.coinsensor.exchange.entity.Exchange;
+
 @Component
-public class StringToExchangeTypeConverter implements Converter<String, ExchangeType> {
+public class StringToExchangeTypeConverter implements Converter<String, Exchange.ExchangeType> {
     
     @Override
-    public ExchangeType convert(String source) {
-        return ExchangeType.valueOf(source.toLowerCase());
+    public Exchange.ExchangeType convert(String source) {
+        return Exchange.ExchangeType.valueOf(source.toLowerCase());
     }
 }
