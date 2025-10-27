@@ -99,8 +99,9 @@ public class CoinDetectionService {
             String timestamp = now.format(formatter);
             
             StringBuilder summary = new StringBuilder();
-            summary.append(String.format("🚨 %s 🚨\n\n", timestamp));
-            summary.append(String.format("기준 : (binance spot), %s, 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
+            summary.append(String.format("🚨 %s 🚨\n", timestamp));
+            summary.append(String.format("거래소: [Binance-Spot]\n"));
+            summary.append(String.format("기준 : %s, 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
                     criteria.getTimeframe().getTimeframeLabel(),
                     criteria.getVolatility(),
                     criteria.getVolume()));
@@ -193,8 +194,9 @@ public class CoinDetectionService {
             String timestamp = now.format(formatter);
             
             StringBuilder summary = new StringBuilder();
-            summary.append(String.format("🚨 %s 🚨\n\n", timestamp));
-            summary.append(String.format("기준 : (binance future), %s, 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
+            summary.append(String.format("🚨 %s 🚨\n", timestamp));
+            summary.append(String.format("거래소: [Binance-Future]\n"));
+            summary.append(String.format("기준 : %s, 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
                     criteria.getTimeframe().getTimeframeLabel(),
                     criteria.getVolatility(),
                     criteria.getVolume()));
