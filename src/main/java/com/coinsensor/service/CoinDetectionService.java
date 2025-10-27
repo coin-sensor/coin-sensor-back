@@ -252,10 +252,12 @@ public class CoinDetectionService {
     }
     
     private void sendDetectionNotification(DetectionGroup group, List<DetectedCoin> detectedCoins, String exchangeType) {
+        String timeframe = group.getDetectionCriteria().getTimeframe().getTimeframeLabel();
+        
         DetectedCoinGroupResponse response = DetectedCoinGroupResponse.builder()
                 .exchangeName(group.getExchange().getName())
                 .exchangeType(exchangeType)
-                .timeframeLabel(group.getDetectionCriteria().getTimeframe().getTimeframeLabel())
+                .timeframeLabel(timeframe)
                 .criteriaVolatility(group.getDetectionCriteria().getVolatility())
                 .criteriaVolume(group.getDetectionCriteria().getVolume())
                 .detectedAt(group.getDetectedAt())
@@ -264,6 +266,6 @@ public class CoinDetectionService {
                         .toList())
                 .build();
         
-        messagingTemplate.convertAndSend("/topic/detection", response);
+        messagingTemplate.convertAndSend("/topic/detection/" + timeframe, response);
     }
 }
