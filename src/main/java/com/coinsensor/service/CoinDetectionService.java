@@ -11,10 +11,13 @@ import com.coinsensor.detectiongroup.repository.DetectionGroupRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
+import com.coinsensor.detectedcoin.dto.response.DetectedCoinGroupResponse;
+import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +41,7 @@ public class CoinDetectionService {
     private final DetectedCoinRepository detectedCoinRepository;
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
+    private final SimpMessagingTemplate messagingTemplate;
     
     @Transactional
     public void detectAbnormalCoins(DetectionCriteria criteria) {
@@ -135,6 +140,7 @@ public class CoinDetectionService {
                 detectedCoinRepository.save(detected);
             }
             
+            sendDetectionNotification(group, detectedCoins, "spot");
             log.info("현물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
         }
     }
@@ -230,6 +236,7 @@ public class CoinDetectionService {
                 detectedCoinRepository.save(detected);
             }
             
+            sendDetectionNotification(group, detectedCoins, "future");
             log.info("선물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
         }
     }
@@ -242,5 +249,21 @@ public class CoinDetectionService {
                 detectAbnormalCoins(criteria);
             }
         }
+    }
+    
+    private void sendDetectionNotification(DetectionGroup group, List<DetectedCoin> detectedCoins, String exchangeType) {
+        DetectedCoinGroupResponse response = DetectedCoinGroupResponse.builder()
+                .exchangeName(group.getExchange().getName())
+                .exchangeType(exchangeType)
+                .timeframeLabel(group.getDetectionCriteria().getTimeframe().getTimeframeLabel())
+                .criteriaVolatility(group.getDetectionCriteria().getVolatility())
+                .criteriaVolume(group.getDetectionCriteria().getVolume())
+                .detectedAt(group.getDetectedAt())
+                .coins(detectedCoins.stream()
+                        .map(DetectedCoinResponse::from)
+                        .toList())
+                .build();
+        
+        messagingTemplate.convertAndSend("/topic/detection", response);
     }
 }
