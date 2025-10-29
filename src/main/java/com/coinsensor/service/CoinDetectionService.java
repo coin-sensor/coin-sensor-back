@@ -2,6 +2,7 @@ package com.coinsensor.service;
 
 import com.coinsensor.coin.entity.Coin;
 import com.coinsensor.coin.repository.CoinRepository;
+import com.coinsensor.common.util.SummaryUtil;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
@@ -51,7 +52,7 @@ public class CoinDetectionService {
     
     private void detectBinanceSpotCoins(DetectionCriteria criteria) {
         List<DetectedCoin> detectedCoins = new ArrayList<>();
-        List<ExchangeCoin> exchangeCoins = exchangeCoinRepository.findByExchange_NameAndExchangeTypeAndIsActive("binance", Exchange.ExchangeType.spot, true);
+        List<ExchangeCoin> exchangeCoins = exchangeCoinRepository.findByExchange_NameAndTypeAndIsActive("binance", Exchange.Type.spot, true);
         
         for (ExchangeCoin exchangeCoin : exchangeCoins) {
             Coin coin = exchangeCoin.getCoin();
@@ -99,32 +100,13 @@ public class CoinDetectionService {
         }
         
         if (!detectedCoins.isEmpty()) {
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd(EEE) HH시 mm분 ss초", Locale.KOREAN);
-            String timestamp = now.format(formatter);
-            
-            StringBuilder summary = new StringBuilder();
-            summary.append(String.format("🚨 %s 🚨\n", timestamp));
-            summary.append(String.format("거래소: [Binance-Spot]\n"));
-            summary.append(String.format("기준 : %s, 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
-                    criteria.getTimeframe().getTimeframeLabel(),
-                    criteria.getVolatility(),
-                    criteria.getVolume()));
-            
-            for (DetectedCoin detected : detectedCoins) {
-                summary.append(String.format("종목 : %s\n변동률 : %5.2f%%,  거래량 : %5.1f배\n\n",
-                        detected.getCoin().getCoinTicker(),
-                        detected.getVolatility(),
-                        detected.getVolume()));
-            }
-            
-            Exchange exchange = exchangeCoins.get(0).getExchange();
+            Exchange exchange = exchangeCoins.getFirst().getExchange();
             DetectionGroup group = DetectionGroup.builder()
                     .detectionCriteria(criteria)
                     .exchange(exchange)
                     .detectedAt(LocalDateTime.now())
                     .detectionCount((long) detectedCoins.size())
-                    .summary(summary.toString())
+                    .summary(SummaryUtil.create(criteria, detectedCoins))
                     .build();
             detectionGroupRepository.save(group);
             
@@ -140,14 +122,14 @@ public class CoinDetectionService {
                 detectedCoinRepository.save(detected);
             }
             
-            sendDetectionNotification(group, detectedCoins, "spot");
+            sendDetectionNotification(group, detectedCoins);
             log.info("현물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
         }
     }
     
     private void detectBinanceFutureCoins(DetectionCriteria criteria) {
         List<DetectedCoin> detectedCoins = new ArrayList<>();
-        List<ExchangeCoin> exchangeCoins = exchangeCoinRepository.findByExchange_NameAndExchangeTypeAndIsActive("binance", Exchange.ExchangeType.future, true);
+        List<ExchangeCoin> exchangeCoins = exchangeCoinRepository.findByExchange_NameAndTypeAndIsActive("binance", Exchange.Type.future, true);
         
         for (ExchangeCoin exchangeCoin : exchangeCoins) {
             Coin coin = exchangeCoin.getCoin();
@@ -195,32 +177,13 @@ public class CoinDetectionService {
         }
         
         if (!detectedCoins.isEmpty()) {
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd(EEE) HH시 mm분 ss초", Locale.KOREAN);
-            String timestamp = now.format(formatter);
-            
-            StringBuilder summary = new StringBuilder();
-            summary.append(String.format("🚨 %s 🚨\n", timestamp));
-            summary.append(String.format("거래소: [Binance-Future]\n"));
-            summary.append(String.format("기준 : %s, 기준 변동률 : %.2f%%, 기준 배수 : %.1f배\n\n",
-                    criteria.getTimeframe().getTimeframeLabel(),
-                    criteria.getVolatility(),
-                    criteria.getVolume()));
-            
-            for (DetectedCoin detected : detectedCoins) {
-                summary.append(String.format("종목 : %s\n변동률 : %5.2f%%,  거래량 : %5.1f배\n\n",
-                        detected.getCoin().getCoinTicker(),
-                        detected.getVolatility(),
-                        detected.getVolume()));
-            }
-            
-            Exchange exchange = exchangeCoins.get(0).getExchange();
+            Exchange exchange = exchangeCoins.getFirst().getExchange();
             DetectionGroup group = DetectionGroup.builder()
                     .detectionCriteria(criteria)
                     .exchange(exchange)
                     .detectedAt(LocalDateTime.now())
                     .detectionCount((long) detectedCoins.size())
-                    .summary(summary.toString())
+                    .summary(SummaryUtil.create(criteria, detectedCoins))
                     .build();
             detectionGroupRepository.save(group);
             
@@ -236,7 +199,7 @@ public class CoinDetectionService {
                 detectedCoinRepository.save(detected);
             }
             
-            sendDetectionNotification(group, detectedCoins, "future");
+            sendDetectionNotification(group, detectedCoins);
             log.info("선물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
         }
     }
@@ -251,11 +214,13 @@ public class CoinDetectionService {
         }
     }
     
-    private void sendDetectionNotification(DetectionGroup group, List<DetectedCoin> detectedCoins, String exchangeType) {
+    private void sendDetectionNotification(DetectionGroup group, List<DetectedCoin> detectedCoins) {
         String timeframe = group.getDetectionCriteria().getTimeframe().getTimeframeLabel();
+        String exchangeName = group.getExchange().getName();
+        String exchangeType = group.getExchange().getType().name();
         
         DetectedCoinGroupResponse response = DetectedCoinGroupResponse.builder()
-                .exchangeName(group.getExchange().getName())
+                .exchangeName(exchangeName)
                 .exchangeType(exchangeType)
                 .timeframeLabel(timeframe)
                 .criteriaVolatility(group.getDetectionCriteria().getVolatility())
@@ -266,6 +231,8 @@ public class CoinDetectionService {
                         .toList())
                 .build();
         
-        messagingTemplate.convertAndSend("/topic/detection/" + timeframe, response);
+        String topic = String.format("/topic/detection/exchanges/%s/exchangeTypes/%s/timeframes/%s",
+                exchangeName, exchangeType, timeframe);
+        messagingTemplate.convertAndSend(topic, response);
     }
 }

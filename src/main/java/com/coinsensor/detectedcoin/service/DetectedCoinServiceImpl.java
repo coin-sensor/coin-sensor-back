@@ -42,7 +42,7 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
         LocalDateTime startTime = now.withSecond(0).withNano(0);
         LocalDateTime endTime = startTime.plusMinutes(1);
         
-        Exchange.ExchangeType type = Exchange.ExchangeType.valueOf(exchangeType);
+        Exchange.Type type = Exchange.Type.valueOf(exchangeType);
         return detectedCoinRepository.findByExchangeNameAndTypeAndTime(exchangeName, type, startTime, endTime)
                 .stream()
                 .map(DetectedCoinResponse::from)
@@ -55,14 +55,14 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
         LocalDateTime startTime = now.withSecond(0).withNano(0);
         LocalDateTime endTime = startTime.plusMinutes(1);
         
-        Exchange.ExchangeType type = Exchange.ExchangeType.valueOf(exchangeType);
+        Exchange.Type type = Exchange.Type.valueOf(exchangeType);
         return detectionGroupRepository.findByExchangeAndTimeframeAndTime(
                 exchangeName, type, timeframeLabel, startTime, endTime)
                 .map(group -> {
                     List<DetectedCoin> detectedCoins = detectedCoinRepository.findByDetectionGroup_DetectionGroupId(group.getDetectionGroupId());
                     return DetectedCoinGroupResponse.builder()
                             .exchangeName(group.getExchange().getName())
-                            .exchangeType(group.getExchange().getExchangeType().name())
+                            .exchangeType(group.getExchange().getType().name())
                             .timeframeLabel(group.getDetectionCriteria().getTimeframe().getTimeframeLabel())
                             .criteriaVolatility(group.getDetectionCriteria().getVolatility())
                             .criteriaVolume(group.getDetectionCriteria().getVolume())

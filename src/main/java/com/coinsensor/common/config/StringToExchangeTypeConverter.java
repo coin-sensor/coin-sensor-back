@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 import com.coinsensor.exchange.entity.Exchange;
 
 @Component
-public class StringToExchangeTypeConverter implements Converter<String, Exchange.ExchangeType> {
+public class StringToExchangeTypeConverter implements Converter<String, Exchange.Type> {
     
     @Override
-    public Exchange.ExchangeType convert(String source) {
-        return Exchange.ExchangeType.valueOf(source.toLowerCase());
+    public Exchange.Type convert(String source) {
+        return Exchange.Type.valueOf(source.toLowerCase());
     }
 }

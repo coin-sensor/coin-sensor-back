@@ -17,13 +17,13 @@ public interface DetectionGroupRepository extends JpaRepository<DetectionGroup, 
            "JOIN FETCH dg.detectionCriteria dc " +
            "JOIN FETCH dc.timeframe tf " +
            "WHERE e.name = :exchangeName " +
-           "AND e.exchangeType = :exchangeType " +
+           "AND e.type = :exchangeType " +
            "AND tf.timeframeLabel = :timeframeLabel " +
            "AND dg.detectedAt >= :startTime " +
            "AND dg.detectedAt < :endTime")
     Optional<DetectionGroup> findByExchangeAndTimeframeAndTime(
         @Param("exchangeName") String exchangeName,
-        @Param("exchangeType") Exchange.ExchangeType exchangeType,
+        @Param("exchangeType") Exchange.Type exchangeType,
         @Param("timeframeLabel") String timeframeLabel,
         @Param("startTime") LocalDateTime startTime,
         @Param("endTime") LocalDateTime endTime

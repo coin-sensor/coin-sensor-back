@@ -38,10 +38,10 @@ public class BinanceCoinScheduler {
     private void syncSpotCoins() {
         log.info("바이낸스 현물 코인 정보 동기화 시작");
         
-        Exchange binanceSpot = exchangeRepository.findByNameAndExchangeType("binance", Exchange.ExchangeType.spot)
+        Exchange binanceSpot = exchangeRepository.findByNameAndType("binance", Exchange.Type.spot)
                 .orElseGet(() -> exchangeRepository.save(Exchange.builder()
                         .name("binance")
-                        .exchangeType(Exchange.ExchangeType.spot)
+                        .type(Exchange.Type.spot)
                         .build()));
         
         try {
@@ -110,10 +110,10 @@ public class BinanceCoinScheduler {
     private void syncFuturesCoins() {
         log.info("바이낸스 선물 코인 정보 동기화 시작");
         
-        Exchange binanceFuture = exchangeRepository.findByNameAndExchangeType("binance", Exchange.ExchangeType.future)
+        Exchange binanceFuture = exchangeRepository.findByNameAndType("binance", Exchange.Type.future)
                 .orElseGet(() -> exchangeRepository.save(Exchange.builder()
                         .name("binance")
-                        .exchangeType(Exchange.ExchangeType.future)
+                        .type(Exchange.Type.future)
                         .build()));
         
         try {

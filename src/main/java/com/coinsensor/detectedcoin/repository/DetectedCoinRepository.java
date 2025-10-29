@@ -16,12 +16,12 @@ public interface DetectedCoinRepository extends JpaRepository<DetectedCoin, Long
            "JOIN FETCH dc.detectionGroup dg " +
            "JOIN FETCH dg.exchange e " +
            "WHERE e.name = :exchangeName " +
-           "AND e.exchangeType = :exchangeType " +
+           "AND e.type = :exchangeType " +
            "AND dg.detectedAt >= :startTime " +
            "AND dg.detectedAt < :endTime")
     List<DetectedCoin> findByExchangeNameAndTypeAndTime(
         @Param("exchangeName") String exchangeName,
-        @Param("exchangeType") Exchange.ExchangeType exchangeType,
+        @Param("exchangeType") Exchange.Type exchangeType,
         @Param("startTime") LocalDateTime startTime,
         @Param("endTime") LocalDateTime endTime
     );

@@ -33,10 +33,10 @@ public class DataInitializer {
     @Transactional
     public void initData() {
         if (exchangeRepository.count() == 0) {
-            exchangeRepository.save(new Exchange("binance", Exchange.ExchangeType.spot));
-            exchangeRepository.save(new Exchange("binance", Exchange.ExchangeType.future));
-            exchangeRepository.save(new Exchange("upbit", Exchange.ExchangeType.spot));
-            exchangeRepository.save(new Exchange("bithumb", Exchange.ExchangeType.spot));
+            exchangeRepository.save(new Exchange("binance", Exchange.Type.spot));
+            exchangeRepository.save(new Exchange("binance", Exchange.Type.future));
+            exchangeRepository.save(new Exchange("upbit", Exchange.Type.spot));
+            exchangeRepository.save(new Exchange("bithumb", Exchange.Type.spot));
 
             log.info("초기 거래소 데이터 생성 완료");
         }

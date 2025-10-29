@@ -13,5 +13,5 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
 
     Optional<Exchange> findByName(String name);
     
-    Optional<Exchange> findByNameAndExchangeType(String name, Exchange.ExchangeType exchangeType);
+    Optional<Exchange> findByNameAndType(String name, Exchange.Type type);
 }
