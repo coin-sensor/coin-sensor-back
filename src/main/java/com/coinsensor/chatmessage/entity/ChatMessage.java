@@ -1,5 +1,6 @@
 package com.coinsensor.chatmessage.entity;
 
+import com.coinsensor.chatmessage.dto.request.ChatMessageRequest;
 import com.coinsensor.chatroom.entity.ChatRoom;
 import com.coinsensor.user.entity.User;
 import jakarta.persistence.*;
@@ -47,4 +48,17 @@ public class ChatMessage {
         this.isDeleted = isDeleted;
         this.createdAt = createdAt;
     }
+
+    public static ChatMessage to(ChatRoom chatRoom, User user, ChatMessageRequest request) {
+        return ChatMessage.builder()
+            .chatRoom(chatRoom)
+            .user(user)
+            .nickname(request.getNickname())
+            .message(request.getMessage())
+            .isDeleted(false)
+            .createdAt(LocalDateTime.now())
+            .build();
+    }
+
+
 }

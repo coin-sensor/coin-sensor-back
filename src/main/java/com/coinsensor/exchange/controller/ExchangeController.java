@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/exchanges")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ExchangeController {
     
     private final ExchangeService exchangeService;

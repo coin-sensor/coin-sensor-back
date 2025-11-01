@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/events")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class EconomicEventController {
     
     private final EconomicEventService economicEventService;

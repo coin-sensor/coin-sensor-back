@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/sync")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class CoinSyncController {
     
     private final BinanceCoinScheduler binanceCoinScheduler;

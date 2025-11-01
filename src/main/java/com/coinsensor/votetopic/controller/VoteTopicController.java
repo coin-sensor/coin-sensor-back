@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/vote")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class VoteTopicController {
     
     private final VoteTopicService voteTopicService;

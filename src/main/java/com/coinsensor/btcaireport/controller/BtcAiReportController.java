@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/analysis")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class BtcAiReportController {
     
     private final BtcAiReportService btcAiReportService;

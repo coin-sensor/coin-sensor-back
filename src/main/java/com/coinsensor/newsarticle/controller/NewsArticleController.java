@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/news")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class NewsArticleController {
     
     private final NewsArticleService newsArticleService;

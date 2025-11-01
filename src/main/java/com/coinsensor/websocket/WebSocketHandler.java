@@ -33,6 +33,8 @@ public class WebSocketHandler implements org.springframework.web.socket.WebSocke
         } else if (payload.startsWith("UNSUBSCRIBE:")) {
             String topic = payload.substring(12);
             unsubscribe(session, topic);
+        } else if (payload.startsWith("CHAT:")) {
+            handleChatMessage(session, payload);
         }
     }
     
@@ -78,6 +80,24 @@ public class WebSocketHandler implements org.springframework.web.socket.WebSocke
             broadcast("coins", message);
         } catch (Exception e) {
             log.error("Failed to broadcast coin data", e);
+        }
+    }
+    
+    private void handleChatMessage(WebSocketSession session, String payload) {
+        try {
+            String uuid = (String) session.getAttributes().get("uuid");
+            String chatMessage = payload.substring(5); // "CHAT:" 제거
+            
+            // TODO: DB에 채팅 메시지 저장
+            // chatService.saveChatMessage(uuid, chatMessage);
+            
+            // 채팅방의 모든 사용자에게 브로드캐스트
+            String broadcastMessage = String.format("{\"type\":\"chat\",\"uuid\":\"%s\",\"message\":\"%s\"}", uuid, chatMessage);
+            broadcast("chat", broadcastMessage);
+            
+            log.info("Chat message from {}: {}", uuid, chatMessage);
+        } catch (Exception e) {
+            log.error("Failed to handle chat message", e);
         }
     }
     

@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/coins")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class CoinController {
     
     private final CoinService coinService;

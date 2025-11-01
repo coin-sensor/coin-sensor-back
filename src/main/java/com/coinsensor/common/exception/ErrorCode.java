@@ -16,7 +16,8 @@ public enum ErrorCode {
     VOTE_TOPIC_NOT_FOUND("투표 주제를 찾을 수 없습니다."),
     ALREADY_VOTED("이미 투표하셨습니다."),
     NEWS_NOT_FOUND("뉴스를 찾을 수 없습니다."),
-    REPORT_NOT_FOUND("리포트를 찾을 수 없습니다.");
+    REPORT_NOT_FOUND("리포트를 찾을 수 없습니다."),
+    ROOM_NOT_FOUND("채팅방을 찾을 수 없습니다.");
     
     private final String message;
 }

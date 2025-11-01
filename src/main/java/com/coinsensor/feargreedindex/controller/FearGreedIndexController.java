@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/market")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class FearGreedIndexController {
     
     private final FearGreedIndexService fearGreedIndexService;

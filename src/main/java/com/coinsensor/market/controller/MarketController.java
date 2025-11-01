@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/market")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class MarketController {
     
     @GetMapping("/overview")

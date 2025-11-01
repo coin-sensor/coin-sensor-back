@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/market")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class KimchiPremiumController {
     
     private final KimchiPremiumService kimchiPremiumService;

@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/coins")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class CoinOhlcvController {
     
     private final CoinOhlcvService coinOhlcvService;

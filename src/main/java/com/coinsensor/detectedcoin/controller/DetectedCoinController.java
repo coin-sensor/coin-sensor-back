@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/coins")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class DetectedCoinController {
     
     private final DetectedCoinService detectedCoinService;
