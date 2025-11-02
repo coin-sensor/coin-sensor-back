@@ -7,13 +7,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class RoomResponse {
+public class ChatRoomResponse {
     private Long roomId;
     private String roomName;
     private LocalDateTime createdAt;
     
-    public static RoomResponse from(ChatRoom chatRoom) {
-        return RoomResponse.builder()
+    public static ChatRoomResponse from(ChatRoom chatRoom) {
+        return ChatRoomResponse.builder()
                 .roomId(chatRoom.getRoomId())
                 .roomName(chatRoom.getRoomName())
                 .createdAt(chatRoom.getCreatedAt())

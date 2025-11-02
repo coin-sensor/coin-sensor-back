@@ -23,8 +23,12 @@ public class ChatRoom {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
-    public ChatRoom(String roomName, LocalDateTime createdAt) {
+    public ChatRoom(String roomName) {
         this.roomName = roomName;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void updateRoomName(String roomName) {
+        this.roomName = roomName;
     }
 }

@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class RoomRequest {
+public class ChatRoomRequest {
     private String roomName;
 }

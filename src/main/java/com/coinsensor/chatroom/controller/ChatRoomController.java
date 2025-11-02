@@ -1,8 +1,8 @@
 package com.coinsensor.chatroom.controller;
 
-import com.coinsensor.chatroom.dto.request.RoomRequest;
-import com.coinsensor.chatroom.dto.response.RoomResponse;
-import com.coinsensor.chatroom.service.RoomService;
+import com.coinsensor.chatroom.dto.request.ChatRoomRequest;
+import com.coinsensor.chatroom.dto.response.ChatRoomResponse;
+import com.coinsensor.chatroom.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,27 +11,27 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
-public class RoomController {
+public class ChatRoomController {
     
-    private final RoomService roomService;
+    private final ChatRoomService roomService;
     
     @PostMapping("/rooms")
-    public ResponseEntity<RoomResponse> createRoom(@RequestBody RoomRequest request) {
+    public ResponseEntity<ChatRoomResponse> createRoom(@RequestBody ChatRoomRequest request) {
         return ResponseEntity.ok(roomService.createRoom(request));
     }
     
     @GetMapping("/rooms")
-    public ResponseEntity<List<RoomResponse>> getAllRooms() {
+    public ResponseEntity<List<ChatRoomResponse>> getAllRooms() {
         return ResponseEntity.ok(roomService.getAllRooms());
     }
     
     @GetMapping("/rooms/{roomId}")
-    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) {
+    public ResponseEntity<ChatRoomResponse> getRoomById(@PathVariable Long roomId) {
         return ResponseEntity.ok(roomService.getRoomById(roomId));
     }
     
     @PutMapping("/rooms/{roomId}")
-    public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long roomId, @RequestBody RoomRequest request) {
+    public ResponseEntity<ChatRoomResponse> updateRoom(@PathVariable Long roomId, @RequestBody ChatRoomRequest request) {
         return ResponseEntity.ok(roomService.updateRoom(roomId, request));
     }
     
