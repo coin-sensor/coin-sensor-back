@@ -16,8 +16,8 @@ public class VoteTopic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vote_topic_id")
     private Long voteTopicId;
-    
-    @Column(nullable = false)
+
+    @Column(name = "title", nullable = false)
     private String title;
     
     @Column(name = "is_active", nullable = false)

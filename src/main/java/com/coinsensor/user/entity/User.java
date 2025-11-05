@@ -35,12 +35,16 @@ public class User {
     @Column(nullable = false)
     private String role;
     
-    public User(String uuid, String ipAddress, Boolean isBanned, LocalDateTime lastActive, String nickname, String role) {
+    @Column(nullable = false)
+    private Boolean notification;
+    
+    public User(String uuid, String ipAddress, Boolean isBanned, LocalDateTime lastActive, String nickname, String role, Boolean notification) {
         this.uuid = uuid;
         this.ipAddress = ipAddress;
         this.isBanned = isBanned;
         this.lastActive = lastActive;
         this.nickname = nickname;
         this.role = role;
+        this.notification = notification;
     }
 }

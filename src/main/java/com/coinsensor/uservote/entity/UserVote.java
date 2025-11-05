@@ -32,13 +32,13 @@ public class UserVote {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    @Column(name = "voted_at", nullable = false)
-    private LocalDateTime votedAt;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
     
-    public UserVote(VoteTopic voteTopic, VoteOption voteOption, User user, LocalDateTime votedAt) {
+    public UserVote(VoteTopic voteTopic, VoteOption voteOption, User user, LocalDateTime createdAt) {
         this.voteTopic = voteTopic;
         this.voteOption = voteOption;
         this.user = user;
-        this.votedAt = votedAt;
+        this.createdAt = createdAt;
     }
 }

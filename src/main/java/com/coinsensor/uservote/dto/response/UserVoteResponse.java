@@ -21,7 +21,7 @@ public class UserVoteResponse {
                 .voteTopicId(entity.getVoteTopic().getVoteTopicId())
                 .voteOptionId(entity.getVoteOption().getVoteOptionId())
                 .userId(entity.getUser().getUserId())
-                .votedAt(entity.getVotedAt())
+                .votedAt(entity.getCreatedAt())
                 .build();
     }
 }

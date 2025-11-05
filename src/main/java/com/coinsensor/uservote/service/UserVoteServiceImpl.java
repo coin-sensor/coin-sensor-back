@@ -41,7 +41,7 @@ public class UserVoteServiceImpl implements UserVoteService {
                 .voteTopic(voteTopic)
                 .voteOption(voteOption)
                 .user(user)
-                .votedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .build();
         
         return UserVoteResponse.from(userVoteRepository.save(userVote));
