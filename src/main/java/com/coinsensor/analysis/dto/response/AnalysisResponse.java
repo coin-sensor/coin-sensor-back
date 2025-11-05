@@ -1,6 +1,6 @@
-package com.coinsensor.btcaireport.dto.response;
+package com.coinsensor.analysis.dto.response;
 
-import com.coinsensor.btcaireport.entity.BtcAiReport;
+import com.coinsensor.analysis.entity.Analysis;
 import lombok.*;
 import java.time.LocalDate;
 
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BtcAiReportResponse {
+public class AnalysisResponse {
     private Long reportId;
     private LocalDate reportDate;
     private String summaryText;
@@ -16,8 +16,8 @@ public class BtcAiReportResponse {
     private Boolean isVolatilityAlert;
     private String recommendation;
     
-    public static BtcAiReportResponse from(BtcAiReport entity) {
-        return BtcAiReportResponse.builder()
+    public static AnalysisResponse from(Analysis entity) {
+        return AnalysisResponse.builder()
                 .reportId(entity.getReportId())
                 .reportDate(entity.getReportDate())
                 .summaryText(entity.getSummaryText())

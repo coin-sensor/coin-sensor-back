@@ -1,4 +1,4 @@
-package com.coinsensor.btcaireport.entity;
+package com.coinsensor.analysis.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,20 +6,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "btc_ai_reports")
+@Table(name = "btc_ai_analysiss")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class BtcAiReport {
+public class Analysis {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "report_id")
-    private Long reportId;
+    @Column(name = "analysis_id")
+    private Long analysisId;
     
-    @Column(name = "report_date", nullable = false)
-    private LocalDate reportDate;
+    @Column(name = "analysis_date", nullable = false)
+    private LocalDate analysisDate;
     
     @Column(name = "summary_text", columnDefinition = "TEXT")
     private String summaryText;
@@ -37,8 +37,8 @@ public class BtcAiReport {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
-    public BtcAiReport(LocalDate reportDate, String summaryText, TrendPrediction trendPrediction, Boolean isVolatilityAlert, String recommendation, LocalDateTime createdAt) {
-        this.reportDate = reportDate;
+    public Analysis(LocalDate analysisDate, String summaryText, TrendPrediction trendPrediction, Boolean isVolatilityAlert, String recommendation, LocalDateTime createdAt) {
+        this.analysisDate = analysisDate;
         this.summaryText = summaryText;
         this.trendPrediction = trendPrediction;
         this.isVolatilityAlert = isVolatilityAlert;
