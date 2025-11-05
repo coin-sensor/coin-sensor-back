@@ -1,8 +1,9 @@
 package com.coinsensor.analysis.dto.response;
 
-import com.coinsensor.analysis.entity.Analysis;
 import lombok.*;
 import java.time.LocalDate;
+
+import com.coinsensor.analysis.entity.Analysis;
 
 @Getter
 @NoArgsConstructor
@@ -16,14 +17,13 @@ public class AnalysisResponse {
     private Boolean isVolatilityAlert;
     private String recommendation;
     
-    public static AnalysisResponse from(Analysis entity) {
+    public static AnalysisResponse from(Analysis analysis) {
         return AnalysisResponse.builder()
-                .reportId(entity.getReportId())
-                .reportDate(entity.getReportDate())
-                .summaryText(entity.getSummaryText())
-                .trendPrediction(entity.getTrendPrediction() != null ? entity.getTrendPrediction().name() : null)
-                .isVolatilityAlert(entity.getIsVolatilityAlert())
-                .recommendation(entity.getRecommendation())
+                .reportId(analysis.getAnalysisId())
+                .summaryText(analysis.getSummaryText())
+                .trendPrediction(analysis.getTrendPrediction() != null ? analysis.getTrendPrediction().name() : null)
+                .isVolatilityAlert(analysis.getIsVolatilityAlert())
+                .recommendation(analysis.getRecommendation())
                 .build();
     }
 }

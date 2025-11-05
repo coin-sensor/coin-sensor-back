@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AnalysisServiceImpl implements AnalysisService {
     
-    private final AnalysisRepository btcAiReportRepository;
+    private final AnalysisRepository analysisRepository;
     
     @Override
-    public AnalysisResponse getLatestReport() {
-        return btcAiReportRepository.findAll().stream()
+    public AnalysisResponse getLatestAnalysis() {
+        return analysisRepository.findAll().stream()
                 .reduce((first, second) -> second)
                 .map(AnalysisResponse::from)
                 .orElse(null);

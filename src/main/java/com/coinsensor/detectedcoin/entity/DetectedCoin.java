@@ -40,15 +40,15 @@ public class DetectedCoin {
     @Column(nullable = false)
     private Double volume;
     
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "detected_at", nullable = false)
+    private LocalDateTime detectedAt;
     
-    public DetectedCoin(DetectionGroup detectionGroup, Coin coin, ExchangeCoin exchangeCoin, BigDecimal volatility, Double volume, LocalDateTime createdAt) {
+    public DetectedCoin(DetectionGroup detectionGroup, Coin coin, ExchangeCoin exchangeCoin, BigDecimal volatility, Double volume, LocalDateTime detectedAt) {
         this.detectionGroup = detectionGroup;
         this.coin = coin;
         this.exchangeCoin = exchangeCoin;
         this.volatility = volatility;
         this.volume = volume;
-        this.createdAt = createdAt;
+        this.detectedAt = detectedAt;
     }
 }

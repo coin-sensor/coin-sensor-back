@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AnalysisController {
     
-    private final AnalysisService btcAiReportService;
+    private final AnalysisService analysisService;
     
     @GetMapping("/daily-report")
-    public ResponseEntity<AnalysisResponse> getDailyReport() {
-        return ResponseEntity.ok(btcAiReportService.getLatestReport());
+    public ResponseEntity<AnalysisResponse> getLatestAnalysis() {
+        return ResponseEntity.ok(analysisService.getLatestAnalysis());
     }
 }

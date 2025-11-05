@@ -89,7 +89,7 @@ public class CoinDetectionService {
                             .exchangeCoin(exchangeCoin)
                             .volatility(BigDecimal.valueOf(priceChangePercent).setScale(2, RoundingMode.HALF_UP))
                             .volume(Math.round(volumeRatio * 10.0) / 10.0)
-                            .createdAt(LocalDateTime.now())
+                            .detectedAt(LocalDateTime.now())
                             .build();
                     detectedCoins.add(detected);
                 }
@@ -117,7 +117,7 @@ public class CoinDetectionService {
                         .exchangeCoin(detected.getExchangeCoin())
                         .volatility(detected.getVolatility())
                         .volume(detected.getVolume())
-                        .createdAt(detected.getCreatedAt())
+                        .detectedAt(detected.getDetectedAt())
                         .build();
                 detectedCoinRepository.save(detected);
             }
@@ -166,7 +166,7 @@ public class CoinDetectionService {
                             .exchangeCoin(exchangeCoin)
                             .volatility(BigDecimal.valueOf(priceChangePercent).setScale(2, RoundingMode.HALF_UP))
                             .volume(Math.round(volumeRatio * 10.0) / 10.0)
-                            .createdAt(LocalDateTime.now())
+                            .detectedAt(LocalDateTime.now())
                             .build();
                     detectedCoins.add(detected);
                 }
@@ -194,7 +194,7 @@ public class CoinDetectionService {
                         .exchangeCoin(detected.getExchangeCoin())
                         .volatility(detected.getVolatility())
                         .volume(detected.getVolume())
-                        .createdAt(detected.getCreatedAt())
+                        .detectedAt(detected.getDetectedAt())
                         .build();
                 detectedCoinRepository.save(detected);
             }

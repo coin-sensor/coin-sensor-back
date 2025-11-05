@@ -17,10 +17,7 @@ public class Analysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "analysis_id")
     private Long analysisId;
-    
-    @Column(name = "analysis_date", nullable = false)
-    private LocalDate analysisDate;
-    
+
     @Column(name = "summary_text", columnDefinition = "TEXT")
     private String summaryText;
     
@@ -37,8 +34,7 @@ public class Analysis {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
-    public Analysis(LocalDate analysisDate, String summaryText, TrendPrediction trendPrediction, Boolean isVolatilityAlert, String recommendation, LocalDateTime createdAt) {
-        this.analysisDate = analysisDate;
+    public Analysis(String summaryText, TrendPrediction trendPrediction, Boolean isVolatilityAlert, String recommendation, LocalDateTime createdAt) {
         this.summaryText = summaryText;
         this.trendPrediction = trendPrediction;
         this.isVolatilityAlert = isVolatilityAlert;

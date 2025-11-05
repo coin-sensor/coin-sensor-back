@@ -14,7 +14,7 @@ public class DetectedCoinResponse {
     private String coinTicker;
     private BigDecimal volatility;
     private Double volume;
-    private LocalDateTime createdAt;
+    private LocalDateTime detectedAt;
     
     public static DetectedCoinResponse from(DetectedCoin detectedCoin) {
         return DetectedCoinResponse.builder()
@@ -22,7 +22,7 @@ public class DetectedCoinResponse {
                 .coinTicker(detectedCoin.getCoin().getCoinTicker())
                 .volatility(detectedCoin.getVolatility())
                 .volume(detectedCoin.getVolume())
-                .createdAt(detectedCoin.getCreatedAt())
+                .detectedAt(detectedCoin.getDetectedAt())
                 .build();
     }
 }
