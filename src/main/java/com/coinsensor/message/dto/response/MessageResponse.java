@@ -1,27 +1,27 @@
-package com.coinsensor.chatmessage.dto.response;
+package com.coinsensor.message.dto.response;
 
-import com.coinsensor.chatmessage.entity.ChatMessage;
+import com.coinsensor.message.entity.Message;
 import lombok.Builder;
 import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class ChatMessageResponse {
+public class MessageResponse {
     private Long messageId;
     private Long roomId;
     private String uuid;
     private String nickname;
-    private String message;
+    private String content;
     private LocalDateTime createdAt;
     
-    public static ChatMessageResponse from(ChatMessage chatMessage) {
-        return ChatMessageResponse.builder()
+    public static MessageResponse from(Message chatMessage) {
+        return MessageResponse.builder()
                 .messageId(chatMessage.getMessageId())
                 .roomId(chatMessage.getChatRoom().getRoomId())
                 .uuid(chatMessage.getUser().getUuid())
                 .nickname(chatMessage.getNickname())
-                .message(chatMessage.getMessage())
+                .content(chatMessage.getContent())
                 .createdAt(chatMessage.getCreatedAt())
                 .build();
     }

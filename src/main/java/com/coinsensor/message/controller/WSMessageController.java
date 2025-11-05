@@ -1,8 +1,8 @@
-package com.coinsensor.chatmessage.controller;
+package com.coinsensor.message.controller;
 
-import com.coinsensor.chatmessage.dto.request.ChatMessageRequest;
-import com.coinsensor.chatmessage.dto.response.ChatMessageResponse;
-import com.coinsensor.chatmessage.service.ChatMessageService;
+import com.coinsensor.message.dto.request.MessageRequest;
+import com.coinsensor.message.dto.response.MessageResponse;
+import com.coinsensor.message.service.MessageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
-public class ChatController {
+public class WSMessageController {
 
-    private final ChatMessageService chatMessageService;
+    private final MessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/ws/chat/send")
-    public void sendMessage(@Payload ChatMessageRequest request, @Header String uuid) {
-        ChatMessageResponse response = chatMessageService.saveMessage(ChatMessageRequest.to(request, uuid));
+    public void sendMessage(@Payload MessageRequest request, @Header String uuid) {
+        MessageResponse response = chatMessageService.saveMessage(MessageRequest.to(request, uuid));
         messagingTemplate.convertAndSend("/topic/chat/rooms/" + request.getRoomId(), response);
     }
 }

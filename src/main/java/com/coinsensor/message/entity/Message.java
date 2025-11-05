@@ -1,6 +1,6 @@
-package com.coinsensor.chatmessage.entity;
+package com.coinsensor.message.entity;
 
-import com.coinsensor.chatmessage.dto.request.ChatMessageRequest;
+import com.coinsensor.message.dto.request.MessageRequest;
 import com.coinsensor.chatroom.entity.ChatRoom;
 import com.coinsensor.user.entity.User;
 import jakarta.persistence.*;
@@ -8,12 +8,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chat_messages")
+@Table(name = "messages")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ChatMessage {
+public class Message {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,7 @@ public class ChatMessage {
     private String nickname;
     
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String message;
+    private String content;
     
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
@@ -40,21 +40,21 @@ public class ChatMessage {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
-    public ChatMessage(ChatRoom chatRoom, User user, String nickname, String message, Boolean isDeleted, LocalDateTime createdAt) {
+    public Message(ChatRoom chatRoom, User user, String nickname, String content, Boolean isDeleted, LocalDateTime createdAt) {
         this.chatRoom = chatRoom;
         this.user = user;
         this.nickname = nickname;
-        this.message = message;
+        this.content = content;
         this.isDeleted = isDeleted;
         this.createdAt = createdAt;
     }
 
-    public static ChatMessage to(ChatRoom chatRoom, User user, ChatMessageRequest request) {
-        return ChatMessage.builder()
+    public static Message to(ChatRoom chatRoom, User user, MessageRequest request) {
+        return Message.builder()
             .chatRoom(chatRoom)
             .user(user)
             .nickname(request.getNickname())
-            .message(request.getMessage())
+            .content(request.getContent())
             .isDeleted(false)
             .createdAt(LocalDateTime.now())
             .build();

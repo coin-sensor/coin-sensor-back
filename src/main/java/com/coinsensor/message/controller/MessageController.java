@@ -1,8 +1,8 @@
-package com.coinsensor.chatmessage.controller;
+package com.coinsensor.message.controller;
 
-import com.coinsensor.chatmessage.dto.request.ChatMessageRequest;
-import com.coinsensor.chatmessage.dto.response.ChatMessageResponse;
-import com.coinsensor.chatmessage.service.ChatMessageService;
+import com.coinsensor.message.dto.request.MessageRequest;
+import com.coinsensor.message.dto.response.MessageResponse;
+import com.coinsensor.message.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,19 +11,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
-public class ChatMessageController {
+public class MessageController {
     
-    private final ChatMessageService chatMessageService;
+    private final MessageService chatMessageService;
     
     @GetMapping("/rooms/{roomId}/messages")
-    public ResponseEntity<List<ChatMessageResponse>> getMessages(
+    public ResponseEntity<List<MessageResponse>> getMessages(
             @PathVariable Long roomId,
             @RequestParam(defaultValue = "20") int limit) {
         return ResponseEntity.ok(chatMessageService.getRecentMessages(roomId, limit));
     }
     
     @GetMapping("/rooms/{roomId}/messages/before/{lastMessageId}")
-    public ResponseEntity<List<ChatMessageResponse>> getMessagesBefore(
+    public ResponseEntity<List<MessageResponse>> getMessagesBefore(
             @PathVariable Long roomId,
             @PathVariable Long lastMessageId,
             @RequestParam(defaultValue = "20") int limit) {
@@ -31,7 +31,7 @@ public class ChatMessageController {
     }
     
     @PostMapping("/messages")
-    public ResponseEntity<ChatMessageResponse> saveMessage(@RequestBody ChatMessageRequest request) {
+    public ResponseEntity<MessageResponse> saveMessage(@RequestBody MessageRequest request) {
         return ResponseEntity.ok(chatMessageService.saveMessage(request));
     }
     
