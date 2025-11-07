@@ -7,6 +7,8 @@ import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchange.repository.ExchangeRepository;
 import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
+import com.coinsensor.reaction.entity.Reaction;
+import com.coinsensor.reaction.repository.ReactionRepository;
 import com.coinsensor.scheduler.BinanceCoinScheduler;
 import com.coinsensor.timeframe.entity.Timeframe;
 import com.coinsensor.timeframe.repository.TimeframeRepository;
@@ -30,6 +32,7 @@ public class DataInitializer {
     private final ExchangeCoinRepository exchangeCoinRepository;
     private final BinanceCoinScheduler binanceCoinScheduler;
     private final ChannelRepository channelRepository;
+    private final ReactionRepository reactionRepository;
 
     
     @EventListener(ApplicationReadyEvent.class)
@@ -76,6 +79,11 @@ public class DataInitializer {
             channelRepository.save(new Channel("일반"));
 
             log.info("초기 채팅방 데이터 생성 완료");
+        }
+
+        if (reactionRepository.count() == 0) {
+            reactionRepository.save(new Reaction("like"));
+            reactionRepository.save(new Reaction("dislike"));
         }
     }
 }

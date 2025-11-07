@@ -17,5 +17,9 @@ public class Reaction {
     private Long reactionId;
     
     @Column(nullable = false)
-    private String type;
+    private String name;
+
+    public Reaction(String name) {
+        this.name = name;
+    }
 }
