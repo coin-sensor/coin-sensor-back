@@ -19,11 +19,11 @@ public class FavoriteCoin {
     @Column(name = "favorite_coin_id")
     private Long favoriteCoinId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "exchange_coin_id")
     private ExchangeCoin exchangeCoin;
     

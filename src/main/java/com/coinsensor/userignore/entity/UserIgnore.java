@@ -17,11 +17,11 @@ public class UserIgnore {
     @Column(name = "user_ignore_id")
     private Long userIgnoreId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_target_id")
     private User targetUser;
 }

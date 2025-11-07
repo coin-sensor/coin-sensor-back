@@ -19,11 +19,11 @@ public class BanUser {
     @Column(name = "ban_user_id")
     private Long banUserId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ban_type_id")
     private BanType banType;
     

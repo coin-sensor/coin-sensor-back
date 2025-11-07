@@ -19,11 +19,11 @@ public class ClickCoin {
     @Column(name = "click_coin_id")
     private Long clickCoinId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "exchange_coin_id")
     private ExchangeCoin exchangeCoin;
     

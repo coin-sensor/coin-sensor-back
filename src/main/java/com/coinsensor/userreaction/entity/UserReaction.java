@@ -18,11 +18,11 @@ public class UserReaction {
     @Column(name = "user_reaction_id")
     private Long userReactionId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "reaction_id")
     private Reaction reaction;
     
