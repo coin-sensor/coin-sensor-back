@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 public class MessageRequest {
-    private Long roomId;
+    private Long channelId;
     private String uuid;
     private String nickname;
     private String content;
 
-    public MessageRequest(Long roomId, String uuid, String nickname, String content) {
-        this.roomId = roomId;
+    public MessageRequest(Long channelId, String uuid, String nickname, String content) {
+        this.channelId = channelId;
         this.uuid = uuid;
         this.nickname = nickname;
         this.content = content;
@@ -22,7 +22,7 @@ public class MessageRequest {
 
     public static MessageRequest to(MessageRequest request, String uuid) {
         return MessageRequest.builder()
-                .roomId(request.getRoomId())
+                .channelId(request.getChannelId())
                 .uuid(uuid)
                 .nickname(request.getNickname())
                 .content(request.getContent())

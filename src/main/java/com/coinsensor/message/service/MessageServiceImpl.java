@@ -6,8 +6,8 @@ import com.coinsensor.message.dto.request.MessageRequest;
 import com.coinsensor.message.dto.response.MessageResponse;
 import com.coinsensor.message.entity.Message;
 import com.coinsensor.message.repository.MessageRepository;
-import com.coinsensor.chatroom.entity.ChatRoom;
-import com.coinsensor.chatroom.repository.ChatRoomRepository;
+import com.coinsensor.channel.entity.Channel;
+import com.coinsensor.channel.repository.ChannelRepository;
 import com.coinsensor.common.exception.BusinessException;
 import com.coinsensor.user.entity.User;
 import com.coinsensor.user.service.UserService;
@@ -24,22 +24,22 @@ import java.util.List;
 public class MessageServiceImpl implements MessageService {
     
     private final MessageRepository chatMessageRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChannelRepository channelRepository;
     private final UserService userService;
     
     @Override
     @Transactional
     public MessageResponse saveMessage(MessageRequest request) {
-        ChatRoom chatRoom = chatRoomRepository.findById(request.getRoomId())
+        Channel channel = channelRepository.findById(request.getChannelId())
                 .orElseThrow(() -> new BusinessException(ROOM_NOT_FOUND));
         
         User user = userService.getUserByUuid(request.getUuid());
-        return MessageResponse.from(chatMessageRepository.save(Message.to(chatRoom, user, request)));
+        return MessageResponse.from(chatMessageRepository.save(Message.to(channel, user, request)));
     }
 
     @Override
-    public List<MessageResponse> getRecentMessages(Long roomId, int limit) {
-        List<Message> messages = chatMessageRepository.findRecentMessagesByRoomId(roomId, limit);
+    public List<MessageResponse> getRecentMessages(Long channelId, int limit) {
+        List<Message> messages = chatMessageRepository.findRecentMessagesByChannelId(channelId, limit);
         return messages.stream()
                 .map(MessageResponse::from)
                 .sorted(Comparator.comparing(MessageResponse::getCreatedAt))
@@ -47,8 +47,8 @@ public class MessageServiceImpl implements MessageService {
     }
     
     @Override
-    public List<MessageResponse> getMessagesByRoomId(Long roomId) {
-        List<Message> messages = chatMessageRepository.findRecentMessagesByRoomId(roomId, 50);
+    public List<MessageResponse> getMessagesByChannelId(Long channelId) {
+        List<Message> messages = chatMessageRepository.findRecentMessagesByChannelId(channelId, 50);
         return messages.stream()
                 .map(MessageResponse::from)
                 .sorted(Comparator.comparing(MessageResponse::getCreatedAt))
@@ -56,8 +56,8 @@ public class MessageServiceImpl implements MessageService {
     }
     
     @Override
-    public List<MessageResponse> getMessagesBefore(Long roomId, Long lastMessageId, int limit) {
-        List<Message> messages = chatMessageRepository.findMessagesBefore(roomId, lastMessageId, limit);
+    public List<MessageResponse> getMessagesBefore(Long channelId, Long lastMessageId, int limit) {
+        List<Message> messages = chatMessageRepository.findMessagesBefore(channelId, lastMessageId, limit);
         return messages.stream()
                 .map(MessageResponse::from)
                 .sorted(Comparator.comparing(MessageResponse::getCreatedAt))
@@ -72,7 +72,7 @@ public class MessageServiceImpl implements MessageService {
         
         Message deletedMessage = Message.builder()
                 .messageId(message.getMessageId())
-                .chatRoom(message.getChatRoom())
+                .channel(message.getChannel())
                 .user(message.getUser())
                 .nickname(message.getNickname())
                 .content(message.getContent())

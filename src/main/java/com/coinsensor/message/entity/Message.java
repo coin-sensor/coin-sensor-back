@@ -1,7 +1,7 @@
 package com.coinsensor.message.entity;
 
 import com.coinsensor.message.dto.request.MessageRequest;
-import com.coinsensor.chatroom.entity.ChatRoom;
+import com.coinsensor.channel.entity.Channel;
 import com.coinsensor.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,8 +21,8 @@ public class Message {
     private Long messageId;
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "room_id", nullable = false)
-    private ChatRoom chatRoom;
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -40,8 +40,8 @@ public class Message {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
-    public Message(ChatRoom chatRoom, User user, String nickname, String content, Boolean isDeleted, LocalDateTime createdAt) {
-        this.chatRoom = chatRoom;
+    public Message(Channel channel, User user, String nickname, String content, Boolean isDeleted, LocalDateTime createdAt) {
+        this.channel = channel;
         this.user = user;
         this.nickname = nickname;
         this.content = content;
@@ -49,9 +49,9 @@ public class Message {
         this.createdAt = createdAt;
     }
 
-    public static Message to(ChatRoom chatRoom, User user, MessageRequest request) {
+    public static Message to(Channel channel, User user, MessageRequest request) {
         return Message.builder()
-            .chatRoom(chatRoom)
+            .channel(channel)
             .user(user)
             .nickname(request.getNickname())
             .content(request.getContent())

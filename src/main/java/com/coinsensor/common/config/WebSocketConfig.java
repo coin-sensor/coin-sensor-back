@@ -23,7 +23,7 @@ public class WebSocketConfig implements WebSocketConfigurer, WebSocketMessageBro
     
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(webSocketHandler, "/ws/coins", "/ws/alerts", "/ws/chat")
+        registry.addHandler(webSocketHandler, "/ws/coins", "/ws/alerts", "/ws/channels")
                 .setAllowedOrigins("*");
     }
     

@@ -9,34 +9,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/api/channels/{channelId}/messages")
 @RequiredArgsConstructor
 public class MessageController {
     
     private final MessageService chatMessageService;
     
-    @GetMapping("/rooms/{roomId}/messages")
+    @GetMapping
     public ResponseEntity<List<MessageResponse>> getMessages(
-            @PathVariable Long roomId,
+            @PathVariable Long channelId,
             @RequestParam(defaultValue = "20") int limit) {
-        return ResponseEntity.ok(chatMessageService.getRecentMessages(roomId, limit));
+        return ResponseEntity.ok(chatMessageService.getRecentMessages(channelId, limit));
     }
-    
-    @GetMapping("/rooms/{roomId}/messages/before/{lastMessageId}")
+
+    @GetMapping("/before/{lastMessageId}")
     public ResponseEntity<List<MessageResponse>> getMessagesBefore(
-            @PathVariable Long roomId,
+            @PathVariable Long channelId,
             @PathVariable Long lastMessageId,
             @RequestParam(defaultValue = "20") int limit) {
-        return ResponseEntity.ok(chatMessageService.getMessagesBefore(roomId, lastMessageId, limit));
+        return ResponseEntity.ok(chatMessageService.getMessagesBefore(channelId, lastMessageId, limit));
     }
     
-    @PostMapping("/messages")
-    public ResponseEntity<MessageResponse> saveMessage(@RequestBody MessageRequest request) {
+    @PostMapping
+    public ResponseEntity<MessageResponse> saveMessage(@PathVariable String channelId, @RequestBody MessageRequest request) {
         return ResponseEntity.ok(chatMessageService.saveMessage(request));
     }
     
-    @DeleteMapping("/messages/{messageId}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable Long messageId) {
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Void> deleteMessage(@PathVariable String channelId, @PathVariable Long messageId) {
         chatMessageService.deleteMessage(messageId);
         return ResponseEntity.ok().build();
     }

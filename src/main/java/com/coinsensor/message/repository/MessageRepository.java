@@ -9,9 +9,9 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
-    @Query("SELECT cm FROM Message cm WHERE cm.chatRoom.roomId = :roomId AND cm.isDeleted = false ORDER BY cm.createdAt DESC LIMIT :limit")
-    List<Message> findRecentMessagesByRoomId(@Param("roomId") Long roomId, @Param("limit") int limit);
+    @Query("SELECT cm FROM Message cm WHERE cm.channel.channelId = :channelId AND cm.isDeleted = false ORDER BY cm.createdAt DESC LIMIT :limit")
+    List<Message> findRecentMessagesByChannelId(@Param("channelId") Long channelId, @Param("limit") int limit);
     
-    @Query("SELECT cm FROM Message cm WHERE cm.chatRoom.roomId = :roomId AND cm.messageId < :lastMessageId AND cm.isDeleted = false ORDER BY cm.createdAt DESC LIMIT :limit")
-    List<Message> findMessagesBefore(@Param("roomId") Long roomId, @Param("lastMessageId") Long lastMessageId, @Param("limit") int limit);
+    @Query("SELECT cm FROM Message cm WHERE cm.channel.channelId = :channelId AND cm.messageId < :lastMessageId AND cm.isDeleted = false ORDER BY cm.createdAt DESC LIMIT :limit")
+    List<Message> findMessagesBefore(@Param("channelId") Long channelId, @Param("lastMessageId") Long lastMessageId, @Param("limit") int limit);
 }

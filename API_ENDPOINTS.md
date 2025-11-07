@@ -50,7 +50,7 @@ GET /api/coins/{coinId}/ohlcv
 
 ### 2.1 채팅방 메시지 조회
 ```
-GET /api/chat/rooms/{roomId}/messages
+GET /api/chat/channels/{channelId}/messages
 ```
 **Response**: `List<ChatMessageResponse>`
 
@@ -61,7 +61,7 @@ POST /api/chat/messages
 **Request Body**:
 ```json
 {
-  "roomId": 1,
+  "channelId": 1,
   "userId": 1,
   "nickname": "사용자닉네임",
   "message": "메시지 내용"
@@ -255,7 +255,7 @@ GET /api/exchanges
 ```json
 {
   "messageId": 1,
-  "roomId": 1,
+  "channelId": 1,
   "userId": 1,
   "nickname": "사용자",
   "message": "안녕하세요",

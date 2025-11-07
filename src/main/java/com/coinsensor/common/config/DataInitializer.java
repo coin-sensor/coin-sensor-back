@@ -1,7 +1,7 @@
 package com.coinsensor.common.config;
 
-import com.coinsensor.chatroom.entity.ChatRoom;
-import com.coinsensor.chatroom.repository.ChatRoomRepository;
+import com.coinsensor.channel.entity.Channel;
+import com.coinsensor.channel.repository.ChannelRepository;
 import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
 import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
 import com.coinsensor.exchange.entity.Exchange;
@@ -29,7 +29,7 @@ public class DataInitializer {
     private final DetectionCriteriaRepository detectionCriteriaRepository;
     private final ExchangeCoinRepository exchangeCoinRepository;
     private final BinanceCoinScheduler binanceCoinScheduler;
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChannelRepository channelRepository;
 
     
     @EventListener(ApplicationReadyEvent.class)
@@ -72,8 +72,8 @@ public class DataInitializer {
             log.info("초기 바이낸스 코인 데이터 생성 완료");
         }
 
-        if (chatRoomRepository.count() == 0) {
-            chatRoomRepository.save(new ChatRoom("일반"));
+        if (channelRepository.count() == 0) {
+            channelRepository.save(new Channel("일반"));
 
             log.info("초기 채팅방 데이터 생성 완료");
         }

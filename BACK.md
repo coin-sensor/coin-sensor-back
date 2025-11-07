@@ -211,7 +211,7 @@ GET /api/analysis/patterns - 패턴 분석 결과
 
 ### 4. 커뮤니티 API
 ```
-GET /api/chat/rooms - 채팅룸 리스트
+GET /api/chat/channels - 채팅룸 리스트
 GET /api/chat/keywords - 인기 키워드
 POST /api/tools/roulette - 투자 돌림판
 ```

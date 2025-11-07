@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface MessageService {
     MessageResponse saveMessage(MessageRequest request);
-    List<MessageResponse> getRecentMessages(Long roomId, int limit);
-    List<MessageResponse> getMessagesByRoomId(Long roomId);
-    List<MessageResponse> getMessagesBefore(Long roomId, Long lastMessageId, int limit);
+    List<MessageResponse> getRecentMessages(Long channelId, int limit);
+    List<MessageResponse> getMessagesByChannelId(Long channelId);
+    List<MessageResponse> getMessagesBefore(Long channelId, Long lastMessageId, int limit);
     void deleteMessage(Long messageId);
 }

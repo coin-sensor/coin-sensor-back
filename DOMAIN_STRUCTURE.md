@@ -21,7 +21,7 @@ com.coinsensor/
 ├── btcaireport/        # BTC AI 리포트
 ├── chatban/            # 채팅 차단
 ├── chatmessage/        # 채팅 메시지
-├── chatroom/           # 채팅방
+├── chatchannel/           # 채팅방
 ├── user/               # 사용자
 ├── kimchipremium/      # 김치 프리미엄
 ├── feargreedindex/     # 공포 탐욕 지수
@@ -115,9 +115,9 @@ com.coinsensor.{entity_name}/
 - **Entity**: `ChatMessage.java`
 - **Repository**: `ChatMessageRepository.java`
 
-### 15. chatroom - 채팅방
-- **Entity**: `ChatRoom.java`
-- **Repository**: `ChatRoomRepository.java`
+### 15. chatchannel - 채팅방
+- **Entity**: `Channel.java`
+- **Repository**: `ChannelRepository.java`
 
 ### 16. user - 사용자
 - **Entity**: `User.java`

@@ -19,9 +19,9 @@ public class WSMessageController {
     private final MessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/ws/chat/send")
+    @MessageMapping("/ws/channel/send")
     public void sendMessage(@Payload MessageRequest request, @Header String uuid) {
         MessageResponse response = chatMessageService.saveMessage(MessageRequest.to(request, uuid));
-        messagingTemplate.convertAndSend("/topic/chat/rooms/" + request.getRoomId(), response);
+        messagingTemplate.convertAndSend("/topic/channels/" + request.getChannelId(), response);
     }
 }

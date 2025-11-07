@@ -38,13 +38,25 @@ public class User {
     @Column(nullable = false)
     private Boolean notification;
     
-    public User(String uuid, String ipAddress, Boolean isBanned, LocalDateTime lastActive, String nickname, String role, Boolean notification) {
+    public User(String uuid, String ipAddress, Boolean isBanned, LocalDateTime lastActive, String nickname, String role) {
         this.uuid = uuid;
         this.ipAddress = ipAddress;
         this.isBanned = isBanned;
         this.lastActive = lastActive;
         this.nickname = nickname;
         this.role = role;
-        this.notification = notification;
+        this.notification = true;
+    }
+
+    public static User to(String uuid, String ipAddress) {
+        return User.builder()
+            .uuid(uuid)
+            .ipAddress(ipAddress)
+            .isBanned(false)
+            .lastActive(LocalDateTime.now())
+            .nickname("트레이더#" + uuid.substring(0, 4))
+            .role("member")
+            .notification(true)
+            .build();
     }
 }

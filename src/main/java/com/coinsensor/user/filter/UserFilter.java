@@ -36,10 +36,10 @@ public class UserFilter implements Filter {
 
 		if (uuid != null) {
 			User user = userRepository.findByUuid(uuid).orElse(null);
-			if (user == null) {
-				createUser(uuid, getClientIpAddress(httpRequest));
-			}
 
+			if (user == null) {
+				userRepository.save(User.to(uuid, getClientIpAddress(httpRequest)));
+			}
 		}
 
 		chain.doFilter(request, response);
@@ -66,18 +66,6 @@ public class UserFilter implements Filter {
 	private boolean isWebSocketRequest(HttpServletRequest request) {
 		String uri = request.getRequestURI();
 		return uri.startsWith("/ws");
-	}
-
-	private void createUser(String uuid, String ipAddress) {
-		User user = User.builder()
-			.uuid(uuid)
-			.ipAddress(ipAddress)
-			.isBanned(false)
-			.lastActive(LocalDateTime.now())
-			.nickname("트레이더#" + uuid.substring(0, 4))
-			.role("member")
-			.build();
-		userRepository.save(user);
 	}
 
 	private String getClientIpAddress(HttpServletRequest request) {

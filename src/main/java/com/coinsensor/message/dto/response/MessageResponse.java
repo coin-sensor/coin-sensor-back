@@ -9,20 +9,20 @@ import java.time.LocalDateTime;
 @Builder
 public class MessageResponse {
     private Long messageId;
-    private Long roomId;
+    private Long channelId;
     private String uuid;
     private String nickname;
     private String content;
     private LocalDateTime createdAt;
     
-    public static MessageResponse from(Message chatMessage) {
+    public static MessageResponse from(Message message) {
         return MessageResponse.builder()
-                .messageId(chatMessage.getMessageId())
-                .roomId(chatMessage.getChatRoom().getRoomId())
-                .uuid(chatMessage.getUser().getUuid())
-                .nickname(chatMessage.getNickname())
-                .content(chatMessage.getContent())
-                .createdAt(chatMessage.getCreatedAt())
+                .messageId(message.getMessageId())
+                .channelId(message.getChannel().getChannelId())
+                .uuid(message.getUser().getUuid())
+                .nickname(message.getNickname())
+                .content(message.getContent())
+                .createdAt(message.getCreatedAt())
                 .build();
     }
 }
