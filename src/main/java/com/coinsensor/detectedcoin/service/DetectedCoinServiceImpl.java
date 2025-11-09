@@ -16,7 +16,6 @@ import java.util.List;
 public class DetectedCoinServiceImpl implements DetectedCoinService {
     
     private final DetectedCoinRepository detectedCoinRepository;
-    private final DetectionRepository detectionRepository;
     
     @Override
     public List<DetectedCoinResponse> getAbnormalCoins() {

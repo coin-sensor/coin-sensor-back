@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
-    
+
+    FORBIDDEN("접근 권한이 없습니다."),
     INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
     COIN_NOT_FOUND("코인을 찾을 수 없습니다."),
     USER_NOT_FOUND("사용자를 찾을 수 없습니다."),

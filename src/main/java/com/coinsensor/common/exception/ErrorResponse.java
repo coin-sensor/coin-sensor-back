@@ -22,4 +22,12 @@ public class ErrorResponse {
                 .message(errorCode.getMessage())
                 .build();
     }
+    
+    public static ErrorResponse of(String message) {
+        return ErrorResponse.builder()
+                .status(403)
+                .code("FORBIDDEN")
+                .message(message)
+                .build();
+    }
 }
