@@ -1,4 +1,4 @@
-package com.coinsensor.detectiongroup.entity;
+package com.coinsensor.detection.entity;
 
 import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
 import com.coinsensor.exchange.entity.Exchange;
@@ -7,17 +7,17 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "detection_groups")
+@Table(name = "detections")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class DetectionGroup {
+public class Detection {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "detection_group_id")
-    private Long detectionGroupId;
+    @Column(name = "detection_id")
+    private Long detectionId;
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "detection_criteria_id", nullable = false)
@@ -36,7 +36,7 @@ public class DetectionGroup {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String summary;
     
-    public DetectionGroup(DetectionCriteria detectionCriteria, Exchange exchange, LocalDateTime detectedAt, Long detectionCount, String summary) {
+    public Detection(DetectionCriteria detectionCriteria, Exchange exchange, LocalDateTime detectedAt, Long detectionCount, String summary) {
         this.detectionCriteria = detectionCriteria;
         this.exchange = exchange;
         this.detectedAt = detectedAt;

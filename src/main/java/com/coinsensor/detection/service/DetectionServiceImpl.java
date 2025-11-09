@@ -1,9 +1,9 @@
-package com.coinsensor.detectiongroup.service;
+package com.coinsensor.detection.service;
 
-import com.coinsensor.detectedcoin.dto.response.DetectedCoinGroupResponse;
+import com.coinsensor.detection.dto.response.DetectionInfoResponse;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
-import com.coinsensor.detectiongroup.repository.DetectionGroupRepository;
+import com.coinsensor.detection.repository.DetectionRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,28 +12,28 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DetectionGroupServiceImpl implements DetectionGroupService {
+public class DetectionServiceImpl implements DetectionService {
     
-    private final DetectionGroupRepository detectionGroupRepository;
+    private final DetectionRepository detectionRepository;
     private final DetectedCoinRepository detectedCoinRepository;
     
     @Override
-    public List<DetectedCoinGroupResponse> getDetectionGroups(String exchange, String exchangeType, String timeframe) {
+    public List<DetectionInfoResponse> getDetections(String exchange, String exchangeType, String timeframe) {
         LocalDateTime startTime = getStartTimeByTimeframe(timeframe);
         Exchange.Type type = Exchange.Type.valueOf(exchangeType);
         
-        return detectionGroupRepository.findByExchangeAndTimeframeAndAfterTime(exchange, type, timeframe, startTime)
+        return detectionRepository.findByExchangeAndTimeframeAndAfterTime(exchange, type, timeframe, startTime)
                 .stream()
-                .map(group -> {
-                    var detectedCoins = detectedCoinRepository.findByDetectionGroup(group);
+                .map(detection -> {
+                    var detectedCoins = detectedCoinRepository.findByDetection(detection);
                     
-                    return DetectedCoinGroupResponse.builder()
-                            .exchangeName(group.getExchange().getName())
-                            .exchangeType(group.getExchange().getType().name())
+                    return DetectionInfoResponse.builder()
+                            .exchangeName(detection.getExchange().getName())
+                            .exchangeType(detection.getExchange().getType().name())
                             .timeframeLabel(timeframe)
-                            .criteriaVolatility(group.getDetectionCriteria().getVolatility())
-                            .criteriaVolume(group.getDetectionCriteria().getVolume())
-                            .detectedAt(group.getDetectedAt())
+                            .criteriaVolatility(detection.getDetectionCriteria().getVolatility())
+                            .criteriaVolume(detection.getDetectionCriteria().getVolume())
+                            .detectedAt(detection.getDetectedAt())
                             .coins(detectedCoins.stream()
                                     .map(DetectedCoinResponse::from)
                                     .toList())

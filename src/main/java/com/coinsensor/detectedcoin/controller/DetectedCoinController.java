@@ -1,7 +1,6 @@
 package com.coinsensor.detectedcoin.controller;
 
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
-import com.coinsensor.detectedcoin.dto.response.DetectedCoinGroupResponse;
 import com.coinsensor.detectedcoin.service.DetectedCoinService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +28,5 @@ public class DetectedCoinController {
     public ResponseEntity<List<DetectedCoinResponse>> getDetectedCoins(
             @RequestParam String exchangeName, @RequestParam String exchangeType) {
         return ResponseEntity.ok(detectedCoinService.getDetectedCoinsByTimeAndType(exchangeName, exchangeType));
-    }
-    
-    @GetMapping("/detected-group")
-    public ResponseEntity<DetectedCoinGroupResponse> getDetectedCoinGroup(
-            @RequestParam String exchangeName, @RequestParam String timeframeLabel, @RequestParam String exchangeType) {
-        return ResponseEntity.ok(detectedCoinService.getDetectedCoinGroupByTimeAndType(exchangeName, timeframeLabel, exchangeType));
     }
 }

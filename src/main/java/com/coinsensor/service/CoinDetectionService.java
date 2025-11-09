@@ -1,18 +1,17 @@
 package com.coinsensor.service;
 
 import com.coinsensor.coin.entity.Coin;
-import com.coinsensor.coin.repository.CoinRepository;
 import com.coinsensor.common.util.SummaryUtil;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
 import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
-import com.coinsensor.detectiongroup.entity.DetectionGroup;
-import com.coinsensor.detectiongroup.repository.DetectionGroupRepository;
+import com.coinsensor.detection.entity.Detection;
+import com.coinsensor.detection.repository.DetectionRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
-import com.coinsensor.detectedcoin.dto.response.DetectedCoinGroupResponse;
+import com.coinsensor.detection.dto.response.DetectionInfoResponse;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,11 +24,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +34,7 @@ public class CoinDetectionService {
     
     private final DetectionCriteriaRepository detectionCriteriaRepository;
     private final ExchangeCoinRepository exchangeCoinRepository;
-    private final DetectionGroupRepository detectionGroupRepository;
+    private final DetectionRepository detectionRepository;
     private final DetectedCoinRepository detectedCoinRepository;
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
@@ -103,18 +99,18 @@ public class CoinDetectionService {
         
         if (!detectedCoins.isEmpty()) {
             Exchange exchange = exchangeCoins.getFirst().getExchange();
-            DetectionGroup group = DetectionGroup.builder()
+            Detection detection = Detection.builder()
                     .detectionCriteria(criteria)
                     .exchange(exchange)
                     .detectedAt(LocalDateTime.now())
                     .detectionCount((long) detectedCoins.size())
                     .summary(SummaryUtil.create(criteria, detectedCoins))
                     .build();
-            detectionGroupRepository.save(group);
+            detectionRepository.save(detection);
             
             for (DetectedCoin detected : detectedCoins) {
                 detected = DetectedCoin.builder()
-                        .detectionGroup(group)
+                        .detection(detection)
                         .coin(detected.getCoin())
                         .exchangeCoin(detected.getExchangeCoin())
                         .volatility(detected.getVolatility())
@@ -126,7 +122,7 @@ public class CoinDetectionService {
                 detectedCoinRepository.save(detected);
             }
             
-            sendDetectionNotification(group, detectedCoins);
+            sendDetectionNotification(detection, detectedCoins);
             log.info("현물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
         }
     }
@@ -184,18 +180,18 @@ public class CoinDetectionService {
         
         if (!detectedCoins.isEmpty()) {
             Exchange exchange = exchangeCoins.getFirst().getExchange();
-            DetectionGroup group = DetectionGroup.builder()
+            Detection group = Detection.builder()
                     .detectionCriteria(criteria)
                     .exchange(exchange)
                     .detectedAt(LocalDateTime.now())
                     .detectionCount((long) detectedCoins.size())
                     .summary(SummaryUtil.create(criteria, detectedCoins))
                     .build();
-            detectionGroupRepository.save(group);
+            detectionRepository.save(group);
             
             for (DetectedCoin detected : detectedCoins) {
                 detected = DetectedCoin.builder()
-                        .detectionGroup(group)
+                        .detection(group)
                         .coin(detected.getCoin())
                         .exchangeCoin(detected.getExchangeCoin())
                         .volatility(detected.getVolatility())
@@ -222,18 +218,18 @@ public class CoinDetectionService {
         }
     }
     
-    private void sendDetectionNotification(DetectionGroup group, List<DetectedCoin> detectedCoins) {
-        String timeframe = group.getDetectionCriteria().getTimeframe().getTimeframeLabel();
-        String exchangeName = group.getExchange().getName();
-        String exchangeType = group.getExchange().getType().name();
+    private void sendDetectionNotification(Detection detection, List<DetectedCoin> detectedCoins) {
+        String timeframe = detection.getDetectionCriteria().getTimeframe().getTimeframeLabel();
+        String exchangeName = detection.getExchange().getName();
+        String exchangeType = detection.getExchange().getType().name();
         
-        DetectedCoinGroupResponse response = DetectedCoinGroupResponse.builder()
+        DetectionInfoResponse response = DetectionInfoResponse.builder()
                 .exchangeName(exchangeName)
                 .exchangeType(exchangeType)
                 .timeframeLabel(timeframe)
-                .criteriaVolatility(group.getDetectionCriteria().getVolatility())
-                .criteriaVolume(group.getDetectionCriteria().getVolume())
-                .detectedAt(group.getDetectedAt())
+                .criteriaVolatility(detection.getDetectionCriteria().getVolatility())
+                .criteriaVolume(detection.getDetectionCriteria().getVolume())
+                .detectedAt(detection.getDetectedAt())
                 .coins(detectedCoins.stream()
                         .map(DetectedCoinResponse::from)
                         .toList())

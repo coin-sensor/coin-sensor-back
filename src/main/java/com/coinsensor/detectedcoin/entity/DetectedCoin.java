@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.coinsensor.coin.entity.Coin;
-import com.coinsensor.detectiongroup.entity.DetectionGroup;
+import com.coinsensor.detection.entity.Detection;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 
 @Entity
@@ -23,8 +23,8 @@ public class DetectedCoin {
     private Long detectedCoinId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "detection_group_id", nullable = false)
-    private DetectionGroup detectionGroup;
+    @JoinColumn(name = "detection_id", nullable = false)
+    private Detection detection;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "coin_id", nullable = false)
@@ -49,8 +49,8 @@ public class DetectedCoin {
     @Column(name = "detected_at", nullable = false)
     private LocalDateTime detectedAt;
     
-    public DetectedCoin(DetectionGroup detectionGroup, Coin coin, ExchangeCoin exchangeCoin, BigDecimal volatility, Double volume, Double high, Double low, LocalDateTime detectedAt) {
-        this.detectionGroup = detectionGroup;
+    public DetectedCoin(Detection detection, Coin coin, ExchangeCoin exchangeCoin, BigDecimal volatility, Double volume, Double high, Double low, LocalDateTime detectedAt) {
+        this.detection = detection;
         this.coin = coin;
         this.exchangeCoin = exchangeCoin;
         this.volatility = volatility;

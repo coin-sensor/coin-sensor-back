@@ -1,15 +1,17 @@
-package com.coinsensor.detectedcoin.dto.response;
+package com.coinsensor.detection.dto.response;
 
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DetectedCoinGroupResponse {
+public class DetectionInfoResponse {
     private String exchangeName;
     private String exchangeType;
     private String timeframeLabel;
