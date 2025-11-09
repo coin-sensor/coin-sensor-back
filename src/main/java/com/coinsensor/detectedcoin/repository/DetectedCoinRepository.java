@@ -1,6 +1,7 @@
 package com.coinsensor.detectedcoin.repository;
 
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
+import com.coinsensor.detectiongroup.entity.DetectionGroup;
 import com.coinsensor.exchange.entity.Exchange;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,10 @@ public interface DetectedCoinRepository extends JpaRepository<DetectedCoin, Long
     );
     
     List<DetectedCoin> findByDetectionGroup_DetectionGroupId(Long detectionGroupId);
+    @Query("SELECT dc FROM DetectedCoin dc " +
+           "JOIN FETCH dc.coin c " +
+           "JOIN FETCH dc.exchangeCoin ec " +
+           "JOIN FETCH ec.exchange e " +
+           "WHERE dc.detectionGroup = :detectionGroup")
+    List<DetectedCoin> findByDetectionGroup(@Param("detectionGroup") DetectionGroup detectionGroup);
 }
