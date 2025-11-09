@@ -5,9 +5,11 @@ import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
 import com.coinsensor.service.CoinDetectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 @RequiredArgsConstructor
@@ -18,35 +20,42 @@ public class CoinDetectionScheduler {
     
     @Scheduled(cron = "0 * * * * ?") // 매분 정각
     public void detect1mCoins() {
-        executeDetection("1m");
+        executeDetectionAsync("1m");
     }
     
     @Scheduled(cron = "0 */5 * * * ?") // 5분마다
     public void detect5mCoins() {
-        executeDetection("5m");
+        executeDetectionAsync("5m");
     }
     
     @Scheduled(cron = "0 */15 * * * ?") // 15분마다
     public void detect15mCoins() {
-        executeDetection("15m");
+        executeDetectionAsync("15m");
     }
     
     @Scheduled(cron = "0 0 * * * ?") // 매시간 정각
     public void detect1hCoins() {
-        executeDetection("1h");
+        executeDetectionAsync("1h");
     }
     
-    @Scheduled(cron = "0 0 */4 * * ?") // 4시간마다
+    @Scheduled(cron = "0 0 1/4 * * ?") // 01:00부터 4시간마다
     public void detect4hCoins() {
-        executeDetection("4h");
+        executeDetectionAsync("4h");
     }
     
-    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정
+    @Scheduled(cron = "0 0 9 * * ?") // 매일 09:00
     public void detect1dCoins() {
-        executeDetection("1d");
+        executeDetectionAsync("1d");
     }
     
-    private void executeDetection(String timeframeLabel) {
-        coinDetectionService.detectByTimeframe(timeframeLabel);
+    private void executeDetectionAsync(String timeframeLabel) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                log.info("{} 탐지 시작", timeframeLabel);
+                coinDetectionService.detectByTimeframe(timeframeLabel);
+            } catch (Exception e) {
+                log.error("{} 탐지 실패", timeframeLabel, e);
+            }
+        });
     }
 }
