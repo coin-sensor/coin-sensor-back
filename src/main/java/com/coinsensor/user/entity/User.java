@@ -17,7 +17,7 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
     
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String uuid;
     
     @Column(name = "ip_address", nullable = false)
@@ -58,5 +58,9 @@ public class User {
             .role("member")
             .notification(true)
             .build();
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

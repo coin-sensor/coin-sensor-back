@@ -36,17 +36,8 @@ public class UserServiceImpl implements UserService {
     public UserInfoResponse updateNickname(String uuid, String nickname) {
         User user = userRepository.findByUuid(uuid)
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        User updatedUser = User.builder()
-                .userId(user.getUserId())
-                .uuid(user.getUuid())
-                .ipAddress(user.getIpAddress())
-                .isBanned(user.getIsBanned())
-                .lastActive(user.getLastActive())
-                .nickname(nickname)
-                .role(user.getRole())
-                .build();
-        
-        User savedUser = userRepository.save(updatedUser);
-        return UserInfoResponse.from(savedUser);
+
+        user.updateNickname(nickname);
+        return UserInfoResponse.from(user);
     }
 }

@@ -2,6 +2,9 @@ package com.coinsensor.user.filter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.dao.DataIntegrityViolationException;
 
 import com.coinsensor.user.entity.User;
 import com.coinsensor.user.repository.UserRepository;
@@ -19,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserFilter implements Filter {
 	private final UserRepository userRepository;
+	private final ConcurrentHashMap<String, Object> lockMap = new ConcurrentHashMap<>();
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -35,11 +39,17 @@ public class UserFilter implements Filter {
 		String uuid = getUuidFromRequest(httpRequest);
 
 		if (uuid != null) {
-			User user = userRepository.findByUuid(uuid).orElse(null);
-
-			if (user == null) {
-				userRepository.save(User.to(uuid, getClientIpAddress(httpRequest)));
+			// 동시성 문제를 해결
+			Object lock = lockMap.computeIfAbsent(uuid, k -> new Object());
+			synchronized (lock) {
+				try {
+					userRepository.findByUuid(uuid).orElseGet(() ->
+						userRepository.save(User.to(uuid, getClientIpAddress(httpRequest))));
+				} catch (DataIntegrityViolationException e) {
+					log.debug("User with UUID {} already exists, skipping creation", uuid);
+				}
 			}
+			lockMap.remove(uuid);
 		}
 
 		chain.doFilter(request, response);
