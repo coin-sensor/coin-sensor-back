@@ -23,7 +23,7 @@ public class ChannelController {
     public ResponseEntity<ChannelResponse> createChannel(@RequestBody ChannelRequest request) {
         return ResponseEntity.ok(channelService.createChannel(request));
     }
-    
+
     @GetMapping
     public ResponseEntity<List<ChannelResponse>> getAllChannels() {
         return ResponseEntity.ok(channelService.getAllChannels());

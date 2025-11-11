@@ -5,7 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface ClickCoinRepository extends JpaRepository<ClickCoin, Long> {
-    List<ClickCoin> findByUser_UserId(Long userId);
-    Optional<ClickCoin> findByUser_UserIdAndExchangeCoin_ExchangeCoinId(Long userId, Long exchangeCoinId);
+public interface ClickCoinRepository extends JpaRepository<ClickCoin, Long>,  CustomClickCoinRepository{
 }
