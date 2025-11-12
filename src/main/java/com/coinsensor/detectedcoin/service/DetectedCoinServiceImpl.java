@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.coinsensor.clickcoin.entity.ClickCoin;
 import com.coinsensor.clickcoin.repository.ClickCoinRepository;
-import com.coinsensor.common.exception.BusinessException;
+import com.coinsensor.common.exception.CustomException;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
@@ -62,9 +62,9 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 		ClickCoin clickCoin = clickCoinRepository.findByUuidAndDetectedCoinId(uuid, detectedCoinId).orElse(null);
 
 		if (clickCoin == null) {
-			User user = userRepository.findByUuid(uuid).orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
+			User user = userRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 			DetectedCoin detectedCoin = detectedCoinRepository.findById(detectedCoinId)
-				.orElseThrow(() -> new BusinessException(DETECTED_COIN_NOT_FOUND));
+				.orElseThrow(() -> new CustomException(DETECTED_COIN_NOT_FOUND));
 			clickCoinRepository.save(new ClickCoin(user, detectedCoin));
 			detectedCoin.incrementViewCount();
 		} else {
