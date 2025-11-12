@@ -87,8 +87,22 @@ public class DetectedCoin {
 			.volume(volume)
 			.high(high)
 			.low(low)
-			.viewCount((0L))
+			.viewCount(0L)
 			.detectedAt(LocalDateTime.now())
+			.build();
+	}
+
+	public DetectedCoin withDetection(Detection detection) {
+		return DetectedCoin.builder()
+			.detection(detection)
+			.coin(this.coin)
+			.exchangeCoin(this.exchangeCoin)
+			.volatility(this.volatility)
+			.volume(this.volume)
+			.high(this.high)
+			.low(this.low)
+			.viewCount(0L)
+			.detectedAt(this.detectedAt)
 			.build();
 	}
 

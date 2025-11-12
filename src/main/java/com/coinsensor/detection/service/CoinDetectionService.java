@@ -2,7 +2,6 @@ package com.coinsensor.detection.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +15,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.coinsensor.coin.entity.Coin;
 import com.coinsensor.common.util.SummaryUtil;
-import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
@@ -78,29 +76,13 @@ public class CoinDetectionService {
 
 		if (!detectedCoins.isEmpty()) {
 			Exchange exchange = exchangeCoins.getFirst().getExchange();
-			Detection detection = Detection.builder()
-				.detectionCriteria(criteria)
-				.exchange(exchange)
-				.detectedAt(LocalDateTime.now())
-				.detectionCount((long)detectedCoins.size())
-				.summary(SummaryUtil.create(criteria, detectedCoins))
-				.build();
-			detectionRepository.save(detection);
+			Detection detection = detectionRepository.save(
+				Detection.to(criteria, exchange, SummaryUtil.create(criteria, detectedCoins),
+					(long)detectedCoins.size()));
 
-			List<DetectedCoin> coinsToSave = detectedCoins.stream()
-				.map(detected -> DetectedCoin.builder()
-					.detection(detection)
-					.coin(detected.getCoin())
-					.exchangeCoin(detected.getExchangeCoin())
-					.volatility(detected.getVolatility())
-					.volume(detected.getVolume())
-					.high(detected.getHigh())
-					.low(detected.getLow())
-					.viewCount(detected.getViewCount())
-					.detectedAt(detected.getDetectedAt())
-					.build())
-				.toList();
-			detectedCoinRepository.saveAll(coinsToSave);
+			detectedCoins = detectedCoins.stream()
+				.map(detectedCoin -> detectedCoin.withDetection(detection)).toList();
+			detectedCoinRepository.saveAll(detectedCoins);
 
 			sendDetectionNotification(detection, detectedCoins);
 			log.info("현물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
@@ -123,29 +105,14 @@ public class CoinDetectionService {
 
 		if (!detectedCoins.isEmpty()) {
 			Exchange exchange = exchangeCoins.getFirst().getExchange();
-			Detection detection = Detection.builder()
-				.detectionCriteria(criteria)
-				.exchange(exchange)
-				.detectedAt(LocalDateTime.now())
-				.detectionCount((long)detectedCoins.size())
-				.summary(SummaryUtil.create(criteria, detectedCoins))
-				.build();
-			detectionRepository.save(detection);
 
-			List<DetectedCoin> coinsToSave = detectedCoins.stream()
-				.map(detected -> DetectedCoin.builder()
-					.detection(detection)
-					.coin(detected.getCoin())
-					.exchangeCoin(detected.getExchangeCoin())
-					.volatility(detected.getVolatility())
-					.volume(detected.getVolume())
-					.high(detected.getHigh())
-					.low(detected.getLow())
-					.viewCount(detected.getViewCount())
-					.detectedAt(detected.getDetectedAt())
-					.build())
-				.toList();
-			detectedCoinRepository.saveAll(coinsToSave);
+			Detection detection = detectionRepository.save(
+				Detection.to(criteria, exchange, SummaryUtil.create(criteria, detectedCoins),
+					(long)detectedCoins.size()));
+
+			detectedCoins = detectedCoins.stream()
+				.map(detectedCoin -> detectedCoin.withDetection(detection)).toList();
+			detectedCoinRepository.saveAll(detectedCoins);
 
 			sendDetectionNotification(detection, detectedCoins);
 			log.info("선물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
@@ -167,21 +134,10 @@ public class CoinDetectionService {
 		String exchangeName = detection.getExchange().getName();
 		String exchangeType = detection.getExchange().getType().name();
 
-		DetectionInfoResponse response = DetectionInfoResponse.builder()
-			.exchangeName(exchangeName)
-			.exchangeType(exchangeType)
-			.timeframeLabel(timeframe)
-			.criteriaVolatility(detection.getDetectionCriteria().getVolatility())
-			.criteriaVolume(detection.getDetectionCriteria().getVolume())
-			.detectedAt(detection.getDetectedAt())
-			.coins(detectedCoins.stream()
-				.map(DetectedCoinResponse::from)
-				.toList())
-			.build();
-
 		String topic = String.format("/topic/detection/exchanges/%s/exchangeTypes/%s/timeframes/%s",
 			exchangeName, exchangeType, timeframe);
-		messagingTemplate.convertAndSend(topic, response);
+
+		messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, detectedCoins));
 	}
 
 	private DetectedCoin detectSingleCoin(ExchangeCoin exchangeCoin, DetectionCriteria criteria, String baseUrl) {
