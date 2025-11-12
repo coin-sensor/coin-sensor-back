@@ -78,6 +78,20 @@ public class DetectedCoin {
 		this.detectedAt = detectedAt;
 	}
 
+	public static DetectedCoin to(ExchangeCoin exchangeCoin, BigDecimal volatility, Double volume,
+		Double high, Double low) {
+		return DetectedCoin.builder()
+			.coin(exchangeCoin.getCoin())
+			.exchangeCoin(exchangeCoin)
+			.volatility(volatility)
+			.volume(volume)
+			.high(high)
+			.low(low)
+			.viewCount((0L))
+			.detectedAt(LocalDateTime.now())
+			.build();
+	}
+
 	public void incrementViewCount() {
 		this.viewCount++;
 	}

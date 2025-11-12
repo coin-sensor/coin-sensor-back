@@ -96,6 +96,7 @@ public class CoinDetectionService {
 					.volume(detected.getVolume())
 					.high(detected.getHigh())
 					.low(detected.getLow())
+					.viewCount(detected.getViewCount())
 					.detectedAt(detected.getDetectedAt())
 					.build())
 				.toList();
@@ -140,6 +141,7 @@ public class CoinDetectionService {
 					.volume(detected.getVolume())
 					.high(detected.getHigh())
 					.low(detected.getLow())
+					.viewCount(detected.getViewCount())
 					.detectedAt(detected.getDetectedAt())
 					.build())
 				.toList();
@@ -214,15 +216,9 @@ public class CoinDetectionService {
 				if (closePrice < openPrice)
 					priceChangePercent *= -1;
 
-				return DetectedCoin.builder()
-					.coin(coin)
-					.exchangeCoin(exchangeCoin)
-					.volatility(BigDecimal.valueOf(priceChangePercent).setScale(2, RoundingMode.HALF_UP))
-					.volume(Math.round(volumeRatio * 10.0) / 10.0)
-					.high(highPrice)
-					.low(lowPrice)
-					.detectedAt(LocalDateTime.now())
-					.build();
+				return DetectedCoin.to(exchangeCoin,
+					BigDecimal.valueOf(priceChangePercent).setScale(2, RoundingMode.HALF_UP),
+					Math.round(volumeRatio * 10.0) / 10.0, highPrice, lowPrice);
 			}
 
 		} catch (Exception e) {
