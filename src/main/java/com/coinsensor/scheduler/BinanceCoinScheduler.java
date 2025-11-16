@@ -28,7 +28,7 @@ public class BinanceCoinScheduler {
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
     
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 1 * * * *")
     @Transactional
     public void syncBinanceCoins() {
         syncSpotCoins();
