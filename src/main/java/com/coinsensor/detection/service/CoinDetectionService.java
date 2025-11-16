@@ -81,7 +81,7 @@ public class CoinDetectionService {
 		if (!detectedCoins.isEmpty()) {
 			Exchange exchange = exchangeCoins.getFirst().getExchange();
 			Detection detection = detectionRepository.save(
-				Detection.to(criteria, exchange, SummaryUtil.create(criteria, detectedCoins),
+				Detection.to(criteria, exchange, SummaryUtil.create(exchange, criteria, detectedCoins),
 					(long)detectedCoins.size()));
 
 			detectedCoins = detectedCoins.stream()
@@ -112,7 +112,7 @@ public class CoinDetectionService {
 			Exchange exchange = exchangeCoins.getFirst().getExchange();
 
 			Detection detection = detectionRepository.save(
-				Detection.to(criteria, exchange, SummaryUtil.create(criteria, detectedCoins),
+				Detection.to(criteria, exchange, SummaryUtil.create(exchange, criteria, detectedCoins),
 					(long)detectedCoins.size()));
 
 			detectedCoins = detectedCoins.stream()
@@ -174,7 +174,7 @@ public class CoinDetectionService {
 		String exchangeName = detection.getExchange().getName();
 		String exchangeType = detection.getExchange().getType().name();
 
-		String topic = String.format("/topic/detections?exchanges=%s&exchangeTypes=%s&coinCategory=%s&timeframes=%s",
+		String topic = String.format("/topic/detections?exchange=%s&exchangeType=%s&coinCategory=%s&timeframe=%s",
 			exchangeName, exchangeType, coinCategory, timeframe);
 
 		messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, detectedCoins));

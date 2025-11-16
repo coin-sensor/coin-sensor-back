@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -124,8 +123,8 @@ public class BinanceWebSocketService {
 
 			allCoins.sort(Comparator.comparing(TopBottomCoinResponse::getPriceChangePercent).reversed());
 
-			futuresTopCoins = allCoins.stream().limit(20).collect(Collectors.toList());
-			futuresBottomCoins = allCoins.stream().skip(Math.max(0, allCoins.size() - 20)).collect(Collectors.toList());
+			futuresTopCoins = allCoins.stream().limit(20).toList();
+			futuresBottomCoins = allCoins.stream().skip(Math.max(0, allCoins.size() - 20)).toList();
 
 		} catch (Exception e) {
 			log.warn("티커 데이터 처리 실패", e);
@@ -167,8 +166,8 @@ public class BinanceWebSocketService {
 
 			allCoins.sort(Comparator.comparing(TopBottomCoinResponse::getPriceChangePercent).reversed());
 
-			spotTopCoins = allCoins.stream().limit(20).collect(Collectors.toList());
-			spotBottomCoins = allCoins.stream().skip(Math.max(0, allCoins.size() - 20)).collect(Collectors.toList());
+			spotTopCoins = allCoins.stream().limit(20).toList();
+			spotBottomCoins = allCoins.stream().skip(Math.max(0, allCoins.size() - 20)).toList();
 
 		} catch (Exception e) {
 			log.warn("현물 티커 데이터 처리 실패", e);
