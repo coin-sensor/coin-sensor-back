@@ -8,21 +8,31 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 public class DataSourceConfig {
 
+	/**
+	 * PoolSize = Tn × ( Cm - 1 ) + ( Tn / 2 )
+	 * Tn: thread count (CPU cores)
+	 * Cm: simultaneous connection count (2)
+	 */
+	private final int poolSize = calculatePoolSize();
 	@Value("${spring.datasource.dbcp2.username}")
 	private String username;
-
 	@Value("${spring.datasource.dbcp2.password}")
 	private String password;
 
-	/**
-	 * PoolSize = Tn × ( Cm - 1 ) + ( Tn / 2 )
-	 * thread count : 12
-	 * simultaneous connection count : 2
-	 * pool size : 12 * ( 2 – 1 ) + (12 / 2) = 18
-	 */
+	private int calculatePoolSize() {
+		int threadCount = Runtime.getRuntime().availableProcessors();
+		int simultaneousConnectionCount = 2;
+		int calculatedPoolSize = threadCount * (simultaneousConnectionCount - 1) + (threadCount / 2);
+
+		log.info("[DataSource Pool Size] - CPU Cores: {}, Pool Size: {}", threadCount, calculatedPoolSize);
+		return calculatedPoolSize;
+	}
 
 	@Bean
 	@Profile("dev")
@@ -78,11 +88,11 @@ public class DataSourceConfig {
 		dataSource.setPassword(password);
 		dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-		// 💡 기존 설정 그대로 반영
-		dataSource.setInitialSize(18);
-		dataSource.setMaxTotal(18);
-		dataSource.setMaxIdle(18);
-		dataSource.setMinIdle(18);
+		// 💡 CPU 환경에 따른 동적 풀 사이즈 설정
+		dataSource.setInitialSize(poolSize);
+		dataSource.setMaxTotal(poolSize);
+		dataSource.setMaxIdle(poolSize);
+		dataSource.setMinIdle(poolSize);
 
 		dataSource.setTestOnBorrow(true);
 		dataSource.setValidationQuery("SELECT 1");

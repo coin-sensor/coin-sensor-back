@@ -133,9 +133,10 @@ public class CoinDetectionService {
 		String timeframe = detection.getDetectionCriteria().getTimeframe().getTimeframeLabel();
 		String exchangeName = detection.getExchange().getName();
 		String exchangeType = detection.getExchange().getType().name();
+		String coinRanking = "all";
 
-		String topic = String.format("/topic/detection/exchanges/%s/exchangeTypes/%s/timeframes/%s",
-			exchangeName, exchangeType, timeframe);
+		String topic = String.format("/topic/detections?exchanges=%s&exchangeTypes=%s&coinRanking=%s&timeframes=%s",
+			exchangeName, exchangeType, coinRanking, timeframe);
 
 		messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, detectedCoins));
 	}

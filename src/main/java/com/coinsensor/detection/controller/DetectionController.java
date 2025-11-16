@@ -24,7 +24,8 @@ public class DetectionController {
 	public ResponseEntity<List<DetectionInfoResponse>> getDetections(
 		@RequestParam String exchange,
 		@RequestParam String exchangeType,
+		@RequestParam String coinRanking,
 		@RequestParam String timeframe) {
-		return ResponseEntity.ok(detectionService.getDetections(exchange, exchangeType, timeframe));
+		return ResponseEntity.ok(detectionService.getDetections(exchange, exchangeType, coinRanking, timeframe));
 	}
 }
