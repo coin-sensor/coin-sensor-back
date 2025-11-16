@@ -1,9 +1,8 @@
 spring:
   datasource:
     url: ${DEV_MYSQL_URL}
-    dbcp2:
-      username: ${MYSQL_USERNAME}
-      password: ${MYSQL_PASSWORD}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
 
   data:
     redis:
