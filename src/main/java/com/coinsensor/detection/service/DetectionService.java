@@ -5,6 +5,6 @@ import java.util.List;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
 
 public interface DetectionService {
-	List<DetectionInfoResponse> getDetections(String exchange, String exchangeType, String coinRanking,
+	List<DetectionInfoResponse> getDetections(String exchange, String exchangeType, String coinCategory,
 		String timeframe);
 }

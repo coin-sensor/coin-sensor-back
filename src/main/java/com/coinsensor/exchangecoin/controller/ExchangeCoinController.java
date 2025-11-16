@@ -22,13 +22,13 @@ public class ExchangeCoinController {
 
 	@GetMapping("/top")
 	public ResponseEntity<List<TopBottomCoinResponse>> getTopCoins(
-		@RequestParam(defaultValue = "spot") String market) {
-		return ResponseEntity.ok(exchangeCoinService.getTopCoins(market));
+		@RequestParam(defaultValue = "spot") String exchangeType) {
+		return ResponseEntity.ok(exchangeCoinService.getTopCoins(exchangeType));
 	}
 
 	@GetMapping("/bottom")
 	public ResponseEntity<List<TopBottomCoinResponse>> getBottomCoins(
-		@RequestParam(defaultValue = "spot") String market) {
-		return ResponseEntity.ok(exchangeCoinService.getBottomCoins(market));
+		@RequestParam(defaultValue = "spot") String exchangeType) {
+		return ResponseEntity.ok(exchangeCoinService.getBottomCoins(exchangeType));
 	}
 }

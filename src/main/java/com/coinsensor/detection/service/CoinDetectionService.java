@@ -23,8 +23,10 @@ import com.coinsensor.detection.repository.DetectionRepository;
 import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
 import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
 import com.coinsensor.exchange.entity.Exchange;
+import com.coinsensor.exchangecoin.dto.response.TopBottomCoinResponse;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
+import com.coinsensor.exchangecoin.service.ExchangeCoinService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,6 +46,8 @@ public class CoinDetectionService {
 	private final ObjectMapper objectMapper;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final Executor taskExecutor = Executors.newFixedThreadPool(20);
+	private final List<String> coinCategories = List.of("all", "top20", "bottom20");
+	private final ExchangeCoinService exchangeCoinService;
 
 	@Transactional
 	public void detectAbnormalCoins(DetectionCriteria criteria) {
@@ -84,7 +88,8 @@ public class CoinDetectionService {
 				.map(detectedCoin -> detectedCoin.withDetection(detection)).toList();
 			detectedCoinRepository.saveAll(detectedCoins);
 
-			sendDetectionNotification(detection, detectedCoins);
+			processDetectionNotifications(detection, detectedCoins);
+
 			log.info("현물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
 		}
 	}
@@ -114,7 +119,7 @@ public class CoinDetectionService {
 				.map(detectedCoin -> detectedCoin.withDetection(detection)).toList();
 			detectedCoinRepository.saveAll(detectedCoins);
 
-			sendDetectionNotification(detection, detectedCoins);
+			processDetectionNotifications(detection, detectedCoins);
 			log.info("선물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
 		}
 	}
@@ -129,14 +134,48 @@ public class CoinDetectionService {
 				detectAbnormalCoins(criteria), taskExecutor));
 	}
 
-	private void sendDetectionNotification(Detection detection, List<DetectedCoin> detectedCoins) {
+	private void processDetectionNotifications(Detection detection, List<DetectedCoin> detectedCoins) {
+		for (String coinCategory : coinCategories) {
+			String exchangeType = detection.getExchange().getType().name();
+			switch (coinCategory) {
+				case "top20":
+					List<String> top20Tickers = exchangeCoinService.getTopCoins(exchangeType).stream()
+						.map(TopBottomCoinResponse::getSymbol)
+						.toList();
+
+					List<DetectedCoin> detectedTop20Coin = detectedCoins.stream()
+						.filter(coin -> top20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
+						.toList();
+
+					if (!detectedTop20Coin.isEmpty()) {
+						sendDetectionNotification(detection, detectedTop20Coin, coinCategory);
+					}
+					break;
+				case "bottom20":
+					List<String> bottom20Tickers = exchangeCoinService.getBottomCoins(exchangeType).stream()
+						.map(TopBottomCoinResponse::getSymbol)
+						.toList();
+					List<DetectedCoin> detectedBottom20Coin = detectedCoins.stream()
+						.filter(coin -> bottom20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
+						.toList();
+					if (!detectedBottom20Coin.isEmpty()) {
+						sendDetectionNotification(detection, detectedBottom20Coin, coinCategory);
+					}
+					break;
+				default:
+					sendDetectionNotification(detection, detectedCoins, coinCategory);
+					break;
+			}
+		}
+	}
+
+	private void sendDetectionNotification(Detection detection, List<DetectedCoin> detectedCoins, String coinCategory) {
 		String timeframe = detection.getDetectionCriteria().getTimeframe().getTimeframeLabel();
 		String exchangeName = detection.getExchange().getName();
 		String exchangeType = detection.getExchange().getType().name();
-		String coinRanking = "all";
 
-		String topic = String.format("/topic/detections?exchanges=%s&exchangeTypes=%s&coinRanking=%s&timeframes=%s",
-			exchangeName, exchangeType, coinRanking, timeframe);
+		String topic = String.format("/topic/detections?exchanges=%s&exchangeTypes=%s&coinCategory=%s&timeframes=%s",
+			exchangeName, exchangeType, coinCategory, timeframe);
 
 		messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, detectedCoins));
 	}

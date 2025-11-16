@@ -15,15 +15,15 @@ public class ExchangeCoinServiceImpl implements ExchangeCoinService {
 	private final BinanceWebSocketService binanceWebSocketService;
 
 	@Override
-	public List<TopBottomCoinResponse> getTopCoins(String market) {
-		return "spot".equals(market) ?
+	public List<TopBottomCoinResponse> getTopCoins(String exchangeType) {
+		return "spot".equals(exchangeType) ?
 			binanceWebSocketService.getSpotTopCoins() :
 			binanceWebSocketService.getFuturesTopCoins();
 	}
 
 	@Override
-	public List<TopBottomCoinResponse> getBottomCoins(String market) {
-		return "spot".equals(market) ?
+	public List<TopBottomCoinResponse> getBottomCoins(String exchangeType) {
+		return "spot".equals(exchangeType) ?
 			binanceWebSocketService.getSpotBottomCoins() :
 			binanceWebSocketService.getFuturesBottomCoins();
 	}
