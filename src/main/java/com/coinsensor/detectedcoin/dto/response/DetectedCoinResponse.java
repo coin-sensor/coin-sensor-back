@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 public class DetectedCoinResponse {
 	private Long detectedCoinId;
 	private String coinTicker;
-	private BigDecimal volatility;
-	private Double volume;
+	private BigDecimal changeX;
+	private BigDecimal volumeX;
 	private Long viewCount;
 	private LocalDateTime detectedAt;
 
@@ -26,8 +26,8 @@ public class DetectedCoinResponse {
 		return DetectedCoinResponse.builder()
 			.detectedCoinId(detectedCoin.getDetectedCoinId())
 			.coinTicker(detectedCoin.getCoin().getCoinTicker())
-			.volatility(detectedCoin.getVolatility())
-			.volume(detectedCoin.getVolume())
+			.changeX(detectedCoin.getChangeX())
+			.volumeX(detectedCoin.getVolumeX())
 			.viewCount(detectedCoin.getViewCount())
 			.detectedAt(detectedCoin.getDetectedAt())
 			.build();

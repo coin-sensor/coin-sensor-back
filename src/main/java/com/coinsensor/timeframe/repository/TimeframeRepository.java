@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TimeframeRepository extends JpaRepository<Timeframe, Long> {
-    java.util.Optional<Timeframe> findByTimeframeLabel(String timeframeLabel);
+    java.util.Optional<Timeframe> findByName(String name);
 }

@@ -38,7 +38,7 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 	@Override
 	public List<DetectedCoinResponse> getVolatileCoins() {
 		return detectedCoinRepository.findAll().stream()
-			.sorted((a, b) -> b.getVolatility().compareTo(a.getVolatility()))
+			.sorted((a, b) -> b.getChangeX().compareTo(a.getChangeX()))
 			.limit(20)
 			.map(DetectedCoinResponse::from)
 			.toList();

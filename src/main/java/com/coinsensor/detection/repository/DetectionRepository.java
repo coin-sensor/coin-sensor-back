@@ -15,45 +15,45 @@ public interface DetectionRepository extends JpaRepository<Detection, Long> {
     
     @Query("SELECT dg FROM Detection dg " +
            "JOIN FETCH dg.exchange e " +
-           "JOIN FETCH dg.detectionCriteria dc " +
-           "JOIN FETCH dc.timeframe tf " +
+           "JOIN FETCH dg.condition c " +
+           "JOIN FETCH c.timeframe tf " +
            "WHERE e.name = :exchangeName " +
            "AND e.type = :exchangeType " +
-           "AND tf.timeframeLabel = :timeframeLabel " +
+           "AND tf.name = :timeframeName " +
            "AND dg.detectedAt >= :startTime " +
            "AND dg.detectedAt < :endTime")
     Optional<Detection> findByExchangeAndTimeframeAndTime(
         @Param("exchangeName") String exchangeName,
         @Param("exchangeType") Exchange.Type exchangeType,
-        @Param("timeframeLabel") String timeframeLabel,
+        @Param("timeframeName") String timeframeName,
         @Param("startTime") LocalDateTime startTime,
         @Param("endTime") LocalDateTime endTime
     );
     
     @Query("SELECT dg FROM Detection dg " +
-           "JOIN FETCH dg.detectionCriteria dc " +
-           "JOIN FETCH dc.timeframe tf " +
-           "WHERE tf.timeframeLabel = :timeframeLabel " +
+           "JOIN FETCH dg.condition c " +
+           "JOIN FETCH c.timeframe tf " +
+           "WHERE tf.name = :timeframeName " +
            "AND dg.detectedAt >= :startTime " +
            "ORDER BY dg.detectedAt DESC")
     List<Detection> findByTimeframeAndAfterTime(
-        @Param("timeframeLabel") String timeframeLabel,
+        @Param("timeframeName") String timeframeName,
         @Param("startTime") LocalDateTime startTime
     );
     
     @Query("SELECT dg FROM Detection dg " +
            "JOIN FETCH dg.exchange e " +
-           "JOIN FETCH dg.detectionCriteria dc " +
-           "JOIN FETCH dc.timeframe tf " +
+           "JOIN FETCH dg.condition c " +
+           "JOIN FETCH c.timeframe tf " +
            "WHERE e.name = :exchangeName " +
            "AND e.type = :exchangeType " +
-           "AND tf.timeframeLabel = :timeframeLabel " +
+           "AND tf.name = :timeframeName " +
            "AND dg.detectedAt >= :startTime " +
            "ORDER BY dg.detectedAt DESC")
     List<Detection> findByExchangeAndTimeframeAndAfterTime(
         @Param("exchangeName") String exchangeName,
         @Param("exchangeType") Exchange.Type exchangeType,
-        @Param("timeframeLabel") String timeframeLabel,
+        @Param("timeframeName") String timeframeName,
         @Param("startTime") LocalDateTime startTime
     );
 }

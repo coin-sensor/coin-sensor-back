@@ -20,9 +20,9 @@ import lombok.NoArgsConstructor;
 public class DetectionInfoResponse {
 	private String exchangeName;
 	private String exchangeType;
-	private String timeframeLabel;
-	private BigDecimal criteriaVolatility;
-	private Double criteriaVolume;
+	private String timeframeName;
+	private BigDecimal conditionChangeX;
+	private BigDecimal conditionVolumeX;
 	private LocalDateTime detectedAt;
 	private List<DetectedCoinResponse> coins;
 
@@ -30,9 +30,9 @@ public class DetectionInfoResponse {
 		return DetectionInfoResponse.builder()
 			.exchangeName(detection.getExchange().getName())
 			.exchangeType(detection.getExchange().getType().name())
-			.timeframeLabel(detection.getDetectionCriteria().getTimeframe().getTimeframeLabel())
-			.criteriaVolatility(detection.getDetectionCriteria().getVolatility())
-			.criteriaVolume(detection.getDetectionCriteria().getVolume())
+			.timeframeName(detection.getCondition().getTimeframe().getName())
+			.conditionChangeX(detection.getCondition().getChangeX())
+			.conditionVolumeX(detection.getCondition().getVolumeX())
 			.detectedAt(detection.getDetectedAt())
 			.coins(detectedCoins.stream()
 				.map(DetectedCoinResponse::from)

@@ -20,8 +20,8 @@ import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
 import com.coinsensor.detection.entity.Detection;
 import com.coinsensor.detection.repository.DetectionRepository;
-import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
-import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
+import com.coinsensor.conditions.entity.Condition;
+import com.coinsensor.conditions.repository.ConditionRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.dto.response.TopBottomCoinResponse;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CoinDetectionService {
 
-	private final DetectionCriteriaRepository detectionCriteriaRepository;
+	private final ConditionRepository conditionRepository;
 	private final ExchangeCoinRepository exchangeCoinRepository;
 	private final DetectionRepository detectionRepository;
 	private final DetectedCoinRepository detectedCoinRepository;
@@ -50,7 +50,7 @@ public class CoinDetectionService {
 	private final ExchangeCoinService exchangeCoinService;
 
 	@Transactional
-	public void detectAbnormalCoins(DetectionCriteria criteria) {
+	public void detectAbnormalCoins(Condition condition) {
 		try {
 			Thread.sleep(5000); // 5초 딜레이 - 서버 데이터 갱신 대기
 		} catch (InterruptedException e) {
@@ -59,18 +59,18 @@ public class CoinDetectionService {
 		}
 
 		CompletableFuture.runAsync(() ->
-			detectBinanceSpotCoins(criteria), taskExecutor);
+			detectBinanceSpotCoins(condition), taskExecutor);
 		CompletableFuture.runAsync(() ->
-			detectBinanceFutureCoins(criteria), taskExecutor);
+			detectBinanceFutureCoins(condition), taskExecutor);
 	}
 
-	private void detectBinanceSpotCoins(DetectionCriteria criteria) {
+	private void detectBinanceSpotCoins(Condition condition) {
 		List<ExchangeCoin> exchangeCoins = exchangeCoinRepository.findByExchange_NameAndTypeAndIsActive("binance",
 			Exchange.Type.spot, true);
 
 		List<CompletableFuture<DetectedCoin>> futures = exchangeCoins.stream()
 			.map(exchangeCoin -> CompletableFuture.supplyAsync(() ->
-				detectSingleCoin(exchangeCoin, criteria, "https://api.binance.com/api/v3/klines"), taskExecutor))
+				detectSingleCoin(exchangeCoin, condition, "https://api.binance.com/api/v3/klines"), taskExecutor))
 			.toList();
 
 		List<DetectedCoin> detectedCoins = futures.stream()
@@ -80,9 +80,17 @@ public class CoinDetectionService {
 
 		if (!detectedCoins.isEmpty()) {
 			Exchange exchange = exchangeCoins.getFirst().getExchange();
+			BigDecimal changeXAvg = detectedCoins.stream()
+				.map(DetectedCoin::getChangeX)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.divide(BigDecimal.valueOf(detectedCoins.size()), 2, RoundingMode.HALF_UP);
+			BigDecimal volumeXAvg = detectedCoins.stream()
+				.map(DetectedCoin::getVolumeX)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.divide(BigDecimal.valueOf(detectedCoins.size()), 2, RoundingMode.HALF_UP);
 			Detection detection = detectionRepository.save(
-				Detection.to(criteria, exchange, SummaryUtil.create(exchange, criteria, detectedCoins),
-					(long)detectedCoins.size()));
+				Detection.to(condition, exchange, SummaryUtil.create(exchange, condition, detectedCoins),
+					(long)detectedCoins.size(), changeXAvg, volumeXAvg));
 
 			detectedCoins = detectedCoins.stream()
 				.map(detectedCoin -> detectedCoin.withDetection(detection)).toList();
@@ -90,17 +98,17 @@ public class CoinDetectionService {
 
 			processDetectionNotifications(detection, detectedCoins);
 
-			log.info("현물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
+			log.info("현물 탐지 완료: {} - {}개 코인", condition.getTimeframe().getName(), detectedCoins.size());
 		}
 	}
 
-	private void detectBinanceFutureCoins(DetectionCriteria criteria) {
+	private void detectBinanceFutureCoins(Condition condition) {
 		List<ExchangeCoin> exchangeCoins = exchangeCoinRepository.findByExchange_NameAndTypeAndIsActive("binance",
 			Exchange.Type.future, true);
 
 		List<CompletableFuture<DetectedCoin>> futures = exchangeCoins.stream()
 			.map(exchangeCoin -> CompletableFuture.supplyAsync(() ->
-				detectSingleCoin(exchangeCoin, criteria, "https://fapi.binance.com/fapi/v1/klines"), taskExecutor))
+				detectSingleCoin(exchangeCoin, condition, "https://fapi.binance.com/fapi/v1/klines"), taskExecutor))
 			.toList();
 
 		List<DetectedCoin> detectedCoins = futures.stream()
@@ -110,28 +118,35 @@ public class CoinDetectionService {
 
 		if (!detectedCoins.isEmpty()) {
 			Exchange exchange = exchangeCoins.getFirst().getExchange();
-
+			BigDecimal changeXAvg = detectedCoins.stream()
+				.map(DetectedCoin::getChangeX)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.divide(BigDecimal.valueOf(detectedCoins.size()), 2, RoundingMode.HALF_UP);
+			BigDecimal volumeXAvg = detectedCoins.stream()
+				.map(DetectedCoin::getVolumeX)
+				.reduce(BigDecimal.ZERO, BigDecimal::add)
+				.divide(BigDecimal.valueOf(detectedCoins.size()), 2, RoundingMode.HALF_UP);
 			Detection detection = detectionRepository.save(
-				Detection.to(criteria, exchange, SummaryUtil.create(exchange, criteria, detectedCoins),
-					(long)detectedCoins.size()));
+				Detection.to(condition, exchange, SummaryUtil.create(exchange, condition, detectedCoins),
+					(long)detectedCoins.size(), changeXAvg, volumeXAvg));
 
 			detectedCoins = detectedCoins.stream()
 				.map(detectedCoin -> detectedCoin.withDetection(detection)).toList();
 			detectedCoinRepository.saveAll(detectedCoins);
 
 			processDetectionNotifications(detection, detectedCoins);
-			log.info("선물 탐지 완료: {} - {}개 코인", criteria.getTimeframe().getTimeframeLabel(), detectedCoins.size());
+			log.info("선물 탐지 완료: {} - {}개 코인", condition.getTimeframe().getName(), detectedCoins.size());
 		}
 	}
 
 	@Transactional
-	public void detectByTimeframe(String timeframeLabel) {
-		List<DetectionCriteria> criteriaList = detectionCriteriaRepository.findAll();
+	public void detectByTimeframe(String timeframeName) {
+		List<Condition> conditionList = conditionRepository.findAll();
 
-		criteriaList.stream()
-			.filter(criteria -> criteria.getTimeframe().getTimeframeLabel().equals(timeframeLabel))
-			.forEach(criteria -> CompletableFuture.runAsync(() ->
-				detectAbnormalCoins(criteria), taskExecutor));
+		conditionList.stream()
+			.filter(condition -> condition.getTimeframe().getName().equals(timeframeName))
+			.forEach(condition -> CompletableFuture.runAsync(() ->
+				detectAbnormalCoins(condition), taskExecutor));
 	}
 
 	private void processDetectionNotifications(Detection detection, List<DetectedCoin> detectedCoins) {
@@ -170,7 +185,7 @@ public class CoinDetectionService {
 	}
 
 	private void sendDetectionNotification(Detection detection, List<DetectedCoin> detectedCoins, String coinCategory) {
-		String timeframe = detection.getDetectionCriteria().getTimeframe().getTimeframeLabel();
+		String timeframe = detection.getCondition().getTimeframe().getName();
 		String exchangeName = detection.getExchange().getName();
 		String exchangeType = detection.getExchange().getType().name();
 
@@ -180,13 +195,13 @@ public class CoinDetectionService {
 		messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, detectedCoins));
 	}
 
-	private DetectedCoin detectSingleCoin(ExchangeCoin exchangeCoin, DetectionCriteria criteria, String baseUrl) {
+	private DetectedCoin detectSingleCoin(ExchangeCoin exchangeCoin, Condition condition, String baseUrl) {
 		Coin coin = exchangeCoin.getCoin();
 
 		try {
 			String response = webClient.get()
 				.uri(baseUrl + "?symbol=" + coin.getCoinTicker() +
-					"&interval=" + criteria.getTimeframe().getTimeframeLabel() + "&limit=3")
+					"&interval=" + condition.getTimeframe().getName() + "&limit=3")
 				.retrieve()
 				.bodyToMono(String.class)
 				.block();
@@ -208,13 +223,15 @@ public class CoinDetectionService {
 			double priceChangePercent = (highPrice / lowPrice - 1) * 100;
 			double volumeRatio = prevVolume > 0 ? currentVolume / prevVolume : 0;
 
-			if (priceChangePercent >= criteria.getVolatility().doubleValue() && volumeRatio >= criteria.getVolume()) {
+			if (priceChangePercent >= condition.getChangeX().doubleValue() && volumeRatio >= condition.getVolumeX().doubleValue()) {
 				if (closePrice < openPrice)
 					priceChangePercent *= -1;
 
 				return DetectedCoin.to(exchangeCoin,
 					BigDecimal.valueOf(priceChangePercent).setScale(2, RoundingMode.HALF_UP),
-					Math.round(volumeRatio * 10.0) / 10.0, highPrice, lowPrice);
+					BigDecimal.valueOf(Math.round(volumeRatio * 100.0) / 100.0).setScale(2, RoundingMode.HALF_UP),
+					BigDecimal.valueOf(highPrice).setScale(8, RoundingMode.HALF_UP),
+					BigDecimal.valueOf(lowPrice).setScale(8, RoundingMode.HALF_UP));
 			}
 
 		} catch (Exception e) {

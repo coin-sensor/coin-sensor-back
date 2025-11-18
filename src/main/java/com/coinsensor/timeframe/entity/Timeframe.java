@@ -16,10 +16,10 @@ public class Timeframe {
     @Column(name = "timeframe_id")
     private Long timeframeId;
     
-    @Column(name = "timeframe_label", nullable = false)
-    private String timeframeLabel;
+    @Column(nullable = false)
+    private String name;
     
-    public Timeframe(String timeframeLabel) {
-        this.timeframeLabel = timeframeLabel;
+    public Timeframe(String name) {
+        this.name = name;
     }
 }

@@ -47,13 +47,13 @@ public class CoinDetectionScheduler {
 		executeDetectionAsync("1d");
 	}
 
-	private void executeDetectionAsync(String timeframeLabel) {
+	private void executeDetectionAsync(String timeframeName) {
 		CompletableFuture.runAsync(() -> {
 			try {
-				log.info("{} 탐지 시작", timeframeLabel);
-				coinDetectionService.detectByTimeframe(timeframeLabel);
+				log.info("{} 탐지 시작", timeframeName);
+				coinDetectionService.detectByTimeframe(timeframeName);
 			} catch (Exception e) {
-				log.error("{} 탐지 실패", timeframeLabel, e);
+				log.error("{} 탐지 실패", timeframeName, e);
 			}
 		});
 	}

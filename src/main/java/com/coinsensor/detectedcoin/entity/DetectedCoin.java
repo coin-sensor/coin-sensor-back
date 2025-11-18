@@ -47,17 +47,17 @@ public class DetectedCoin {
 	@JoinColumn(name = "exchange_coin_id", nullable = false)
 	private ExchangeCoin exchangeCoin;
 
-	@Column(nullable = false, precision = 10, scale = 2)
-	private BigDecimal volatility;
+	@Column(name = "change_x", nullable = false, precision = 10, scale = 2)
+	private BigDecimal changeX;
 
-	@Column(nullable = false)
-	private Double volume;
+	@Column(name = "volume_x", nullable = false, precision = 10, scale = 2)
+	private BigDecimal volumeX;
 
-	@Column(nullable = false)
-	private Double high;
+	@Column(nullable = false, precision = 20, scale = 8)
+	private BigDecimal high;
 
-	@Column(nullable = false)
-	private Double low;
+	@Column(nullable = false, precision = 20, scale = 8)
+	private BigDecimal low;
 
 	@Column(name = "view_count", nullable = false)
 	private Long viewCount;
@@ -65,26 +65,26 @@ public class DetectedCoin {
 	@Column(name = "detected_at", nullable = false)
 	private LocalDateTime detectedAt;
 
-	public DetectedCoin(Detection detection, Coin coin, ExchangeCoin exchangeCoin, BigDecimal volatility, Double volume,
-		Double high, Double low, LocalDateTime detectedAt) {
+	public DetectedCoin(Detection detection, Coin coin, ExchangeCoin exchangeCoin, BigDecimal changeX, BigDecimal volumeX,
+		BigDecimal high, BigDecimal low, LocalDateTime detectedAt) {
 		this.detection = detection;
 		this.coin = coin;
 		this.exchangeCoin = exchangeCoin;
-		this.volatility = volatility;
-		this.volume = volume;
+		this.changeX = changeX;
+		this.volumeX = volumeX;
 		this.high = high;
 		this.low = low;
 		this.viewCount = 0L;
 		this.detectedAt = detectedAt;
 	}
 
-	public static DetectedCoin to(ExchangeCoin exchangeCoin, BigDecimal volatility, Double volume,
-		Double high, Double low) {
+	public static DetectedCoin to(ExchangeCoin exchangeCoin, BigDecimal changeX, BigDecimal volumeX,
+		BigDecimal high, BigDecimal low) {
 		return DetectedCoin.builder()
 			.coin(exchangeCoin.getCoin())
 			.exchangeCoin(exchangeCoin)
-			.volatility(volatility)
-			.volume(volume)
+			.changeX(changeX)
+			.volumeX(volumeX)
 			.high(high)
 			.low(low)
 			.viewCount(0L)
@@ -97,8 +97,8 @@ public class DetectedCoin {
 			.detection(detection)
 			.coin(this.coin)
 			.exchangeCoin(this.exchangeCoin)
-			.volatility(this.volatility)
-			.volume(this.volume)
+			.changeX(this.changeX)
+			.volumeX(this.volumeX)
 			.high(this.high)
 			.low(this.low)
 			.viewCount(0L)

@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.coinsensor.channel.entity.Channel;
 import com.coinsensor.channel.repository.ChannelRepository;
-import com.coinsensor.detectioncriteria.entity.DetectionCriteria;
-import com.coinsensor.detectioncriteria.repository.DetectionCriteriaRepository;
+import com.coinsensor.conditions.entity.Condition;
+import com.coinsensor.conditions.repository.ConditionRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchange.repository.ExchangeRepository;
 import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
@@ -31,7 +31,7 @@ public class DataInitializer {
 
 	private final ExchangeRepository exchangeRepository;
 	private final TimeframeRepository timeframeRepository;
-	private final DetectionCriteriaRepository detectionCriteriaRepository;
+	private final ConditionRepository conditionRepository;
 	private final ExchangeCoinRepository exchangeCoinRepository;
 	private final BinanceCoinScheduler binanceCoinScheduler;
 	private final ChannelRepository channelRepository;
@@ -63,20 +63,20 @@ public class DataInitializer {
 			log.info("초기 타임프레임 데이터 생성: {}", timeframes);
 		}
 
-		if (detectionCriteriaRepository.count() == 0) {
-			Timeframe tf1m = timeframeRepository.findByTimeframeLabel("1m").orElseThrow();
-			Timeframe tf5m = timeframeRepository.findByTimeframeLabel("5m").orElseThrow();
-			Timeframe tf15m = timeframeRepository.findByTimeframeLabel("15m").orElseThrow();
-			Timeframe tf1h = timeframeRepository.findByTimeframeLabel("1h").orElseThrow();
-			Timeframe tf4h = timeframeRepository.findByTimeframeLabel("4h").orElseThrow();
+		if (conditionRepository.count() == 0) {
+			Timeframe tf1m = timeframeRepository.findByName("1m").orElseThrow();
+			Timeframe tf5m = timeframeRepository.findByName("5m").orElseThrow();
+			Timeframe tf15m = timeframeRepository.findByName("15m").orElseThrow();
+			Timeframe tf1h = timeframeRepository.findByName("1h").orElseThrow();
+			Timeframe tf4h = timeframeRepository.findByName("4h").orElseThrow();
 
-			detectionCriteriaRepository.save(new DetectionCriteria(tf1m, BigDecimal.valueOf(1.00), 2.0));
-			detectionCriteriaRepository.save(new DetectionCriteria(tf5m, BigDecimal.valueOf(1.00), 2.0));
-			detectionCriteriaRepository.save(new DetectionCriteria(tf15m, BigDecimal.valueOf(2.00), 2.0));
-			detectionCriteriaRepository.save(new DetectionCriteria(tf1h, BigDecimal.valueOf(3.00), 2.0));
-			detectionCriteriaRepository.save(new DetectionCriteria(tf4h, BigDecimal.valueOf(5.00), 2.0));
+			conditionRepository.save(new Condition(tf1m, BigDecimal.valueOf(1.00), BigDecimal.valueOf(2.00)));
+			conditionRepository.save(new Condition(tf5m, BigDecimal.valueOf(1.00), BigDecimal.valueOf(2.00)));
+			conditionRepository.save(new Condition(tf15m, BigDecimal.valueOf(2.00), BigDecimal.valueOf(2.00)));
+			conditionRepository.save(new Condition(tf1h, BigDecimal.valueOf(3.00), BigDecimal.valueOf(2.00)));
+			conditionRepository.save(new Condition(tf4h, BigDecimal.valueOf(5.00), BigDecimal.valueOf(2.00)));
 
-			log.info("초기 감지 기준 데이터 생성 완료");
+			log.info("초기 감지 조건 데이터 생성 완료");
 		}
 
 		if (exchangeCoinRepository.count() == 0) {

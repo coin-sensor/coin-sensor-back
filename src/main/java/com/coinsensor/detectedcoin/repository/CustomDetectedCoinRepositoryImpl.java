@@ -1,8 +1,8 @@
 package com.coinsensor.detectedcoin.repository;
 
+import static com.coinsensor.conditions.entity.QCondition.*;
 import static com.coinsensor.detectedcoin.entity.QDetectedCoin.*;
 import static com.coinsensor.detection.entity.QDetection.*;
-import static com.coinsensor.detectioncriteria.entity.QDetectionCriteria.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -27,8 +27,8 @@ public class CustomDetectedCoinRepositoryImpl implements CustomDetectedCoinRepos
 		return queryFactory
 			.selectFrom(detectedCoin)
 			.join(detectedCoin.detection, detection).fetchJoin()
-			.join(detection.detectionCriteria, detectionCriteria).fetchJoin()
-			.where(detectionCriteria.timeframe.eq(timeframe)
+			.join(detection.condition, condition).fetchJoin()
+			.where(condition.timeframe.eq(timeframe)
 				.and(detectedCoin.detectedAt.between(startOfPrevMinute, endOfPrevMinute)))
 			.fetch();
 	}
