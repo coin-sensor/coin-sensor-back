@@ -40,7 +40,13 @@ public class DataInitializer {
 	@EventListener(ApplicationReadyEvent.class)
 	@Transactional
 	public void initData() {
-		if (exchangeRepository.count() == 0) {
+
+		if (exchangeRepository.count() != 0) {
+			log.info("[ ** 초기 데이터 생성을 Skip ** ]");
+			return;
+		} else {
+			log.info("[ ** 초기 데이터 생성 시작 ** ]");
+
 			exchangeRepository.save(new Exchange("binance", Exchange.Type.spot));
 			exchangeRepository.save(new Exchange("binance", Exchange.Type.future));
 			exchangeRepository.save(new Exchange("upbit", Exchange.Type.spot));
