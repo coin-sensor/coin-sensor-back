@@ -10,8 +10,7 @@ public enum ErrorCode {
 	FORBIDDEN("접근 권한이 없습니다."),
 	INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
 
-	ALREADY_VOTED("이미 투표하셨습니다."),
-
+	NOT_FOUND("찾을 수 없습니다."),
 	COIN_NOT_FOUND("코인을 찾을 수 없습니다."),
 	USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
 	USER_BANNED("차단된 사용자입니다."),
@@ -23,7 +22,10 @@ public enum ErrorCode {
 	ROOM_NOT_FOUND("채팅방을 찾을 수 없습니다."),
 	DETECTED_COIN_NOT_FOUND("감지된 코인을 찾을 수 없습니다."),
 	EXCHANGE_COIN_NOT_FOUND("거래소 코인을 찾을 수 없습니다."),
-	CLICK_COIN_NOT_FOUND("클릭 코인을 찾을 수 없습니다.");
+	CLICK_COIN_NOT_FOUND("클릭 코인을 찾을 수 없습니다."),
+
+	ALREADY_EXISTS("이미 존재합니다."),
+	FAVORITE_COIN_ALREADY_EXISTS("이미 존재하는 즐겨찾기 코인 입니다.");
 
 	private final String message;
 }
