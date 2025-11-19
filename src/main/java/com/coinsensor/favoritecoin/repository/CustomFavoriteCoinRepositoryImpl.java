@@ -27,10 +27,10 @@ public class CustomFavoriteCoinRepositoryImpl implements CustomFavoriteCoinRepos
 				favoriteCoin.exchangeCoin.exchangeCoinId,
 				favoriteCoin.exchangeCoin.coin.coinTicker,
 				favoriteCoin.exchangeCoin.exchange.name,
-				favoriteCoin.exchangeCoin.exchange.type
+				favoriteCoin.exchangeCoin.exchange.type.stringValue()
 			))
 			.from(favoriteCoin)
-			.where(user.uuid.eq(uuid))
+			.where(favoriteCoin.user.uuid.eq(uuid))
 			.fetch();
 	}
 

@@ -8,7 +8,5 @@ public interface FavoriteCoinService {
 
 	List<FavoriteCoinResponse> getFavoriteCoins(String uuid);
 
-	void addFavoriteCoin(String uuid, Long exchangeCoinId);
-
-	void removeFavoriteCoin(String uuid, Long exchangeCoinId);
+	void createOrDeleteFavoriteCoin(String uuid, Long exchangeCoinId);
 }

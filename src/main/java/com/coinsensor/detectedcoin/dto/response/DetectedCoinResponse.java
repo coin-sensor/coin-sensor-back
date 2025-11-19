@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DetectedCoinResponse {
 	private Long detectedCoinId;
+	private Long exchangeCoinId;
 	private String coinTicker;
 	private BigDecimal changeX;
 	private BigDecimal volumeX;
@@ -25,6 +26,7 @@ public class DetectedCoinResponse {
 	public static DetectedCoinResponse from(DetectedCoin detectedCoin) {
 		return DetectedCoinResponse.builder()
 			.detectedCoinId(detectedCoin.getDetectedCoinId())
+			.exchangeCoinId(detectedCoin.getExchangeCoin().getExchangeCoinId())
 			.coinTicker(detectedCoin.getCoin().getCoinTicker())
 			.changeX(detectedCoin.getChangeX())
 			.volumeX(detectedCoin.getVolumeX())

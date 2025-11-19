@@ -44,16 +44,11 @@ public class FavoriteCoin {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
-	public FavoriteCoin(User user, ExchangeCoin exchangeCoin) {
-		this.user = user;
-		this.exchangeCoin = exchangeCoin;
-		this.createdAt = LocalDateTime.now();
-	}
-
 	public static FavoriteCoin to(User user, ExchangeCoin exchangeCoin) {
 		return FavoriteCoin.builder()
 			.user(user)
 			.exchangeCoin(exchangeCoin)
+			.createdAt(LocalDateTime.now())
 			.build();
 	}
 }

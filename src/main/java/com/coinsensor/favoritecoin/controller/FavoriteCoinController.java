@@ -3,7 +3,6 @@ package com.coinsensor.favoritecoin.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,14 +28,9 @@ public class FavoriteCoinController {
 	}
 
 	@PostMapping("/{exchangeCoinId}")
-	public ResponseEntity<Void> addFavoriteCoin(@RequestHeader String uuid, @PathVariable Long exchangeCoinId) {
-		favoriteCoinService.addFavoriteCoin(uuid, exchangeCoinId);
-		return ResponseEntity.ok().build();
-	}
-
-	@DeleteMapping("/{exchangeCoinId}")
-	public ResponseEntity<Void> removeFavoriteCoin(@RequestHeader String uuid, @PathVariable Long exchangeCoinId) {
-		favoriteCoinService.removeFavoriteCoin(uuid, exchangeCoinId);
+	public ResponseEntity<Void> createOrDeleteFavoriteCoin(@RequestHeader String uuid,
+		@PathVariable Long exchangeCoinId) {
+		favoriteCoinService.createOrDeleteFavoriteCoin(uuid, exchangeCoinId);
 		return ResponseEntity.ok().build();
 	}
 }

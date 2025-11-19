@@ -33,20 +33,17 @@ public class FavoriteCoinServiceImpl implements FavoriteCoinService {
 	}
 
 	@Override
-	public void addFavoriteCoin(String uuid, Long exchangeCoinId) {
+	public void createOrDeleteFavoriteCoin(String uuid, Long exchangeCoinId) {
 		if (favoriteCoinRepository.existsByUuidAndExchangeCoinId(uuid, exchangeCoinId)) {
-			throw new CustomException(FAVORITE_COIN_ALREADY_EXISTS);
+			favoriteCoinRepository.deleteByUuidAndExchangeCoinId(uuid, exchangeCoinId);
+		} else {
+			User user = userRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+			ExchangeCoin exchangeCoin = exchangeCoinRepository.findById(exchangeCoinId)
+				.orElseThrow(() -> new CustomException(EXCHANGE_COIN_NOT_FOUND));
+
+			favoriteCoinRepository.save(FavoriteCoin.to(user, exchangeCoin));
 		}
 
-		User user = userRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-		ExchangeCoin exchangeCoin = exchangeCoinRepository.findById(exchangeCoinId)
-			.orElseThrow(() -> new CustomException(EXCHANGE_COIN_NOT_FOUND));
-
-		favoriteCoinRepository.save(FavoriteCoin.to(user, exchangeCoin));
 	}
 
-	@Override
-	public void removeFavoriteCoin(String uuid, Long exchangeCoinId) {
-		favoriteCoinRepository.deleteByUuidAndExchangeCoinId(uuid, exchangeCoinId);
-	}
 }
