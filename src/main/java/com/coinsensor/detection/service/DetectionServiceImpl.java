@@ -1,13 +1,18 @@
 package com.coinsensor.detection.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
+import com.coinsensor.detection.dto.response.DetectionChartResponse;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
 import com.coinsensor.detection.entity.Detection;
 import com.coinsensor.detection.repository.DetectionRepository;
@@ -81,6 +86,37 @@ public class DetectionServiceImpl implements DetectionService {
 			default:
 				return DetectionInfoResponse.of(detection, detectedCoins);
 		}
+	}
+
+	@Override
+	public DetectionChartResponse getDetectionChart(String timeframe, LocalDateTime startTime, LocalDateTime endTime) {
+		List<Detection> detections = detectionRepository.findByTimeframeBetween(timeframe, startTime, endTime);
+
+		Map<String, Long> detectionCounts = detections.stream()
+			.collect(Collectors.groupingBy(
+				detection -> formatDateTime(detection.getDetectedAt(), timeframe),
+				Collectors.summingLong(Detection::getDetectionCount)
+			));
+
+		List<String> labels = new ArrayList<>(detectionCounts.keySet());
+		labels.sort(String::compareTo);
+
+		List<Integer> data = labels.stream()
+			.map(label -> detectionCounts.getOrDefault(label, 0L).intValue())
+			.toList();
+
+		DetectionChartResponse.Dataset dataset = new DetectionChartResponse.Dataset("탐지 수", data);
+		return new DetectionChartResponse(labels, List.of(dataset));
+	}
+
+	private String formatDateTime(LocalDateTime dateTime, String timeframe) {
+		DateTimeFormatter formatter = switch (timeframe) {
+			case "1m", "5m", "15m" -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+			case "1h", "4h" -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00");
+			case "1d" -> DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00");
+			default -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		};
+		return dateTime.format(formatter);
 	}
 
 }
