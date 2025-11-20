@@ -16,7 +16,9 @@
 - '/api' 로 시작
 - 각 엔티티에 맞게 작성하는데 Camel Case 사용, 복수형 사용
 
-## 팩토리 메서드 네이밍 규칙
+## 팩토리 메서드 규칙
+
+- 엔티티에 관련된 to 는 각 엔티티 클래스 파일에 정적 메소드로 작성하여 사용
 
 ### `from`
 
@@ -97,8 +99,20 @@ of(value)
 
 ## JPA 사용
 
-- 기본적인 find, delete를 사용하는게 아닌 경우 각 패키지에 CustomRepository를 구현하고 queryDSL 을 통해 구현하여 사용
+- 기본적인 엔티티에 포함된 외래키가 아닌 필드를 사용할 경우 JPARepository에서 생성해주는 메서드 활용
+- 여러개의 필드나 외래키 등 복잡한 쿼리를 구현해야될 경우 CustomRepository를 구현하고 queryDSL 을 통해 구현하여 사용
 
 ## DTO
 
-- Post, Delete, Put 은 요청 파라미터가 필요한경우 별도의 DTO 를 구현하여 사용 
+- Post, Delete, Put 은 요청 파라미터가 필요한경우 별도의 DTO 를 구현하여 사용
+
+## 어노테이션 순서
+
+1. @Service
+2. @Transactional
+3. @RequiredArgsConstructor
+
+## controller, service, repository
+
+- 인터페이스 작성 시 클래스 명과 각 메서드 사이에 한줄씩 띄어쓰기 추가해서 보기 좋게 작성
+- CURD 순서로 메서드 정리 
