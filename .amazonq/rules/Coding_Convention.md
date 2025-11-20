@@ -6,6 +6,16 @@
 - name: 식별자, 레이블, 카테고리명 등 텍스트 형태의 명칭
 - value: 수치, 측정값, 계산 결과 등 정량적 데이터
 
+## 예외처리
+
+- CustomException.java 를 활용
+- 기존에 있는 ErrorCode 사용 or 특정 패키지에 해당하는 ErrorCode 가 없으면 다른 ErrorCode 참고해서 추가하고 사용
+
+## Controller @RequestMapping 명명규칙
+
+- '/api' 로 시작
+- 각 엔티티에 맞게 작성하는데 Camel Case 사용, 복수형 사용
+
 ## 팩토리 메서드 네이밍 규칙
 
 ### `from`
@@ -84,3 +94,11 @@ of(value)
 2. **여러 파라미터로 Entity 생성**: `to` 사용
 3. **여러 파라미터로 DTO/Response 생성**: `of` 사용
 4. **일관성 유지**: 프로젝트 전체에서 동일한 규칙 적용
+
+## JPA 사용
+
+- 기본적인 find, delete를 사용하는게 아닌 경우 각 패키지에 CustomRepository를 구현하고 queryDSL 을 통해 구현하여 사용
+
+## DTO
+
+- Post, Delete, Put 은 요청 파라미터가 필요한경우 별도의 DTO 를 구현하여 사용 
