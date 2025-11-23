@@ -1,6 +1,11 @@
 package com.coinsensor.userreaction.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.coinsensor.reaction.entity.Reaction;
+import com.coinsensor.targettable.entity.TargetTable;
 import com.coinsensor.user.entity.User;
 
 import jakarta.persistence.Column;
@@ -40,9 +45,27 @@ public class UserReaction {
 	private Reaction reaction;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "table_id")
-	private Table table;
+	@JoinColumn(name = "target_table_id")
+	private TargetTable targetTable;
 
 	@Column(name = "target_id", nullable = false)
 	private Long targetId;
+
+	@CreationTimestamp
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
+	public static UserReaction to(User user, Reaction reaction, TargetTable targetTable,
+		Long targetId) {
+		return UserReaction.builder()
+			.user(user)
+			.reaction(reaction)
+			.targetTable(targetTable)
+			.targetId(targetId)
+			.build();
+	}
+
+	public void updateReaction(Reaction reaction) {
+		this.reaction = reaction;
+	}
 }

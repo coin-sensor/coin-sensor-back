@@ -23,9 +23,12 @@ public enum ErrorCode {
 	DETECTED_COIN_NOT_FOUND("감지된 코인을 찾을 수 없습니다."),
 	EXCHANGE_COIN_NOT_FOUND("거래소 코인을 찾을 수 없습니다."),
 	CLICK_COIN_NOT_FOUND("클릭 코인을 찾을 수 없습니다."),
+	REACTION_NOT_FOUND("리액션을 찾을 수 없습니다."),
+	TABLE_NOT_FOUND("테이블을 찾을 수 없습니다."),
 
 	ALREADY_EXISTS("이미 존재합니다."),
 	FAVORITE_COIN_ALREADY_EXISTS("이미 존재하는 즐겨찾기 코인 입니다."),
+	REACTION_ALREADY_EXISTS("이미 존재하는 리액션입니다."),
 	TARGET_USER_NOT_FOUND("대상 사용자를 찾을 수 없습니다.");
 
 	private final String message;

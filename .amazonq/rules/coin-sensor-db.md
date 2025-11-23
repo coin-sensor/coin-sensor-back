@@ -1,4 +1,4 @@
-﻿﻿CREATE TABLE `detected_coins` (
+﻿CREATE TABLE `detected_coins` (
 `detected_coin_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '탐지된 코인 ID',
 `detection_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '탐지 ID',
 `exchange_coin_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '거래소 코인 ID',
@@ -50,9 +50,9 @@ CREATE TABLE `vote_topics` (
 `created_at`    DATETIME NOT NULL COMMENT '생성시각'
 );
 
-CREATE TABLE `tables` (
-`table_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '테이블 ID',
-`name`    VARCHAR(255)    NOT NULL COMMENT '테이름 이름'
+CREATE TABLE `target_tables` (
+`target_table_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '타켓 테이블 ID',
+`name`    VARCHAR(255)    NOT NULL COMMENT '테이블 이름'
 );
 
 CREATE TABLE `analyses` (
@@ -216,7 +216,8 @@ CREATE TABLE `user_reactions` (
 `user_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '유저 ID',
 `reaction_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '리액션 ID',
 `table_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '테이블 ID',
-`target_id`    BIGINT NOT NULL COMMENT '타켓 키 값'
+`target_id`    BIGINT NOT NULL COMMENT '타켓 키 값',
+`created_at`    DAT ETIME NOT NULL COMMENT '생성시간'
 );
 
 ALTER TABLE `detected_coins` ADD CONSTRAINT `PK_DETECTED_COINS` PRIMARY KEY (
@@ -243,8 +244,8 @@ ALTER TABLE `vote_topics` ADD CONSTRAINT `PK_VOTE_TOPICS` PRIMARY KEY (
 `vote_topic_id`
 );
 
-ALTER TABLE `tables` ADD CONSTRAINT `PK_TABLES` PRIMARY KEY (
-`table_id`
+ALTER TABLE `target_tables` ADD CONSTRAINT `PK_TARGET_TABLES` PRIMARY KEY (
+`target_table_id`
 );
 
 ALTER TABLE `analyses` ADD CONSTRAINT `PK_ANALYSES` PRIMARY KEY (
@@ -505,10 +506,10 @@ REFERENCES `reactions` (
 `reaction_id`
 );
 
-ALTER TABLE `user_reactions` ADD CONSTRAINT `FK_tables_TO_user_reactions_1` FOREIGN KEY (
+ALTER TABLE `user_reactions` ADD CONSTRAINT `FK_target_tables_TO_user_reactions_1` FOREIGN KEY (
 `table_id`
 )
-REFERENCES `tables` (
-`table_id`
+REFERENCES `target_tables` (
+`target_table_id`
 );
 

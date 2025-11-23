@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class UserReactionRequest {
-    private Long reactionId;
-    private String targetTable;
+    private String reactionName;
+    private String tableName;
     private Long targetId;
 }
