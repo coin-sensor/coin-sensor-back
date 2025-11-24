@@ -61,18 +61,20 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 	}
 
 	@Override
-	public void viewDetectedCoin(String uuid, Long detectedCoinId) {
+	public Long viewDetectedCoin(String uuid, Long detectedCoinId) {
 		ClickCoin clickCoin = clickCoinRepository.findByUuidAndDetectedCoinId(uuid, detectedCoinId).orElse(null);
+		DetectedCoin detectedCoin = detectedCoinRepository.findById(detectedCoinId)
+			.orElseThrow(() -> new CustomException(DETECTED_COIN_NOT_FOUND));
 
 		if (clickCoin == null) {
 			User user = userRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-			DetectedCoin detectedCoin = detectedCoinRepository.findById(detectedCoinId)
-				.orElseThrow(() -> new CustomException(DETECTED_COIN_NOT_FOUND));
 			clickCoinRepository.save(new ClickCoin(user, detectedCoin));
 			detectedCoin.incrementViewCount();
 		} else {
 			clickCoin.reClick();
 		}
+		
+		return detectedCoin.getViewCount();
 	}
 
 	private DetectedCoinResponse mapToResponseWithReactions(DetectedCoin detectedCoin) {

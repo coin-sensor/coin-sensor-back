@@ -42,8 +42,8 @@ public class DetectedCoinController {
 	}
 
 	@PostMapping("/detected/{detectedCoinId}/view")
-	public ResponseEntity<Void> viewDetectedCoin(@RequestHeader String uuid, @PathVariable Long detectedCoinId) {
-		detectedCoinService.viewDetectedCoin(uuid, detectedCoinId);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Long> viewDetectedCoin(@RequestHeader String uuid, @PathVariable Long detectedCoinId) {
+		Long viewCount = detectedCoinService.viewDetectedCoin(uuid, detectedCoinId);
+		return ResponseEntity.ok(viewCount);
 	}
 }

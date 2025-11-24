@@ -8,5 +8,5 @@ public interface DetectedCoinService {
     List<DetectedCoinResponse> getAbnormalCoins();
     List<DetectedCoinResponse> getVolatileCoins();
     List<DetectedCoinResponse> getDetectedCoinsByTimeAndType(String exchangeName, String exchangeType);
-    void viewDetectedCoin(String uuid, Long detectedCoinId);
+    Long viewDetectedCoin(String uuid, Long detectedCoinId);
 }
