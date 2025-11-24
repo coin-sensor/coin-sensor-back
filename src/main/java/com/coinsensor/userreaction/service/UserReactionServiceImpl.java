@@ -35,21 +35,25 @@ public class UserReactionServiceImpl implements UserReactionService {
 		Reaction reaction = reactionRepository.findByName(request.getReactionName())
 			.orElseThrow(() -> new CustomException(ErrorCode.REACTION_NOT_FOUND));
 
-		TargetTable table = tableRepository.findByName(request.getTableName())
+		TargetTable targetTable = tableRepository.findByName(request.getTableName())
 			.orElseThrow(() -> new CustomException(ErrorCode.TABLE_NOT_FOUND));
 
 		// 기존 리액션 조회
-		UserReaction userReaction = userReactionRepository.findByUserAndTargetTableAndTargetId(user, table,
+		UserReaction userReaction = userReactionRepository.findByUserAndTargetTableAndTargetId(user, targetTable,
 			request.getTargetId()).orElse(null);
 
 		// 기존 리액션이 있는 경우
 		if (userReaction != null) {
-
-			// 다른 리액션이면 기존 리액션을 새 리액션으로 수정
-			userReaction.updateReaction(reaction);
+			if (userReaction.getReaction().equals(reaction)) {
+				// 같은 리액션이면 리액션 삭제
+				userReactionRepository.delete(userReaction);
+			} else {
+				// 다른 리액션이면 기존 리액션을 새 리액션으로 수정
+				userReaction.updateReaction(reaction);
+			}
 		} else {
 			// 새 리액션 추가
-			userReaction = UserReaction.to(user, reaction, table, request.getTargetId());
+			userReaction = UserReaction.to(user, reaction, targetTable, request.getTargetId());
 			userReactionRepository.save(userReaction);
 		}
 
