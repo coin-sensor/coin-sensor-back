@@ -1,13 +1,18 @@
 package com.coinsensor.userreaction.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coinsensor.userreaction.dto.request.UserReactionRequest;
+import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
 import com.coinsensor.userreaction.service.UserReactionService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,5 +28,13 @@ public class UserReactionController {
 	public ResponseEntity<Void> toggleReaction(@RequestHeader String uuid, @RequestBody UserReactionRequest request) {
 		userReactionService.toggleReaction(uuid, request);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/counts")
+	public ResponseEntity<List<ReactionCountResponse>> getReactionCounts(
+			@RequestParam String targetType,
+			@RequestParam Long targetId) {
+		List<ReactionCountResponse> counts = userReactionService.getReactionCounts(targetType, targetId);
+		return ResponseEntity.ok(counts);
 	}
 }

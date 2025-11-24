@@ -1,11 +1,8 @@
-package com.coinsensor.userreaction.entity;
+package com.coinsensor.reaction.entity;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.CreationTimestamp;
-
-import com.coinsensor.reaction.entity.Reaction;
-import com.coinsensor.user.entity.User;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,23 +20,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user_reactions")
+@Table(name = "reaction_counts")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserReaction {
+public class ReactionCount {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_reaction_id")
-	private Long userReactionId;
+	@Column(name = "reaction_count_id")
+	private Long reactionCountId;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "user_id")
-	private User user;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "reaction_id")
 	private Reaction reaction;
 
@@ -49,20 +42,27 @@ public class UserReaction {
 	@Column(name = "target_type", nullable = false)
 	private String targetType;
 
-	@CreationTimestamp
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+	@Column(nullable = false)
+	private Long count;
 
-	public static UserReaction to(User user, Reaction reaction, String targetType, Long targetId) {
-		return UserReaction.builder()
-			.user(user)
-			.reaction(reaction)
-			.targetType(targetType)
+	@UpdateTimestamp
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt;
+
+	public static ReactionCount to(Long targetId, String targetType, Reaction reaction, Long count) {
+		return ReactionCount.builder()
 			.targetId(targetId)
+			.targetType(targetType)
+			.reaction(reaction)
+			.count(count)
 			.build();
 	}
 
-	public void updateReaction(Reaction reaction) {
-		this.reaction = reaction;
+	public void incrementCount() {
+		this.count++;
+	}
+
+	public void decrementCount() {
+		this.count--;
 	}
 }

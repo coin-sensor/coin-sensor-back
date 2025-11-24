@@ -50,11 +50,6 @@ CREATE TABLE `vote_topics` (
 `created_at`    DATETIME NOT NULL COMMENT '생성시각'
 );
 
-CREATE TABLE `target_tables` (
-`target_table_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '타켓 테이블 ID',
-`name`    VARCHAR(255)    NOT NULL COMMENT '테이블 이름'
-);
-
 CREATE TABLE `analyses` (
 `ai_analysis_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '분석 ID',
 `report_date`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '리포트 날짜',
@@ -215,9 +210,18 @@ CREATE TABLE `user_reactions` (
 `user_reaction_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '사용자 리액선',
 `user_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '유저 ID',
 `reaction_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '리액션 ID',
-`table_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '테이블 ID',
 `target_id`    BIGINT NOT NULL COMMENT '타켓 키 값',
+`target_type`    VARCHAR(255)    NOT NULL COMMENT '타켓 타입',
 `created_at`    DAT ETIME NOT NULL COMMENT '생성시간'
+);
+
+CREATE TABLE `reaction_counts` (
+`reaction_count_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '사용자 수 ID',
+`reaction_id`    BIGINT NOT NULL DEFAULT auto_increment COMMENT '리액션 ID',
+`target_id`    BIGINT NOT NULL COMMENT '타켓 키 값',
+`target_type`    VARCHAR(255)    NOT NULL COMMENT '타켓 타입',
+`count`    BIGINT NOT NULL COMMENT '리액션 수',
+`updated_at`    DAT ETIME NOT NULL COMMENT '수정시간'
 );
 
 ALTER TABLE `detected_coins` ADD CONSTRAINT `PK_DETECTED_COINS` PRIMARY KEY (
@@ -242,10 +246,6 @@ ALTER TABLE `economic_events` ADD CONSTRAINT `PK_ECONOMIC_EVENTS` PRIMARY KEY (
 
 ALTER TABLE `vote_topics` ADD CONSTRAINT `PK_VOTE_TOPICS` PRIMARY KEY (
 `vote_topic_id`
-);
-
-ALTER TABLE `target_tables` ADD CONSTRAINT `PK_TARGET_TABLES` PRIMARY KEY (
-`target_table_id`
 );
 
 ALTER TABLE `analyses` ADD CONSTRAINT `PK_ANALYSES` PRIMARY KEY (
@@ -322,6 +322,10 @@ ALTER TABLE `coins` ADD CONSTRAINT `PK_COINS` PRIMARY KEY (
 
 ALTER TABLE `user_reactions` ADD CONSTRAINT `PK_USER_REACTIONS` PRIMARY KEY (
 `user_reaction_id`
+);
+
+ALTER TABLE `reaction_counts` ADD CONSTRAINT `PK_REACTION_COUNTS` PRIMARY KEY (
+`reaction_count_id`
 );
 
 ALTER TABLE `detected_coins` ADD CONSTRAINT `FK_detections_TO_detected_coins_1` FOREIGN KEY (
@@ -506,10 +510,10 @@ REFERENCES `reactions` (
 `reaction_id`
 );
 
-ALTER TABLE `user_reactions` ADD CONSTRAINT `FK_target_tables_TO_user_reactions_1` FOREIGN KEY (
-`table_id`
+ALTER TABLE `reaction_counts` ADD CONSTRAINT `FK_reactions_TO_reaction_counts_1` FOREIGN KEY (
+`reaction_id`
 )
-REFERENCES `target_tables` (
-`target_table_id`
+REFERENCES `reactions` (
+`reaction_id`
 );
 

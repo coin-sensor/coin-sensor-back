@@ -18,8 +18,7 @@ import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
 import com.coinsensor.reaction.entity.Reaction;
 import com.coinsensor.reaction.repository.ReactionRepository;
 import com.coinsensor.scheduler.BinanceCoinScheduler;
-import com.coinsensor.targettable.entity.TargetTable;
-import com.coinsensor.targettable.repository.TargetTableRepository;
+
 import com.coinsensor.timeframe.entity.Timeframe;
 import com.coinsensor.timeframe.repository.TimeframeRepository;
 
@@ -38,7 +37,7 @@ public class DataInitializer {
 	private final BinanceCoinScheduler binanceCoinScheduler;
 	private final ChannelRepository channelRepository;
 	private final ReactionRepository reactionRepository;
-	private final TargetTableRepository tableRepository;
+
 
 	@EventListener(ApplicationReadyEvent.class)
 	@Transactional
@@ -46,7 +45,7 @@ public class DataInitializer {
 
 		if (exchangeRepository.count() != 0) {
 			log.info("[ ** 초기 데이터 생성을 Skip ** ]");
-			return;
+			// return;
 		} else {
 			log.info("[ ** 초기 데이터 생성 시작 ** ]");
 
@@ -99,10 +98,5 @@ public class DataInitializer {
 			reactionRepository.save(new Reaction("dislike"));
 		}
 
-		if (tableRepository.count() == 0) {
-			tableRepository.save(TargetTable.builder().name("detected_coins").build());
-			tableRepository.save(TargetTable.builder().name("analyses").build());
-			tableRepository.save(TargetTable.builder().name("messages").build());
-		}
 	}
 }
