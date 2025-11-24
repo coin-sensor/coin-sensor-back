@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.detection.dto.response.DetectionChartResponse;
@@ -19,6 +20,8 @@ import com.coinsensor.detection.repository.DetectionRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.dto.response.TopBottomCoinResponse;
 import com.coinsensor.exchangecoin.service.ExchangeCoinService;
+import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
+import com.coinsensor.userreaction.service.UserReactionService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +32,7 @@ public class DetectionServiceImpl implements DetectionService {
 	private final DetectionRepository detectionRepository;
 	private final DetectedCoinRepository detectedCoinRepository;
 	private final ExchangeCoinService exchangeCoinService;
+	private final UserReactionService userReactionService;
 
 	@Override
 	public List<DetectionInfoResponse> getDetections(String exchange, String exchangeType, String coinCategory,
@@ -71,7 +75,7 @@ public class DetectionServiceImpl implements DetectionService {
 				List<DetectedCoin> detectedTop20Coin = detectedCoins.stream()
 					.filter(coin -> top20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
 					.toList();
-				return !detectedTop20Coin.isEmpty() ? DetectionInfoResponse.of(detection, detectedTop20Coin) : null;
+				return !detectedTop20Coin.isEmpty() ? DetectionInfoResponse.of(detection, mapToResponseWithReactions(detectedTop20Coin)) : null;
 
 			case "bottom20":
 				List<String> bottom20Tickers = exchangeCoinService.getBottomCoins(exchangeType).stream()
@@ -80,11 +84,11 @@ public class DetectionServiceImpl implements DetectionService {
 				List<DetectedCoin> detectedBottom20Coin = detectedCoins.stream()
 					.filter(coin -> bottom20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
 					.toList();
-				return !detectedBottom20Coin.isEmpty() ? DetectionInfoResponse.of(detection, detectedBottom20Coin) :
+				return !detectedBottom20Coin.isEmpty() ? DetectionInfoResponse.of(detection, mapToResponseWithReactions(detectedBottom20Coin)) :
 					null;
 
 			default:
-				return DetectionInfoResponse.of(detection, detectedCoins);
+				return DetectionInfoResponse.of(detection, mapToResponseWithReactions(detectedCoins));
 		}
 	}
 
@@ -119,4 +123,13 @@ public class DetectionServiceImpl implements DetectionService {
 		return dateTime.format(formatter);
 	}
 
+	private List<DetectedCoinResponse> mapToResponseWithReactions(List<DetectedCoin> detectedCoins) {
+		return detectedCoins.stream()
+			.map(coin -> {
+				List<ReactionCountResponse> reactionCounts = userReactionService
+					.getReactionCounts("detected_coins", coin.getDetectedCoinId());
+				return DetectedCoinResponse.of(coin, reactionCounts);
+			})
+			.toList();
+	}
 }

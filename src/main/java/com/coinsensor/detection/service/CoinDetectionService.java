@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.coinsensor.coin.entity.Coin;
 import com.coinsensor.common.util.SummaryUtil;
+import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
@@ -27,6 +28,8 @@ import com.coinsensor.exchangecoin.dto.response.TopBottomCoinResponse;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
 import com.coinsensor.exchangecoin.service.ExchangeCoinService;
+import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
+import com.coinsensor.userreaction.service.UserReactionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,6 +51,7 @@ public class CoinDetectionService {
 	private final Executor taskExecutor = Executors.newFixedThreadPool(20);
 	private final List<String> coinCategories = List.of("all", "top20", "bottom20");
 	private final ExchangeCoinService exchangeCoinService;
+	private final UserReactionService userReactionService;
 
 	@Transactional
 	public void detectAbnormalCoins(Condition condition) {
@@ -192,7 +196,14 @@ public class CoinDetectionService {
 		String topic = String.format("/topic/detections?exchange=%s&exchangeType=%s&coinCategory=%s&timeframe=%s",
 			exchangeName, exchangeType, coinCategory, timeframe);
 
-		messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, detectedCoins));
+		List<DetectedCoinResponse> detectedCoinResponses = detectedCoins.stream()
+			.map(coin -> {
+				List<ReactionCountResponse> reactionCounts = userReactionService
+					.getReactionCounts("detected_coins", coin.getDetectedCoinId());
+				return DetectedCoinResponse.of(coin, reactionCounts);
+			})
+			.toList();
+		messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, detectedCoinResponses));
 	}
 
 	private DetectedCoin detectSingleCoin(ExchangeCoin exchangeCoin, Condition condition, String baseUrl) {

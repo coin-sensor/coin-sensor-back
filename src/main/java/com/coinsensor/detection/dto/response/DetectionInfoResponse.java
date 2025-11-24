@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
-import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detection.entity.Detection;
 
 import lombok.AllArgsConstructor;
@@ -26,7 +25,7 @@ public class DetectionInfoResponse {
 	private LocalDateTime detectedAt;
 	private List<DetectedCoinResponse> coins;
 
-	public static DetectionInfoResponse of(Detection detection, List<DetectedCoin> detectedCoins) {
+	public static DetectionInfoResponse of(Detection detection, List<DetectedCoinResponse> detectedCoinResponses) {
 		return DetectionInfoResponse.builder()
 			.exchangeName(detection.getExchange().getName())
 			.exchangeType(detection.getExchange().getType().name())
@@ -34,9 +33,7 @@ public class DetectionInfoResponse {
 			.conditionChangeX(detection.getCondition().getChangeX())
 			.conditionVolumeX(detection.getCondition().getVolumeX())
 			.detectedAt(detection.getDetectedAt())
-			.coins(detectedCoins.stream()
-				.map(DetectedCoinResponse::from)
-				.toList())
+			.coins(detectedCoinResponses)
 			.build();
 	}
 }
