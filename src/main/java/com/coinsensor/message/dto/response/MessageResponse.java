@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class MessageResponse {
     private Long messageId;
     private Long channelId;
+    private Long userId;
     private String uuid;
     private String nickname;
     private String content;
@@ -19,6 +20,7 @@ public class MessageResponse {
         return MessageResponse.builder()
                 .messageId(message.getMessageId())
                 .channelId(message.getChannel().getChannelId())
+                .userId(message.getUser().getUserId())
                 .uuid(message.getUser().getUuid())
                 .nickname(message.getNickname())
                 .content(message.getContent())

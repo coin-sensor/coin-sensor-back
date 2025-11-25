@@ -1,6 +1,7 @@
 package com.coinsensor.userban.dto.response;
 
 import com.coinsensor.userban.entity.UserBan;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@AllArgsConstructor
 public class UserBanResponse {
     private Long userBanId;
     private Long userId;

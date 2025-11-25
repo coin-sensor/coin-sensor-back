@@ -42,4 +42,18 @@ public class UserServiceImpl implements UserService {
 		user.updateNickname(nickname);
 		return UserInfoResponse.from(user);
 	}
+
+	@Override
+	public String getUserRole(String uuid) {
+		User user = userRepository.findByUuid(uuid)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+		return user.getRole();
+	}
+
+	@Override
+	public boolean isAdmin(String uuid) {
+		User user = userRepository.findByUuid(uuid)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+		return "admin".equals(user.getRole());
+	}
 }

@@ -20,8 +20,8 @@ import com.coinsensor.userban.repository.UserBanRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class UserBanServiceImpl implements UserBanService {
 
 	private final UserBanRepository userBanRepository;
@@ -32,6 +32,11 @@ public class UserBanServiceImpl implements UserBanService {
 	public UserBanResponse banUser(UserBanRequest request) {
 		User user = userRepository.findByUserId(request.getUserId())
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+		// 이미 활성화된 금지가 있는지 확인
+		if (userBanRepository.findActiveBanByUserId(request.getUserId()) != null) {
+			throw new CustomException(ErrorCode.ALREADY_EXISTS);
+		}
 
 		BanType banType = banTypeRepository.findById(request.getBanTypeId())
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
@@ -50,6 +55,33 @@ public class UserBanServiceImpl implements UserBanService {
 			.stream()
 			.map(UserBanResponse::from)
 			.toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<UserBanResponse> getUserBans(Long userId) {
+		return userBanRepository.findByUserUserId(userId)
+			.stream()
+			.map(UserBanResponse::from)
+			.toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UserBanResponse getActiveBan(Long userId) {
+		return userBanRepository.findActiveBanByUserId(userId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UserBanResponse getActiveBanByUuid(String uuid) {
+		return userBanRepository.findActiveBanByUuid(uuid);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean isBannedByUuid(String uuid) {
+		return userBanRepository.existsActiveBanByUuid(uuid);
 	}
 
 	@Override

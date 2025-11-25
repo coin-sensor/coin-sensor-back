@@ -25,6 +25,7 @@ public enum ErrorCode {
 	CLICK_COIN_NOT_FOUND("클릭 코인을 찾을 수 없습니다."),
 	REACTION_NOT_FOUND("리액션을 찾을 수 없습니다."),
 	TABLE_NOT_FOUND("테이블을 찾을 수 없습니다."),
+	BAN_TYPE_NOT_FOUND("금지 유형을 찾을 수 없습니다."),
 
 	ALREADY_EXISTS("이미 존재합니다."),
 	FAVORITE_COIN_ALREADY_EXISTS("이미 존재하는 즐겨찾기 코인 입니다."),

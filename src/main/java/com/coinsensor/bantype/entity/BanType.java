@@ -39,4 +39,9 @@ public class BanType {
 			.period(request.getPeriod())
 			.build();
 	}
+
+	public void update(BanTypeRequest request) {
+		this.reason = request.getReason();
+		this.period = request.getPeriod();
+	}
 }

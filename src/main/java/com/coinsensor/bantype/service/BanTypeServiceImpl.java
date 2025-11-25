@@ -9,6 +9,8 @@ import com.coinsensor.bantype.dto.request.BanTypeRequest;
 import com.coinsensor.bantype.dto.response.BanTypeResponse;
 import com.coinsensor.bantype.entity.BanType;
 import com.coinsensor.bantype.repository.BanTypeRepository;
+import com.coinsensor.common.exception.CustomException;
+import com.coinsensor.common.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +34,14 @@ public class BanTypeServiceImpl implements BanTypeService {
 			.stream()
 			.map(BanTypeResponse::from)
 			.toList();
+	}
+
+	@Override
+	public BanTypeResponse updateBanType(Long banTypeId, BanTypeRequest request) {
+		BanType banType = banTypeRepository.findByBanTypeId(banTypeId)
+			.orElseThrow(() -> new CustomException(ErrorCode.BAN_TYPE_NOT_FOUND));
+		banType.update(request);
+		return BanTypeResponse.from(banType);
 	}
 
 	@Override

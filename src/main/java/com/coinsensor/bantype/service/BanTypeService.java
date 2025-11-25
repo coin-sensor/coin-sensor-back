@@ -10,5 +10,7 @@ public interface BanTypeService {
 
     List<BanTypeResponse> getAllBanTypes();
 
+    BanTypeResponse updateBanType(Long banTypeId, BanTypeRequest request);
+
     void deleteBanType(Long banTypeId);
 }

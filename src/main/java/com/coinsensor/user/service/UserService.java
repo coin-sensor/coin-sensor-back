@@ -7,4 +7,6 @@ public interface UserService {
     User getUserByUuid(String uuid);
     UserInfoResponse getUserInfo(String uuid);
     UserInfoResponse updateNickname(String uuid, String nickname);
+    String getUserRole(String uuid);
+    boolean isAdmin(String uuid);
 }

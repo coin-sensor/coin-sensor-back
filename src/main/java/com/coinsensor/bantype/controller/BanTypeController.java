@@ -28,6 +28,12 @@ public class BanTypeController {
         return ResponseEntity.ok(responses);
     }
     
+    @PutMapping("/{banTypeId}")
+    public ResponseEntity<BanTypeResponse> updateBanType(@PathVariable Long banTypeId, @RequestBody BanTypeRequest request) {
+        BanTypeResponse response = banTypeService.updateBanType(banTypeId, request);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{banTypeId}")
     public ResponseEntity<Void> deleteBanType(@PathVariable Long banTypeId) {
         banTypeService.deleteBanType(banTypeId);
