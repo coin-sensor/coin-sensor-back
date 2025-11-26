@@ -33,6 +33,11 @@ public class BanType {
 	@Column(nullable = false)
 	private Long period;
 
+	public BanType(String reason, Long period) {
+		this.reason = reason;
+		this.period = period;
+	}
+
 	public static BanType to(BanTypeRequest request) {
 		return BanType.builder()
 			.reason(request.getReason())

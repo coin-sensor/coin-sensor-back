@@ -8,6 +8,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.coinsensor.bantype.entity.BanType;
+import com.coinsensor.bantype.repository.BanTypeRepository;
 import com.coinsensor.channel.entity.Channel;
 import com.coinsensor.channel.repository.ChannelRepository;
 import com.coinsensor.conditions.entity.Condition;
@@ -18,7 +20,6 @@ import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
 import com.coinsensor.reaction.entity.Reaction;
 import com.coinsensor.reaction.repository.ReactionRepository;
 import com.coinsensor.scheduler.BinanceCoinScheduler;
-
 import com.coinsensor.timeframe.entity.Timeframe;
 import com.coinsensor.timeframe.repository.TimeframeRepository;
 
@@ -37,7 +38,7 @@ public class DataInitializer {
 	private final BinanceCoinScheduler binanceCoinScheduler;
 	private final ChannelRepository channelRepository;
 	private final ReactionRepository reactionRepository;
-
+	private final BanTypeRepository banTypeRepository;
 
 	@EventListener(ApplicationReadyEvent.class)
 	@Transactional
@@ -45,7 +46,6 @@ public class DataInitializer {
 
 		if (exchangeRepository.count() != 0) {
 			log.info("[ ** 초기 데이터 생성을 Skip ** ]");
-			// return;
 		} else {
 			log.info("[ ** 초기 데이터 생성 시작 ** ]");
 
@@ -96,6 +96,18 @@ public class DataInitializer {
 		if (reactionRepository.count() == 0) {
 			reactionRepository.save(new Reaction("like"));
 			reactionRepository.save(new Reaction("dislike"));
+		}
+
+		if (banTypeRepository.count() == 0) {
+			banTypeRepository.save(new BanType("스팸/도배", 1L));
+			banTypeRepository.save(new BanType("기타", 3L));
+			banTypeRepository.save(new BanType("욕설/비방", 7L));
+			banTypeRepository.save(new BanType("허위정보 유포", 30L));
+			banTypeRepository.save(new BanType("광고/홍보", 90L));
+			banTypeRepository.save(new BanType("사기/피싱", 365L));
+			banTypeRepository.save(new BanType("심각한 규정 위반", 36500L));
+
+			log.info("초기 차단 유형 데이터 생성 완료");
 		}
 
 	}

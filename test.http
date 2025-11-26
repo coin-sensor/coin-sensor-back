@@ -1,4 +1,4 @@
 ### GET request to example server
-POST http://localhost:8080/api/admin/sync/binance-coins
+POST http://localhost:8080/api/admin/sync/binanceCoins
 
 ###

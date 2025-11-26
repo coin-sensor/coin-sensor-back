@@ -14,5 +14,4 @@ public class FavoriteCoinResponse {
 	private String coinTicker;
 	private String exchangeName;
 	private String exchangeType;
-
 }
