@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ExchangeCoinRepository extends JpaRepository<ExchangeCoin, Long> {
+public interface ExchangeCoinRepository extends JpaRepository<ExchangeCoin, Long>, CustomExchangeCoinRepository {
     boolean existsByExchange_ExchangeIdAndCoin_CoinTicker(Long exchangeId, String coinTicker);
     List<ExchangeCoin> findByExchange_ExchangeId(Long exchangeId);
     

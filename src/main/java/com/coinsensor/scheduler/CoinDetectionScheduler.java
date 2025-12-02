@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.coinsensor.detection.service.CoinDetectionService;
+import com.coinsensor.websocket.service.KlineDetectionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class CoinDetectionScheduler {
-
-	private final CoinDetectionService coinDetectionService;
+	private final KlineDetectionService klineDetectionService;
 
 	@Scheduled(cron = "0 * * * * ?") // 매분 정각
 	public void detect1mCoins() {
@@ -50,8 +49,13 @@ public class CoinDetectionScheduler {
 	private void executeDetectionAsync(String timeframeName) {
 		CompletableFuture.runAsync(() -> {
 			try {
+				// 5초 대기 후 탐지 실행
+				Thread.sleep(5000);
 				log.info("{} 탐지 시작", timeframeName);
-				coinDetectionService.detectByTimeframe(timeframeName);
+				klineDetectionService.detectByTimeframe(timeframeName);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				log.warn("{} 탐지 인터럽트", timeframeName);
 			} catch (Exception e) {
 				log.error("{} 탐지 실패", timeframeName, e);
 			}

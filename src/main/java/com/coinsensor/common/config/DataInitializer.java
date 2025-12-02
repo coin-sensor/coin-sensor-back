@@ -39,6 +39,7 @@ public class DataInitializer {
 	private final ChannelRepository channelRepository;
 	private final ReactionRepository reactionRepository;
 	private final BanTypeRepository banTypeRepository;
+	private final org.springframework.context.ApplicationContext applicationContext;
 
 	@EventListener(ApplicationReadyEvent.class)
 	@Transactional
@@ -110,5 +111,10 @@ public class DataInitializer {
 			log.info("초기 차단 유형 데이터 생성 완료");
 		}
 
+		log.info("[ ** 초기 데이터 생성 완료 ** ]");
+		
+		com.coinsensor.websocket.service.BinanceKlineWebSocketService webSocketService = 
+			applicationContext.getBean(com.coinsensor.websocket.service.BinanceKlineWebSocketService.class);
+		webSocketService.initWebSocketConnections();
 	}
 }

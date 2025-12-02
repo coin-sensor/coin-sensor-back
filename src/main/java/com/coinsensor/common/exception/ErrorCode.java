@@ -11,6 +11,7 @@ public enum ErrorCode {
 	INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
 
 	NOT_FOUND("찾을 수 없습니다."),
+	TIMEFRAME_NOT_FOUND("타임프레임을 찾을 수 없습니다."),
 	COIN_NOT_FOUND("코인을 찾을 수 없습니다."),
 	USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
 	USER_BANNED("차단된 사용자입니다."),
@@ -26,6 +27,7 @@ public enum ErrorCode {
 	REACTION_NOT_FOUND("리액션을 찾을 수 없습니다."),
 	TABLE_NOT_FOUND("테이블을 찾을 수 없습니다."),
 	BAN_TYPE_NOT_FOUND("금지 유형을 찾을 수 없습니다."),
+	CONDITION_NOT_FOUND("조건을 찾을 수 없습니다."),
 
 	ALREADY_EXISTS("이미 존재합니다."),
 	FAVORITE_COIN_ALREADY_EXISTS("이미 존재하는 즐겨찾기 코인 입니다."),
