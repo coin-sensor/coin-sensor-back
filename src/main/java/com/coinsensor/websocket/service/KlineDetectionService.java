@@ -87,7 +87,7 @@ public class KlineDetectionService {
 
 			if (!ohlcvList.isEmpty()) {
 				ohlcvRepository.saveAll(ohlcvList);
-				log.info("OHLCV 배치 저장 완료: {} 건", ohlcvList.size());
+				log.info("OHLCV 배치 저장 완료: {} {} - {} 건", exchangeType, timeframeName, ohlcvList.size());
 			}
 		} catch (Exception e) {
 			log.error("OHLCV 배치 저장 오류: {}", e.getMessage());
