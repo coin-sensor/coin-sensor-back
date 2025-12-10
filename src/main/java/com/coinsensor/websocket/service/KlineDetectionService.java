@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,7 +67,7 @@ public class KlineDetectionService {
 
 			// ExchangeCoin 일괄 조회
 			List<ExchangeCoin> exchangeCoins = exchangeCoinRepository
-				.findByExchange_NameAndTypeAndIsActive("binance", exchangeType, true);
+				.findByExchangeNameAndTypeAndIsActive("binance", exchangeType, true);
 
 			java.util.Map<String, ExchangeCoin> coinMap = exchangeCoins.stream()
 				.collect(java.util.stream.Collectors.toMap(
@@ -119,19 +120,19 @@ public class KlineDetectionService {
 			volumeX.compareTo(condition.getVolumeX()) >= 0;
 	}
 
-	@Transactional
 	public void detectByTimeframe(String timeframeName) {
 		// 해당 조건들 조회
 		List<Condition> conditions = conditionRepository.findByTimeframeName(timeframeName)
 			.orElseThrow(() -> new CustomException(ErrorCode.CONDITION_NOT_FOUND));
 
-		// 모든 조건에 대해 탐지 실행
+		// 모든 조건에 대해 비동기 탐지 실행
 		for (Condition condition : conditions) {
 			processConditionDetection(condition, Exchange.Type.spot);
 			processConditionDetection(condition, Exchange.Type.future);
 		}
 	}
 
+	@Async
 	@Transactional
 	public void processConditionDetection(Condition condition, Exchange.Type exchangeType) {
 		String timeframeName = condition.getTimeframe().getName();
@@ -143,7 +144,7 @@ public class KlineDetectionService {
 
 		// 해당 거래소의 모든 코인 조회
 		List<ExchangeCoin> exchangeCoins = exchangeCoinRepository
-			.findByExchange_NameAndTypeAndIsActive("binance", exchangeType, true);
+			.findByExchangeNameAndTypeAndIsActive("binance", exchangeType, true);
 
 		List<DetectedCoin> detectedCoins = new ArrayList<>();
 		BigDecimal totalChangeX = BigDecimal.ZERO;

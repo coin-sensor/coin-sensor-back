@@ -45,7 +45,7 @@ public class BinanceKlineWebSocketService {
 	}
 
 	private void connectToSpotKlines() {
-		List<ExchangeCoin> spotCoins = exchangeCoinRepository.findByExchange_NameAndTypeAndIsActive(
+		List<ExchangeCoin> spotCoins = exchangeCoinRepository.findByExchangeNameAndTypeAndIsActive(
 			"binance", Exchange.Type.spot, true);
 
 		List<String> timeframes = timeframeRepository.findAll().stream()
@@ -58,7 +58,7 @@ public class BinanceKlineWebSocketService {
 	}
 
 	private void connectToFutureKlines() {
-		List<ExchangeCoin> futureCoins = exchangeCoinRepository.findByExchange_NameAndTypeAndIsActive(
+		List<ExchangeCoin> futureCoins = exchangeCoinRepository.findByExchangeNameAndTypeAndIsActive(
 			"binance", Exchange.Type.future, true);
 
 		List<String> timeframes = timeframeRepository.findAll().stream()
@@ -152,7 +152,7 @@ public class BinanceKlineWebSocketService {
 					List<KlineData> buffer = klineBuffer.get(sessionKey);
 					if (buffer != null) {
 						buffer.add(klineData);
-						
+
 						Integer expected = expectedCoinCount.get(sessionKey);
 						if (expected != null && buffer.size() >= expected) {
 							List<KlineData> toSave = new java.util.ArrayList<>(buffer);

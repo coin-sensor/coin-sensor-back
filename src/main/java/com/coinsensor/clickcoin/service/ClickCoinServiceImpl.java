@@ -1,11 +1,14 @@
 package com.coinsensor.clickcoin.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.coinsensor.clickcoin.dto.response.CoinTrendDataResponse;
+import com.coinsensor.clickcoin.dto.response.CoinViewCountResponse;
 import com.coinsensor.clickcoin.repository.ClickCoinRepository;
-import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
-import com.coinsensor.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +18,17 @@ import lombok.RequiredArgsConstructor;
 public class ClickCoinServiceImpl implements ClickCoinService {
 
 	private final ClickCoinRepository clickCoinRepository;
-	private final UserRepository userRepository;
-	private final DetectedCoinRepository detectedCoinRepository;
+
+	@Override
+	public List<CoinViewCountResponse> getTopViewedCoins(int days, int limit) {
+		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
+		return clickCoinRepository.findTopViewedCoins(startTime, limit);
+	}
+
+	@Override
+	public List<CoinTrendDataResponse> getCoinsTrendData(int days, int limit) {
+		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
+		return clickCoinRepository.findCoinsTrendData(startTime, limit);
+	}
 
 }

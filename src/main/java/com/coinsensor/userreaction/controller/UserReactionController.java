@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coinsensor.userreaction.dto.request.UserReactionRequest;
+import com.coinsensor.userreaction.dto.response.CoinReactionResponse;
 import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
 import com.coinsensor.userreaction.service.UserReactionService;
 
@@ -32,9 +33,31 @@ public class UserReactionController {
 
 	@GetMapping("/counts")
 	public ResponseEntity<List<ReactionCountResponse>> getReactionCounts(
-			@RequestParam String targetType,
-			@RequestParam Long targetId) {
+		@RequestParam String targetType,
+		@RequestParam Long targetId) {
 		List<ReactionCountResponse> counts = userReactionService.getReactionCounts(targetType, targetId);
 		return ResponseEntity.ok(counts);
 	}
+
+	@GetMapping("/topLiked")
+	public ResponseEntity<List<CoinReactionResponse>> getTopLikedCoins(
+		@RequestParam(defaultValue = "1") int days,
+		@RequestParam(defaultValue = "10") int limit) {
+		return ResponseEntity.ok(userReactionService.getTopLikedCoins(days, limit));
+	}
+
+	@GetMapping("/topDisliked")
+	public ResponseEntity<List<CoinReactionResponse>> getTopDislikedCoins(
+		@RequestParam(defaultValue = "1") int days,
+		@RequestParam(defaultValue = "10") int limit) {
+		return ResponseEntity.ok(userReactionService.getTopDislikedCoins(days, limit));
+	}
+
+	// @GetMapping("/trend")
+	// public ResponseEntity<List<ReactionTrendDataResponse>> getReactionsTrendData(
+	// 	@RequestParam(defaultValue = "1") int days,
+	// 	@RequestParam(defaultValue = "10") int limit) {
+	// 	return ResponseEntity.ok(userReactionService.getReactionsTrendData(days, limit));
+	// }
+
 }

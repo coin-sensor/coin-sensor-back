@@ -13,9 +13,5 @@ public interface ExchangeCoinRepository extends JpaRepository<ExchangeCoin, Long
     boolean existsByExchange_ExchangeIdAndCoin_CoinTicker(Long exchangeId, String coinTicker);
     List<ExchangeCoin> findByExchange_ExchangeId(Long exchangeId);
     
-    @Query("SELECT ec FROM ExchangeCoin ec JOIN FETCH ec.exchange e JOIN FETCH ec.coin WHERE e.name = :exchangeName AND e.type = :type AND ec.isActive = :isActive")
-    List<ExchangeCoin> findByExchange_NameAndTypeAndIsActive(
-            @Param("exchangeName") String exchangeName, 
-            @Param("type") Exchange.Type type, 
-            @Param("isActive") Boolean isActive);
+
 }

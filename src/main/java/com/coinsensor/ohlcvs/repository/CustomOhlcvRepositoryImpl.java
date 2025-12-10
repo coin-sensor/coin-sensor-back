@@ -20,14 +20,13 @@ public class CustomOhlcvRepositoryImpl implements CustomOhlcvRepository {
 	public List<Ohlcv> findRecentCandles(ExchangeCoin exchangeCoin, String timeframeName, LocalDateTime startTime1, LocalDateTime startTime2) {
 		return queryFactory
 			.selectFrom(ohlcv)
-			.join(ohlcv.exchangeCoin).fetchJoin()
-			.join(ohlcv.timeframe).fetchJoin()
 			.where(
-				ohlcv.exchangeCoin.eq(exchangeCoin)
+				ohlcv.exchangeCoin.exchangeCoinId.eq(exchangeCoin.getExchangeCoinId())
 					.and(ohlcv.timeframe.name.eq(timeframeName))
-					.and(ohlcv.startTime.eq(startTime1).or(ohlcv.startTime.eq(startTime2)))
+					.and(ohlcv.startTime.in(startTime1, startTime2))
 			)
 			.orderBy(ohlcv.startTime.desc())
+			.limit(2)
 			.fetch();
 	}
 }

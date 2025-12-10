@@ -1,5 +1,6 @@
 package com.coinsensor.userreaction.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -14,7 +15,9 @@ import com.coinsensor.reaction.repository.ReactionRepository;
 import com.coinsensor.user.entity.User;
 import com.coinsensor.user.repository.UserRepository;
 import com.coinsensor.userreaction.dto.request.UserReactionRequest;
+import com.coinsensor.userreaction.dto.response.CoinReactionResponse;
 import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
+import com.coinsensor.userreaction.dto.response.ReactionTrendDataResponse;
 import com.coinsensor.userreaction.entity.UserReaction;
 import com.coinsensor.userreaction.repository.UserReactionRepository;
 
@@ -69,6 +72,24 @@ public class UserReactionServiceImpl implements UserReactionService {
 			.stream()
 			.map(ReactionCountResponse::from)
 			.toList();
+	}
+
+	@Override
+	public List<CoinReactionResponse> getTopLikedCoins(int days, int limit) {
+		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
+		return userReactionRepository.findTopLikedCoins(startTime, limit);
+	}
+
+	@Override
+	public List<CoinReactionResponse> getTopDislikedCoins(int days, int limit) {
+		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
+		return userReactionRepository.findTopDislikedCoins(startTime, limit);
+	}
+
+	@Override
+	public List<ReactionTrendDataResponse> getReactionsTrendData(int days, int limit) {
+		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
+		return userReactionRepository.findReactionsTrendData(startTime, limit);
 	}
 
 	private void updateReactionCount(String targetType, Long targetId, Reaction reaction, int delta) {
