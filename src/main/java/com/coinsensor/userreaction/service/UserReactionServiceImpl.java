@@ -8,9 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.coinsensor.common.exception.CustomException;
 import com.coinsensor.common.exception.ErrorCode;
+import com.coinsensor.detectedcoin.entity.DetectedCoin;
+import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.reaction.entity.Reaction;
-import com.coinsensor.reaction.entity.ReactionCount;
-import com.coinsensor.reaction.repository.ReactionCountRepository;
 import com.coinsensor.reaction.repository.ReactionRepository;
 import com.coinsensor.user.entity.User;
 import com.coinsensor.user.repository.UserRepository;
@@ -31,7 +31,7 @@ public class UserReactionServiceImpl implements UserReactionService {
 	private final UserReactionRepository userReactionRepository;
 	private final UserRepository userRepository;
 	private final ReactionRepository reactionRepository;
-	private final ReactionCountRepository reactionCountRepository;
+	private final DetectedCoinRepository detectedCoinRepository;
 
 	@Override
 	public void toggleReaction(String userUuid, UserReactionRequest request) {
@@ -42,7 +42,8 @@ public class UserReactionServiceImpl implements UserReactionService {
 			.orElseThrow(() -> new CustomException(ErrorCode.REACTION_NOT_FOUND));
 
 		// 기존 리액션 조회
-		UserReaction userReaction = userReactionRepository.findByUserAndTargetTypeAndTargetId(user, request.getTargetType(),
+		UserReaction userReaction = userReactionRepository.findByUserAndTargetTypeAndTargetId(user,
+			request.getTargetType(),
 			request.getTargetId()).orElse(null);
 
 		// 기존 리액션이 있는 경우
@@ -68,10 +69,19 @@ public class UserReactionServiceImpl implements UserReactionService {
 
 	@Override
 	public List<ReactionCountResponse> getReactionCounts(String targetType, Long targetId) {
-		return reactionCountRepository.findByTargetTypeAndTargetId(targetType, targetId)
-			.stream()
-			.map(ReactionCountResponse::from)
-			.toList();
+		if ("detected_coins".equals(targetType)) {
+			// detected_coins의 경우 엔티티 필드에서 직접 조회
+			DetectedCoin detectedCoin = detectedCoinRepository.findById(targetId)
+				.orElseThrow(() -> new CustomException(ErrorCode.DETECTED_COIN_NOT_FOUND));
+			
+			return List.of(
+				new ReactionCountResponse("like", detectedCoin.getLikeCount()),
+				new ReactionCountResponse("dislike", detectedCoin.getDislikeCount())
+			);
+		} else {
+			// TODO: 다른 테이블도 필드 추가 방식으로 변경 예정
+			return List.of();
+		}
 	}
 
 	@Override
@@ -93,16 +103,25 @@ public class UserReactionServiceImpl implements UserReactionService {
 	}
 
 	private void updateReactionCount(String targetType, Long targetId, Reaction reaction, int delta) {
-		ReactionCount reactionCount = reactionCountRepository
-			.findByTargetTypeAndTargetIdAndReactionId(targetType, targetId, reaction.getReactionId())
-			.orElse(ReactionCount.to(targetId, targetType, reaction, 0L));
+		// detected_coins 테이블의 경우 엔티티 필드 직접 업데이트
+		if ("detected_coins".equals(targetType)) {
+			DetectedCoin detectedCoin = detectedCoinRepository.findById(targetId)
+				.orElseThrow(() -> new CustomException(ErrorCode.DETECTED_COIN_NOT_FOUND));
 
-		if (delta > 0) {
-			reactionCount.incrementCount();
-		} else {
-			reactionCount.decrementCount();
+			if ("like".equals(reaction.getName())) {
+				if (delta > 0) {
+					detectedCoin.incrementLikeCount();
+				} else {
+					detectedCoin.decrementLikeCount();
+				}
+			} else if ("dislike".equals(reaction.getName())) {
+				if (delta > 0) {
+					detectedCoin.incrementDislikeCount();
+				} else {
+					detectedCoin.decrementDislikeCount();
+				}
+			}
 		}
-
-		reactionCountRepository.save(reactionCount);
+		// TODO: 다른 테이블도 필드 추가 방식으로 변경 예정
 	}
 }

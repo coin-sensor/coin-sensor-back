@@ -31,8 +31,6 @@ import com.coinsensor.ohlcvs.entity.Ohlcv;
 import com.coinsensor.ohlcvs.repository.OhlcvRepository;
 import com.coinsensor.timeframe.entity.Timeframe;
 import com.coinsensor.timeframe.repository.TimeframeRepository;
-import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
-import com.coinsensor.userreaction.service.UserReactionService;
 import com.coinsensor.websocket.dto.KlineData;
 
 import lombok.RequiredArgsConstructor;
@@ -51,7 +49,6 @@ public class KlineDetectionService {
 	private final DetectedCoinRepository detectedCoinRepository;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final ExchangeCoinService exchangeCoinService;
-	private final UserReactionService userReactionService;
 
 	@Transactional
 	public void saveOhlcvDataBatch(List<KlineData> klineDataList, Exchange.Type exchangeType) {
@@ -229,11 +226,7 @@ public class KlineDetectionService {
 					exchangeName, exchangeType, coinCategory, timeframe);
 
 				List<DetectedCoinResponse> responses = filteredCoins.stream()
-					.map(coin -> {
-						List<ReactionCountResponse> reactionCounts = userReactionService
-							.getReactionCounts("detected_coins", coin.getDetectedCoinId());
-						return DetectedCoinResponse.of(coin, reactionCounts);
-					})
+					.map(DetectedCoinResponse::from)
 					.toList();
 
 				messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, responses));

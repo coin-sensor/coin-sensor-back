@@ -3,7 +3,6 @@ package com.coinsensor.userreaction.repository;
 import static com.coinsensor.coin.entity.QCoin.*;
 import static com.coinsensor.detectedcoin.entity.QDetectedCoin.*;
 import static com.coinsensor.exchangecoin.entity.QExchangeCoin.*;
-import static com.coinsensor.reaction.entity.QReactionCount.*;
 import static com.coinsensor.userreaction.entity.QUserReaction.*;
 
 import java.time.LocalDateTime;
@@ -53,16 +52,14 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 			.select(Projections.constructor(CoinReactionResponse.class,
 				coin.coinTicker,
 				coin.baseAsset,
-				reactionCount.count.sum()))
-			.from(reactionCount)
-			.join(detectedCoin).on(reactionCount.targetId.eq(detectedCoin.detectedCoinId))
+				detectedCoin.likeCount.sum()))
+			.from(detectedCoin)
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
 			.join(exchangeCoin.coin, coin)
-			.where(reactionCount.targetType.eq("detected_coins")
-				.and(reactionCount.reaction.name.eq("like"))
-				.and(reactionCount.updatedAt.goe(startTime)))
+			.where(detectedCoin.detectedAt.goe(startTime)
+				.and(detectedCoin.likeCount.gt(0L)))
 			.groupBy(coin.coinTicker, coin.baseAsset)
-			.orderBy(reactionCount.count.sum().desc())
+			.orderBy(detectedCoin.likeCount.sum().desc())
 			.limit(limit)
 			.fetch();
 	}
@@ -73,16 +70,14 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 			.select(Projections.constructor(CoinReactionResponse.class,
 				coin.coinTicker,
 				coin.baseAsset,
-				reactionCount.count.sum()))
-			.from(reactionCount)
-			.join(detectedCoin).on(reactionCount.targetId.eq(detectedCoin.detectedCoinId))
+				detectedCoin.dislikeCount.sum()))
+			.from(detectedCoin)
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
 			.join(exchangeCoin.coin, coin)
-			.where(reactionCount.targetType.eq("detected_coins")
-				.and(reactionCount.reaction.name.eq("dislike"))
-				.and(reactionCount.updatedAt.goe(startTime)))
+			.where(detectedCoin.detectedAt.goe(startTime)
+				.and(detectedCoin.dislikeCount.gt(0L)))
 			.groupBy(coin.coinTicker, coin.baseAsset)
-			.orderBy(reactionCount.count.sum().desc())
+			.orderBy(detectedCoin.dislikeCount.sum().desc())
 			.limit(limit)
 			.fetch();
 	}
@@ -91,15 +86,13 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 	public List<ReactionTrendDataResponse> findReactionsTrendData(LocalDateTime startTime, int limit) {
 		List<Tuple> topCoins = queryFactory
 			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.from(reactionCount)
-			.join(detectedCoin).on(reactionCount.targetId.eq(detectedCoin.detectedCoinId))
+			.from(detectedCoin)
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
 			.join(exchangeCoin.coin, coin)
-			.where(reactionCount.targetType.eq("detected_coins")
-				.and(reactionCount.reaction.name.in("like", "dislike"))
-				.and(reactionCount.updatedAt.goe(startTime)))
+			.where(detectedCoin.detectedAt.goe(startTime)
+				.and(detectedCoin.likeCount.add(detectedCoin.dislikeCount).gt(0L)))
 			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.orderBy(reactionCount.count.sum().desc())
+			.orderBy(detectedCoin.likeCount.add(detectedCoin.dislikeCount).sum().desc())
 			.limit(limit)
 			.fetch();
 
@@ -112,38 +105,34 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 				// Like 데이터 조회
 				List<Tuple> likeData = queryFactory
 					.select(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", reactionCount.updatedAt),
-						reactionCount.count.sum())
-					.from(reactionCount)
-					.join(detectedCoin).on(reactionCount.targetId.eq(detectedCoin.detectedCoinId))
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt),
+						detectedCoin.likeCount.sum())
+					.from(detectedCoin)
 					.join(detectedCoin.exchangeCoin, exchangeCoin)
 					.where(exchangeCoin.coin.coinId.eq(coinId)
-						.and(reactionCount.targetType.eq("detected_coins"))
-						.and(reactionCount.reaction.name.eq("like"))
-						.and(reactionCount.updatedAt.goe(startTime)))
+						.and(detectedCoin.detectedAt.goe(startTime))
+						.and(detectedCoin.likeCount.gt(0L)))
 					.groupBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", reactionCount.updatedAt))
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt))
 					.orderBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", reactionCount.updatedAt)
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt)
 							.asc())
 					.fetch();
 
 				// Dislike 데이터 조회
 				List<Tuple> dislikeData = queryFactory
 					.select(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", reactionCount.updatedAt),
-						reactionCount.count.sum())
-					.from(reactionCount)
-					.join(detectedCoin).on(reactionCount.targetId.eq(detectedCoin.detectedCoinId))
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt),
+						detectedCoin.dislikeCount.sum())
+					.from(detectedCoin)
 					.join(detectedCoin.exchangeCoin, exchangeCoin)
 					.where(exchangeCoin.coin.coinId.eq(coinId)
-						.and(reactionCount.targetType.eq("detected_coins"))
-						.and(reactionCount.reaction.name.eq("dislike"))
-						.and(reactionCount.updatedAt.goe(startTime)))
+						.and(detectedCoin.detectedAt.goe(startTime))
+						.and(detectedCoin.dislikeCount.gt(0L)))
 					.groupBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", reactionCount.updatedAt))
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt))
 					.orderBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", reactionCount.updatedAt)
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt)
 							.asc())
 					.fetch();
 

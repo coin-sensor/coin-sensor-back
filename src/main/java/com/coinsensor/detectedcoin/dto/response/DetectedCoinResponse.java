@@ -2,10 +2,8 @@ package com.coinsensor.detectedcoin.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
-import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,32 +34,8 @@ public class DetectedCoinResponse {
 			.volumeX(detectedCoin.getVolumeX())
 			.viewCount(detectedCoin.getViewCount())
 			.detectedAt(detectedCoin.getDetectedAt())
-			.build();
-	}
-
-	public static DetectedCoinResponse of(DetectedCoin detectedCoin, List<ReactionCountResponse> reactionCounts) {
-		Long likeCount = reactionCounts.stream()
-			.filter(r -> "like".equals(r.reactionName()))
-			.findFirst()
-			.map(ReactionCountResponse::count)
-			.orElse(0L);
-		
-		Long dislikeCount = reactionCounts.stream()
-			.filter(r -> "dislike".equals(r.reactionName()))
-			.findFirst()
-			.map(ReactionCountResponse::count)
-			.orElse(0L);
-		
-		return DetectedCoinResponse.builder()
-			.detectedCoinId(detectedCoin.getDetectedCoinId())
-			.exchangeCoinId(detectedCoin.getExchangeCoin().getExchangeCoinId())
-			.coinTicker(detectedCoin.getCoin().getCoinTicker())
-			.changeX(detectedCoin.getChangeX())
-			.volumeX(detectedCoin.getVolumeX())
-			.viewCount(detectedCoin.getViewCount())
-			.detectedAt(detectedCoin.getDetectedAt())
-			.likeCount(likeCount)
-			.dislikeCount(dislikeCount)
+			.likeCount(detectedCoin.getLikeCount())
+			.dislikeCount(detectedCoin.getDislikeCount())
 			.build();
 	}
 }

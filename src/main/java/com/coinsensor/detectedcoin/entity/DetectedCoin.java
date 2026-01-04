@@ -62,6 +62,12 @@ public class DetectedCoin {
 	@Column(name = "view_count", nullable = false)
 	private Long viewCount;
 
+	@Column(name = "like_count", nullable = false)
+	private Long likeCount;
+
+	@Column(name = "dislike_count", nullable = false)
+	private Long dislikeCount;
+
 	@Column(name = "detected_at", nullable = false)
 	private LocalDateTime detectedAt;
 
@@ -75,6 +81,8 @@ public class DetectedCoin {
 		this.high = high;
 		this.low = low;
 		this.viewCount = 0L;
+		this.likeCount = 0L;
+		this.dislikeCount = 0L;
 		this.detectedAt = detectedAt;
 	}
 
@@ -88,6 +96,8 @@ public class DetectedCoin {
 			.high(high)
 			.low(low)
 			.viewCount(0L)
+			.likeCount(0L)
+			.dislikeCount(0L)
 			.detectedAt(LocalDateTime.now())
 			.build();
 	}
@@ -102,11 +112,33 @@ public class DetectedCoin {
 			.high(this.high)
 			.low(this.low)
 			.viewCount(0L)
+			.likeCount(0L)
+			.dislikeCount(0L)
 			.detectedAt(this.detectedAt)
 			.build();
 	}
 
 	public void incrementViewCount() {
 		this.viewCount++;
+	}
+
+	public void incrementLikeCount() {
+		this.likeCount++;
+	}
+
+	public void decrementLikeCount() {
+		if (this.likeCount > 0) {
+			this.likeCount--;
+		}
+	}
+
+	public void incrementDislikeCount() {
+		this.dislikeCount++;
+	}
+
+	public void decrementDislikeCount() {
+		if (this.dislikeCount > 0) {
+			this.dislikeCount--;
+		}
 	}
 }

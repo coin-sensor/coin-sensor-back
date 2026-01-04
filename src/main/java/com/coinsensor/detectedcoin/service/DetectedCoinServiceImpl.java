@@ -17,8 +17,6 @@ import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.user.entity.User;
 import com.coinsensor.user.repository.UserRepository;
-import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
-import com.coinsensor.userreaction.service.UserReactionService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +27,6 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 	private final DetectedCoinRepository detectedCoinRepository;
 	private final ClickCoinRepository clickCoinRepository;
 	private final UserRepository userRepository;
-	private final UserReactionService userReactionService;
 
 	@Override
 	public List<DetectedCoinResponse> getDetectedCoinsByTimeAndType(String exchangeName, String exchangeType) {
@@ -40,7 +37,7 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 		Exchange.Type type = Exchange.Type.valueOf(exchangeType);
 		return detectedCoinRepository.findByExchangeNameAndTypeAndTime(exchangeName, type, startTime, endTime)
 			.stream()
-			.map(this::mapToResponseWithReactions)
+			.map(DetectedCoinResponse::from)
 			.toList();
 	}
 
@@ -61,9 +58,5 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 		return detectedCoin.getViewCount();
 	}
 
-	private DetectedCoinResponse mapToResponseWithReactions(DetectedCoin detectedCoin) {
-		List<ReactionCountResponse> reactionCounts = userReactionService
-			.getReactionCounts("detected_coins", detectedCoin.getDetectedCoinId());
-		return DetectedCoinResponse.of(detectedCoin, reactionCounts);
-	}
+
 }
