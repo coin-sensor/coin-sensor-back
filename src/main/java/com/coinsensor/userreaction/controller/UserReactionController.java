@@ -26,9 +26,9 @@ public class UserReactionController {
 	private final UserReactionService userReactionService;
 
 	@PostMapping
-	public ResponseEntity<Void> toggleReaction(@RequestHeader String uuid, @RequestBody UserReactionRequest request) {
-		userReactionService.toggleReaction(uuid, request);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<List<ReactionCountResponse>> toggleReaction(@RequestHeader String uuid, @RequestBody UserReactionRequest request) {
+		List<ReactionCountResponse> updatedCounts = userReactionService.toggleReaction(uuid, request);
+		return ResponseEntity.ok(updatedCounts);
 	}
 
 	@GetMapping("/counts")

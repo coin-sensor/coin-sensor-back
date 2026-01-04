@@ -34,7 +34,7 @@ public class UserReactionServiceImpl implements UserReactionService {
 	private final DetectedCoinRepository detectedCoinRepository;
 
 	@Override
-	public void toggleReaction(String userUuid, UserReactionRequest request) {
+	public List<ReactionCountResponse> toggleReaction(String userUuid, UserReactionRequest request) {
 		User user = userRepository.findByUuid(userUuid)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -65,6 +65,9 @@ public class UserReactionServiceImpl implements UserReactionService {
 			userReactionRepository.save(userReaction);
 			updateReactionCount(request.getTargetType(), request.getTargetId(), reaction, 1);
 		}
+
+		// 업데이트된 리액션 카운트 반환
+		return getReactionCounts(request.getTargetType(), request.getTargetId());
 	}
 
 	@Override

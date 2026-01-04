@@ -9,7 +9,7 @@ import com.coinsensor.userreaction.dto.response.ReactionTrendDataResponse;
 
 public interface UserReactionService {
 
-    void toggleReaction(String userUuid, UserReactionRequest request);
+    List<ReactionCountResponse> toggleReaction(String userUuid, UserReactionRequest request);
 
     List<ReactionCountResponse> getReactionCounts(String targetType, Long targetId);
 
