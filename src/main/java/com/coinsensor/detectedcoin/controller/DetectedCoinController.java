@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coinsensor.clickcoin.service.ClickCoinService;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.service.DetectedCoinService;
 
@@ -23,17 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class DetectedCoinController {
 
 	private final DetectedCoinService detectedCoinService;
-	private final ClickCoinService clickCoinService;
-
-	@GetMapping("/abnormal")
-	public ResponseEntity<List<DetectedCoinResponse>> getAbnormalCoins() {
-		return ResponseEntity.ok(detectedCoinService.getAbnormalCoins());
-	}
-
-	@GetMapping("/volatile")
-	public ResponseEntity<List<DetectedCoinResponse>> getVolatileCoins() {
-		return ResponseEntity.ok(detectedCoinService.getVolatileCoins());
-	}
 
 	@GetMapping("/detected")
 	public ResponseEntity<List<DetectedCoinResponse>> getDetectedCoins(

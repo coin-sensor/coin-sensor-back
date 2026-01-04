@@ -32,22 +32,6 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 	private final UserReactionService userReactionService;
 
 	@Override
-	public List<DetectedCoinResponse> getAbnormalCoins() {
-		return detectedCoinRepository.findAll().stream()
-			.map(this::mapToResponseWithReactions)
-			.toList();
-	}
-
-	@Override
-	public List<DetectedCoinResponse> getVolatileCoins() {
-		return detectedCoinRepository.findAll().stream()
-			.sorted((a, b) -> b.getChangeX().compareTo(a.getChangeX()))
-			.limit(20)
-			.map(this::mapToResponseWithReactions)
-			.toList();
-	}
-
-	@Override
 	public List<DetectedCoinResponse> getDetectedCoinsByTimeAndType(String exchangeName, String exchangeType) {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime startTime = now.withSecond(0).withNano(0);
@@ -73,7 +57,7 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 		} else {
 			clickCoin.reClick();
 		}
-		
+
 		return detectedCoin.getViewCount();
 	}
 
