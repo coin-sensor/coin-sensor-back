@@ -1,11 +1,13 @@
 package com.coinsensor.detectedcoin.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
+import com.coinsensor.detection.dto.response.TopDetectedCoinResponse;
 
 public interface DetectedCoinService {
-	List<DetectedCoinResponse> getDetectedCoinsByTimeAndType(String exchangeName, String exchangeType);
 
 	Long viewDetectedCoin(String uuid, Long detectedCoinId);
+
+	List<TopDetectedCoinResponse> getTopDetectedCoins(String timeframe, LocalDateTime startTime, LocalDateTime endTime);
 }

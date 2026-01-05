@@ -13,7 +13,7 @@ import com.coinsensor.detection.entity.Detection;
 import com.coinsensor.exchange.entity.Exchange;
 
 @Repository
-public interface DetectionRepository extends JpaRepository<Detection, Long> {
+public interface DetectionRepository extends JpaRepository<Detection, Long>, CustomDetectionRepository {
 
 	@Query("SELECT dg FROM Detection dg " +
 		"JOIN FETCH dg.exchange e " +

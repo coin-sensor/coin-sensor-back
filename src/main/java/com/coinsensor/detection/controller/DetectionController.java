@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coinsensor.detection.dto.response.DetectionChartResponse;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
-import com.coinsensor.detection.dto.response.TopDetectedCoinResponse;
 import com.coinsensor.detection.service.DetectionService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,12 +24,12 @@ public class DetectionController {
 	private final DetectionService detectionService;
 
 	@GetMapping
-	public ResponseEntity<List<DetectionInfoResponse>> getDetections(
+	public ResponseEntity<List<DetectionInfoResponse>> getDetectionInfos(
 		@RequestParam String exchange,
 		@RequestParam String exchangeType,
 		@RequestParam String coinCategory,
 		@RequestParam String timeframe) {
-		return ResponseEntity.ok(detectionService.getDetections(exchange, exchangeType, coinCategory, timeframe));
+		return ResponseEntity.ok(detectionService.getDetectionInfos(exchange, exchangeType, coinCategory, timeframe));
 	}
 
 	@GetMapping("/chart")
@@ -39,13 +38,5 @@ public class DetectionController {
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
 		return ResponseEntity.ok(detectionService.getDetectionChart(timeframe, startTime, endTime));
-	}
-
-	@GetMapping("/top10")
-	public ResponseEntity<List<TopDetectedCoinResponse>> getTopDetectedCoins(
-		@RequestParam String timeframe,
-		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
-		return ResponseEntity.ok(detectionService.getTopDetectedCoins(timeframe, startTime, endTime));
 	}
 }

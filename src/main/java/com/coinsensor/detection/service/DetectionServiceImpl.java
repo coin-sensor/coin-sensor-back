@@ -5,17 +5,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
-import com.coinsensor.detectedcoin.entity.DetectedCoin;
-import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.detection.dto.response.DetectionChartResponse;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
-import com.coinsensor.detection.dto.response.TopDetectedCoinResponse;
 import com.coinsensor.detection.entity.Detection;
 import com.coinsensor.detection.repository.DetectionRepository;
 import com.coinsensor.exchange.entity.Exchange;
@@ -27,27 +22,18 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class DetectionServiceImpl implements DetectionService {
-
 	private final DetectionRepository detectionRepository;
-	private final DetectedCoinRepository detectedCoinRepository;
 	private final ExchangeCoinService exchangeCoinService;
 
 	@Override
-	public List<DetectionInfoResponse> getDetections(String exchange, String exchangeType, String coinCategory,
+	public List<DetectionInfoResponse> getDetectionInfos(String exchange, String exchangeType, String coinCategory,
 		String timeframe) {
 		LocalDateTime startTime = getStartTimeByTimeframe(timeframe);
 		Exchange.Type type = Exchange.Type.valueOf(exchangeType);
 
-		return detectionRepository.findByExchangeAndTimeframeAndAfterTime(exchange, type, timeframe, startTime)
-			.stream()
-			.map(detection -> {
-				List<DetectedCoin> detectedCoins = detectedCoinRepository.findByDetection(detection);
+		List<String> targetTickers = getTargetTickersByCoinCategory(coinCategory, exchangeType);
 
-				return filterDetectionByCoinCategory(detection, detectedCoins, coinCategory, exchangeType);
-
-			})
-			.filter(Objects::nonNull)
-			.toList();
+		return detectionRepository.getDetectionInfos(exchange, type, timeframe, startTime, targetTickers);
 	}
 
 	private LocalDateTime getStartTimeByTimeframe(String timeframe) {
@@ -63,34 +49,16 @@ public class DetectionServiceImpl implements DetectionService {
 		};
 	}
 
-	private DetectionInfoResponse filterDetectionByCoinCategory(Detection detection,
-		List<DetectedCoin> detectedCoins, String coinCategory, String exchangeType) {
-		switch (coinCategory) {
-			case "top20":
-				List<String> top20Tickers = exchangeCoinService.getTopCoins(exchangeType).stream()
-					.map(TopBottomCoinResponse::getSymbol)
-					.toList();
-				List<DetectedCoin> detectedTop20Coin = detectedCoins.stream()
-					.filter(coin -> top20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
-					.toList();
-				return !detectedTop20Coin.isEmpty() ? DetectionInfoResponse.of(detection,
-					detectedTop20Coin.stream().map(DetectedCoinResponse::from).toList()) : null;
-
-			case "bottom20":
-				List<String> bottom20Tickers = exchangeCoinService.getBottomCoins(exchangeType).stream()
-					.map(TopBottomCoinResponse::getSymbol)
-					.toList();
-				List<DetectedCoin> detectedBottom20Coin = detectedCoins.stream()
-					.filter(coin -> bottom20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
-					.toList();
-				return !detectedBottom20Coin.isEmpty() ? DetectionInfoResponse.of(detection,
-					detectedBottom20Coin.stream().map(DetectedCoinResponse::from).toList()) :
-					null;
-
-			default:
-				return DetectionInfoResponse.of(detection,
-					detectedCoins.stream().map(DetectedCoinResponse::from).toList());
-		}
+	private List<String> getTargetTickersByCoinCategory(String coinCategory, String exchangeType) {
+		return switch (coinCategory) {
+			case "top20" -> exchangeCoinService.getTopCoins(exchangeType).stream()
+				.map(TopBottomCoinResponse::getSymbol)
+				.toList();
+			case "bottom20" -> exchangeCoinService.getBottomCoins(exchangeType).stream()
+				.map(TopBottomCoinResponse::getSymbol)
+				.toList();
+			default -> List.of(); // 빈 리스트는 모든 코인을 의미
+		};
 	}
 
 	@Override
@@ -112,12 +80,6 @@ public class DetectionServiceImpl implements DetectionService {
 
 		DetectionChartResponse.Dataset dataset = new DetectionChartResponse.Dataset("탐지 수", data);
 		return new DetectionChartResponse(labels, List.of(dataset));
-	}
-
-	@Override
-	public List<TopDetectedCoinResponse> getTopDetectedCoins(String timeframe, LocalDateTime startTime,
-		LocalDateTime endTime) {
-		return detectedCoinRepository.findTopDetectedCoins(timeframe, startTime, endTime, 10);
 	}
 
 	private String formatDateTime(LocalDateTime dateTime, String timeframe) {

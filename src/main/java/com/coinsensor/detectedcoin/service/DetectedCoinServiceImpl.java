@@ -11,10 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.coinsensor.coinclick.entity.CoinClick;
 import com.coinsensor.coinclick.repository.CoinClickRepository;
 import com.coinsensor.common.exception.CustomException;
-import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
-import com.coinsensor.exchange.entity.Exchange;
+import com.coinsensor.detection.dto.response.TopDetectedCoinResponse;
 import com.coinsensor.user.entity.User;
 import com.coinsensor.user.repository.UserRepository;
 
@@ -27,19 +26,6 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 	private final DetectedCoinRepository detectedCoinRepository;
 	private final CoinClickRepository coinClickRepository;
 	private final UserRepository userRepository;
-
-	@Override
-	public List<DetectedCoinResponse> getDetectedCoinsByTimeAndType(String exchangeName, String exchangeType) {
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime startTime = now.withSecond(0).withNano(0);
-		LocalDateTime endTime = startTime.plusMinutes(1);
-
-		Exchange.Type type = Exchange.Type.valueOf(exchangeType);
-		return detectedCoinRepository.findByExchangeNameAndTypeAndTime(exchangeName, type, startTime, endTime)
-			.stream()
-			.map(DetectedCoinResponse::from)
-			.toList();
-	}
 
 	@Override
 	public Long viewDetectedCoin(String uuid, Long detectedCoinId) {
@@ -58,4 +44,9 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 		return detectedCoin.getViewCount();
 	}
 
+	@Override
+	public List<TopDetectedCoinResponse> getTopDetectedCoins(String timeframe, LocalDateTime startTime,
+		LocalDateTime endTime) {
+		return detectedCoinRepository.findTopDetectedCoins(timeframe, startTime, endTime, 10);
+	}
 }
