@@ -1,5 +1,6 @@
 package com.coinsensor.ohlcvs.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.coinsensor.ohlcvs.entity.Ohlcv;

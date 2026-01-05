@@ -29,4 +29,12 @@ public class CustomOhlcvRepositoryImpl implements CustomOhlcvRepository {
 			.limit(2)
 			.fetch();
 	}
+
+	@Override
+	public long deleteByCreatedAtBefore(LocalDateTime cutoffDate) {
+		return queryFactory
+			.delete(ohlcv)
+			.where(ohlcv.createdAt.lt(cutoffDate))
+			.execute();
+	}
 }

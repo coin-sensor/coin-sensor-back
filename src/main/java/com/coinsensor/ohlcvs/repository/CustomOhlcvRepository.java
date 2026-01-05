@@ -11,4 +11,6 @@ import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 public interface CustomOhlcvRepository {
 
     List<Ohlcv> findRecentCandles(ExchangeCoin exchangeCoin, String timeframeName, LocalDateTime startTime1, LocalDateTime startTime2);
+    
+    long deleteByCreatedAtBefore(LocalDateTime cutoffDate);
 }
