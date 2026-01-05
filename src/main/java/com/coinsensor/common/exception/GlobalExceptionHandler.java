@@ -2,6 +2,7 @@ package com.coinsensor.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,6 +26,14 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(e.getStatusCode())
 			.body(ErrorResponse.of(e.getReason()));
+	}
+
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException e,
+		jakarta.servlet.http.HttpServletRequest request) {
+		return ResponseEntity
+			.status(HttpStatus.METHOD_NOT_ALLOWED)
+			.body(ErrorResponse.of(String.format("지원하지 않는 API: %s %s", e.getMethod(), request.getRequestURI())));
 	}
 
 	@ExceptionHandler(NoResourceFoundException.class)
