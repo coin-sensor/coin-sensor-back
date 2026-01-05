@@ -63,7 +63,7 @@ public class RedisConfig {
 	@Bean
 	@Primary
 	public RedisConnectionFactory redisConnectionFactory() {
-		return createLettuceConnectionFactory(2);
+		return createLettuceConnectionFactory(15);
 	}
 
 	@Bean
@@ -73,7 +73,7 @@ public class RedisConfig {
 
 	@Bean("cacheRedisConnectionFactory")
 	public RedisConnectionFactory cacheRedisConnectionFactory() {
-		return createLettuceConnectionFactory(3);
+		return createLettuceConnectionFactory(15);
 	}
 
 	@Bean("cacheRedisTemplate")
@@ -82,20 +82,9 @@ public class RedisConfig {
 		return createRedisTemplate(redisConnectionFactory);
 	}
 
-	@Bean("keywordRedisConnectionFactory")
-	public RedisConnectionFactory keywordRedisConnectionFactory() {
-		return createLettuceConnectionFactory(4);
-	}
-
-	@Bean("keywordRedisTemplate")
-	public RedisTemplate<String, Object> keywordRedisTemplate(
-		@Qualifier("keywordRedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
-		return createRedisTemplate(redisConnectionFactory);
-	}
-
 	@Bean("leaderRedisConnectionFactory")
 	public RedisConnectionFactory leaderRedisConnectionFactory() {
-		return createLettuceConnectionFactory(6);
+		return createLettuceConnectionFactory(15);
 	}
 
 	@Bean("leaderRedisTemplate")
