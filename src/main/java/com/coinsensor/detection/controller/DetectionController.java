@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coinsensor.detection.dto.response.DetectionChartResponse;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
+import com.coinsensor.detection.dto.response.TopDetectedCoinResponse;
 import com.coinsensor.detection.service.DetectionService;
 
 import lombok.RequiredArgsConstructor;
@@ -38,5 +39,13 @@ public class DetectionController {
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
 		return ResponseEntity.ok(detectionService.getDetectionChart(timeframe, startTime, endTime));
+	}
+
+	@GetMapping("/top10")
+	public ResponseEntity<List<TopDetectedCoinResponse>> getTopDetectedCoins(
+		@RequestParam String timeframe,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
+		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+		return ResponseEntity.ok(detectionService.getTopDetectedCoins(timeframe, startTime, endTime));
 	}
 }

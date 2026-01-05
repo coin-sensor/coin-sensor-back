@@ -15,6 +15,7 @@ import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
 import com.coinsensor.detection.dto.response.DetectionChartResponse;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
+import com.coinsensor.detection.dto.response.TopDetectedCoinResponse;
 import com.coinsensor.detection.entity.Detection;
 import com.coinsensor.detection.repository.DetectionRepository;
 import com.coinsensor.exchange.entity.Exchange;
@@ -72,7 +73,8 @@ public class DetectionServiceImpl implements DetectionService {
 				List<DetectedCoin> detectedTop20Coin = detectedCoins.stream()
 					.filter(coin -> top20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
 					.toList();
-				return !detectedTop20Coin.isEmpty() ? DetectionInfoResponse.of(detection, detectedTop20Coin.stream().map(DetectedCoinResponse::from).toList()) : null;
+				return !detectedTop20Coin.isEmpty() ? DetectionInfoResponse.of(detection,
+					detectedTop20Coin.stream().map(DetectedCoinResponse::from).toList()) : null;
 
 			case "bottom20":
 				List<String> bottom20Tickers = exchangeCoinService.getBottomCoins(exchangeType).stream()
@@ -81,11 +83,13 @@ public class DetectionServiceImpl implements DetectionService {
 				List<DetectedCoin> detectedBottom20Coin = detectedCoins.stream()
 					.filter(coin -> bottom20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
 					.toList();
-				return !detectedBottom20Coin.isEmpty() ? DetectionInfoResponse.of(detection, detectedBottom20Coin.stream().map(DetectedCoinResponse::from).toList()) :
+				return !detectedBottom20Coin.isEmpty() ? DetectionInfoResponse.of(detection,
+					detectedBottom20Coin.stream().map(DetectedCoinResponse::from).toList()) :
 					null;
 
 			default:
-				return DetectionInfoResponse.of(detection, detectedCoins.stream().map(DetectedCoinResponse::from).toList());
+				return DetectionInfoResponse.of(detection,
+					detectedCoins.stream().map(DetectedCoinResponse::from).toList());
 		}
 	}
 
@@ -110,6 +114,12 @@ public class DetectionServiceImpl implements DetectionService {
 		return new DetectionChartResponse(labels, List.of(dataset));
 	}
 
+	@Override
+	public List<TopDetectedCoinResponse> getTopDetectedCoins(String timeframe, LocalDateTime startTime,
+		LocalDateTime endTime) {
+		return detectedCoinRepository.findTopDetectedCoins(timeframe, startTime, endTime, 10);
+	}
+
 	private String formatDateTime(LocalDateTime dateTime, String timeframe) {
 		DateTimeFormatter formatter = switch (timeframe) {
 			case "1m", "5m", "15m" -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -119,6 +129,5 @@ public class DetectionServiceImpl implements DetectionService {
 		};
 		return dateTime.format(formatter);
 	}
-
 
 }
