@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.coinsensor.clickcoin.entity.ClickCoin;
-import com.coinsensor.clickcoin.repository.ClickCoinRepository;
+import com.coinsensor.coinclick.entity.CoinClick;
+import com.coinsensor.coinclick.repository.CoinClickRepository;
 import com.coinsensor.common.exception.CustomException;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class DetectedCoinServiceImpl implements DetectedCoinService {
 	private final DetectedCoinRepository detectedCoinRepository;
-	private final ClickCoinRepository clickCoinRepository;
+	private final CoinClickRepository coinClickRepository;
 	private final UserRepository userRepository;
 
 	@Override
@@ -43,20 +43,19 @@ public class DetectedCoinServiceImpl implements DetectedCoinService {
 
 	@Override
 	public Long viewDetectedCoin(String uuid, Long detectedCoinId) {
-		ClickCoin clickCoin = clickCoinRepository.findByUuidAndDetectedCoinId(uuid, detectedCoinId).orElse(null);
+		CoinClick coinClick = coinClickRepository.findByUuidAndDetectedCoinId(uuid, detectedCoinId).orElse(null);
 		DetectedCoin detectedCoin = detectedCoinRepository.findById(detectedCoinId)
 			.orElseThrow(() -> new CustomException(DETECTED_COIN_NOT_FOUND));
 
-		if (clickCoin == null) {
+		if (coinClick == null) {
 			User user = userRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-			clickCoinRepository.save(new ClickCoin(user, detectedCoin));
+			coinClickRepository.save(new CoinClick(user, detectedCoin));
 			detectedCoin.incrementViewCount();
 		} else {
-			clickCoin.reClick();
+			coinClick.reClick();
 		}
 
 		return detectedCoin.getViewCount();
 	}
-
 
 }

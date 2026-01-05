@@ -1,7 +1,7 @@
-package com.coinsensor.clickcoin.repository;
+package com.coinsensor.coinclick.repository;
 
-import static com.coinsensor.clickcoin.entity.QClickCoin.*;
 import static com.coinsensor.coin.entity.QCoin.*;
+import static com.coinsensor.coinclick.entity.QCoinClick.*;
 import static com.coinsensor.detectedcoin.entity.QDetectedCoin.*;
 import static com.coinsensor.exchangecoin.entity.QExchangeCoin.*;
 
@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.coinsensor.clickcoin.dto.response.CoinTrendDataResponse;
-import com.coinsensor.clickcoin.dto.response.CoinViewCountResponse;
-import com.coinsensor.clickcoin.entity.ClickCoin;
+import com.coinsensor.coinclick.dto.response.CoinTrendDataResponse;
+import com.coinsensor.coinclick.dto.response.CoinViewCountResponse;
+import com.coinsensor.coinclick.entity.CoinClick;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -23,16 +23,16 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CustomClickCoinRepositoryImpl implements CustomClickCoinRepository {
+public class CustomCoinClickRepositoryImpl implements CustomCoinClickRepository {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Optional<ClickCoin> findByUuidAndDetectedCoinId(String uuid, Long detectedCoinId) {
+	public Optional<CoinClick> findByUuidAndDetectedCoinId(String uuid, Long detectedCoinId) {
 		return Optional.ofNullable(
 			queryFactory
-				.selectFrom(clickCoin)
-				.where(clickCoin.user.uuid.eq(uuid)
-					.and(clickCoin.detectedCoin.detectedCoinId.eq(detectedCoinId)))
+				.selectFrom(coinClick)
+				.where(coinClick.user.uuid.eq(uuid)
+					.and(coinClick.detectedCoin.detectedCoinId.eq(detectedCoinId)))
 				.fetchOne());
 	}
 
@@ -43,14 +43,14 @@ public class CustomClickCoinRepositoryImpl implements CustomClickCoinRepository 
 				coin.coinId,
 				coin.coinTicker,
 				coin.baseAsset,
-				clickCoin.count.sum()))
-			.from(clickCoin)
-			.join(clickCoin.detectedCoin, detectedCoin)
+				coinClick.count.sum()))
+			.from(coinClick)
+			.join(coinClick.detectedCoin, detectedCoin)
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
 			.join(exchangeCoin.coin, coin)
-			.where(clickCoin.clickedAt.goe(startTime))
+			.where(coinClick.clickedAt.goe(startTime))
 			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.orderBy(clickCoin.count.sum().desc())
+			.orderBy(coinClick.count.sum().desc())
 			.limit(limit)
 			.fetch();
 	}
@@ -59,13 +59,13 @@ public class CustomClickCoinRepositoryImpl implements CustomClickCoinRepository 
 	public List<CoinTrendDataResponse> findCoinsTrendData(LocalDateTime startTime, int limit) {
 		List<Tuple> topCoins = queryFactory
 			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.from(clickCoin)
-			.join(clickCoin.detectedCoin, detectedCoin)
+			.from(coinClick)
+			.join(coinClick.detectedCoin, detectedCoin)
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
 			.join(exchangeCoin.coin, coin)
-			.where(clickCoin.clickedAt.goe(startTime))
+			.where(coinClick.clickedAt.goe(startTime))
 			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.orderBy(clickCoin.count.sum().desc())
+			.orderBy(coinClick.count.sum().desc())
 			.limit(limit)
 			.fetch();
 
@@ -76,16 +76,16 @@ public class CustomClickCoinRepositoryImpl implements CustomClickCoinRepository 
 				String baseAsset = coinTuple.get(coin.baseAsset);
 
 				List<Tuple> rawTrendData = queryFactory
-					.select(Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", clickCoin.clickedAt),
-						clickCoin.count.sum())
-					.from(clickCoin)
-					.join(clickCoin.detectedCoin, detectedCoin)
+					.select(Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt),
+						coinClick.count.sum())
+					.from(coinClick)
+					.join(coinClick.detectedCoin, detectedCoin)
 					.join(detectedCoin.exchangeCoin, exchangeCoin)
 					.where(exchangeCoin.coin.coinId.eq(coinId)
-						.and(clickCoin.clickedAt.goe(startTime)))
-					.groupBy(Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", clickCoin.clickedAt))
+						.and(coinClick.clickedAt.goe(startTime)))
+					.groupBy(Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt))
 					.orderBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", clickCoin.clickedAt).asc())
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt).asc())
 					.fetch();
 
 				// 시간별 데이터를 맵으로 변환

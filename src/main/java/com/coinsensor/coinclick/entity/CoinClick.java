@@ -1,4 +1,4 @@
-package com.coinsensor.clickcoin.entity;
+package com.coinsensor.coinclick.entity;
 
 import java.time.LocalDateTime;
 
@@ -21,17 +21,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "click_coins")
+@Table(name = "coin_clicks")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ClickCoin {
+public class CoinClick {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "click_coin_id")
-	private Long clickCoinId;
+	@Column(name = "coin_click_id")
+	private Long coinClickId;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "user_id")
@@ -47,7 +47,7 @@ public class ClickCoin {
 	@Column(name = "clicked_at", nullable = false)
 	private LocalDateTime clickedAt;
 
-	public ClickCoin(User user, DetectedCoin detectedCoin) {
+	public CoinClick(User user, DetectedCoin detectedCoin) {
 		this.user = user;
 		this.detectedCoin = detectedCoin;
 		this.count = 1L;

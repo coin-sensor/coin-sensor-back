@@ -1,4 +1,4 @@
-package com.coinsensor.clickcoin.controller;
+package com.coinsensor.coinclick.controller;
 
 import java.util.List;
 
@@ -8,31 +8,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coinsensor.clickcoin.dto.response.CoinTrendDataResponse;
-import com.coinsensor.clickcoin.dto.response.CoinViewCountResponse;
-import com.coinsensor.clickcoin.service.ClickCoinService;
+import com.coinsensor.coinclick.dto.response.CoinTrendDataResponse;
+import com.coinsensor.coinclick.dto.response.CoinViewCountResponse;
+import com.coinsensor.coinclick.service.CoinClickService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/clickCoins")
+@RequestMapping("/api/coinClicks")
 @RequiredArgsConstructor
-public class ClickCoinController {
+public class CoinClickController {
 
-	private final ClickCoinService clickCoinService;
+	private final CoinClickService coinClickService;
 
 	@GetMapping("/top")
 	public ResponseEntity<List<CoinViewCountResponse>> getTopViewedCoins(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "3") int limit) {
-		return ResponseEntity.ok(clickCoinService.getTopViewedCoins(days, limit));
+		return ResponseEntity.ok(coinClickService.getTopViewedCoins(days, limit));
 	}
 
 	@GetMapping("/trend")
 	public ResponseEntity<List<CoinTrendDataResponse>> getCoinsTrendData(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "10") int limit) {
-		return ResponseEntity.ok(clickCoinService.getCoinsTrendData(days, limit));
+		return ResponseEntity.ok(coinClickService.getCoinsTrendData(days, limit));
 	}
 
 }

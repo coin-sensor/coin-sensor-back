@@ -1,4 +1,4 @@
-package com.coinsensor.clickcoin.dto.response;
+package com.coinsensor.coinclick.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
