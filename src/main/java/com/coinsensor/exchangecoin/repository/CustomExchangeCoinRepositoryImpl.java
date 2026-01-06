@@ -50,4 +50,14 @@ public class CustomExchangeCoinRepositoryImpl implements CustomExchangeCoinRepos
 			)
 			.fetch();
 	}
+
+	@Override
+	public List<ExchangeCoin> findExchangeCoins() {
+		return queryFactory
+			.selectFrom(exchangeCoin)
+			.join(exchangeCoin.exchange).fetchJoin()
+			.join(exchangeCoin.coin).fetchJoin()
+			.orderBy(exchangeCoin.exchangeCoinId.desc())
+			.fetch();
+	}
 }
