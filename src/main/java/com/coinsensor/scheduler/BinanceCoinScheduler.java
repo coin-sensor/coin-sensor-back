@@ -30,6 +30,7 @@ public class BinanceCoinScheduler {
 	private final ExchangeRepository exchangeRepository;
 	private final WebClient webClient;
 	private final ObjectMapper objectMapper;
+	private final Set<String> disabledDetectionTickers = Set.of("FLOWUSDT", "BTTCUSDT");
 
 	@Scheduled(cron = "0 1 * * * *")
 	@Transactional
@@ -87,7 +88,7 @@ public class BinanceCoinScheduler {
 						.exchange(binanceSpot)
 						.coin(coin)
 						.isActive(true)
-						.enableDetection(true)
+						.enableDetection(!disabledDetectionTickers.contains(coinTicker))
 						.build();
 					exchangeCoinRepository.save(exchangeCoin);
 					newCoins++;
@@ -166,7 +167,7 @@ public class BinanceCoinScheduler {
 						.exchange(binanceFuture)
 						.coin(coin)
 						.isActive(true)
-						.enableDetection(true)
+						.enableDetection(!disabledDetectionTickers.contains(coinTicker))
 						.build();
 					exchangeCoinRepository.save(exchangeCoin);
 					newCoins++;

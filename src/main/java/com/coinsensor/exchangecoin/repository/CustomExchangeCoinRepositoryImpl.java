@@ -37,8 +37,8 @@ public class CustomExchangeCoinRepositoryImpl implements CustomExchangeCoinRepos
 	}
 
 	@Override
-	public List<ExchangeCoin> findByExchangeNameAndTypeAndIsActive(String exchangeName, Exchange.Type type,
-		Boolean isActive) {
+	public List<ExchangeCoin> findByExchangeNameAndTypeAndIsActiveAndEnableDetection(String exchangeName,
+		Exchange.Type type) {
 		return queryFactory
 			.selectFrom(exchangeCoin)
 			.join(exchangeCoin.exchange).fetchJoin()
@@ -46,7 +46,8 @@ public class CustomExchangeCoinRepositoryImpl implements CustomExchangeCoinRepos
 			.where(
 				exchangeCoin.exchange.name.eq(exchangeName)
 					.and(exchangeCoin.exchange.type.eq(type))
-					.and(exchangeCoin.isActive.eq(isActive))
+					.and(exchangeCoin.isActive.eq(true))
+					.and(exchangeCoin.enableDetection.eq(true))
 			)
 			.fetch();
 	}

@@ -64,7 +64,7 @@ public class KlineDetectionService {
 
 			// ExchangeCoin 일괄 조회
 			List<ExchangeCoin> exchangeCoins = exchangeCoinRepository
-				.findByExchangeNameAndTypeAndIsActive("binance", exchangeType, true);
+				.findByExchangeNameAndTypeAndIsActiveAndEnableDetection("binance", exchangeType);
 
 			java.util.Map<String, ExchangeCoin> coinMap = exchangeCoins.stream()
 				.collect(java.util.stream.Collectors.toMap(
@@ -141,7 +141,7 @@ public class KlineDetectionService {
 
 		// 해당 거래소의 모든 코인 조회
 		List<ExchangeCoin> exchangeCoins = exchangeCoinRepository
-			.findByExchangeNameAndTypeAndIsActive("binance", exchangeType, true);
+			.findByExchangeNameAndTypeAndIsActiveAndEnableDetection("binance", exchangeType);
 
 		List<DetectedCoin> detectedCoins = new ArrayList<>();
 		BigDecimal totalChangeX = BigDecimal.ZERO;
@@ -188,9 +188,7 @@ public class KlineDetectionService {
 				RoundingMode.HALF_UP);
 
 			// Detection 생성
-			Exchange exchange = detectedCoins.get(0).getExchangeCoin().getExchange();
-			String summary = String.format("%s %s 탐지: %d개 코인",
-				exchange.getName(), timeframeName, detectedCoins.size());
+			Exchange exchange = detectedCoins.getFirst().getExchangeCoin().getExchange();
 
 			Detection detection = detectionRepository.save(
 				Detection.to(condition, exchange, SummaryUtil.create(exchange, condition, detectedCoins),

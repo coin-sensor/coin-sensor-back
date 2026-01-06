@@ -45,8 +45,8 @@ public class BinanceKlineWebSocketService {
 	}
 
 	private void connectToSpotKlines() {
-		List<ExchangeCoin> spotCoins = exchangeCoinRepository.findByExchangeNameAndTypeAndIsActive(
-			"binance", Exchange.Type.spot, true);
+		List<ExchangeCoin> spotCoins = exchangeCoinRepository.findByExchangeNameAndTypeAndIsActiveAndEnableDetection(
+			"binance", Exchange.Type.spot);
 
 		List<String> timeframes = timeframeRepository.findAll().stream()
 			.map(Timeframe::getName)
@@ -58,8 +58,8 @@ public class BinanceKlineWebSocketService {
 	}
 
 	private void connectToFutureKlines() {
-		List<ExchangeCoin> futureCoins = exchangeCoinRepository.findByExchangeNameAndTypeAndIsActive(
-			"binance", Exchange.Type.future, true);
+		List<ExchangeCoin> futureCoins = exchangeCoinRepository.findByExchangeNameAndTypeAndIsActiveAndEnableDetection(
+			"binance", Exchange.Type.future);
 
 		List<String> timeframes = timeframeRepository.findAll().stream()
 			.map(Timeframe::getName)
