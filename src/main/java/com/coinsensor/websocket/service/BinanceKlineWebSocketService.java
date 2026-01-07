@@ -1,6 +1,7 @@
 package com.coinsensor.websocket.service;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
-import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
+import com.coinsensor.exchangecoin.service.ExchangeCoinService;
+import com.coinsensor.ohlcvs.service.OhlcvService;
 import com.coinsensor.timeframe.entity.Timeframe;
 import com.coinsensor.timeframe.repository.TimeframeRepository;
 import com.coinsensor.websocket.dto.KlineData;
@@ -28,9 +30,9 @@ import reactor.netty.http.client.HttpClient;
 @Slf4j
 public class BinanceKlineWebSocketService {
 
-	private final ExchangeCoinRepository exchangeCoinRepository;
 	private final TimeframeRepository timeframeRepository;
-	private final KlineDetectionService klineDetectionService;
+	private final ExchangeCoinService exchangeCoinService;
+	private final OhlcvService ohlcvService;
 	private final ObjectMapper objectMapper;
 
 	private final ConcurrentMap<String, Disposable> connections = new ConcurrentHashMap<>();
@@ -45,7 +47,7 @@ public class BinanceKlineWebSocketService {
 	}
 
 	private void connectToSpotKlines() {
-		List<ExchangeCoin> spotCoins = exchangeCoinRepository.findByExchangeNameAndTypeAndIsActiveAndEnableDetection(
+		List<ExchangeCoin> spotCoins = exchangeCoinService.getDetectableExchangeCoins(
 			"binance", Exchange.Type.spot);
 
 		List<String> timeframes = timeframeRepository.findAll().stream()
@@ -53,12 +55,12 @@ public class BinanceKlineWebSocketService {
 			.toList();
 
 		for (String timeframe : timeframes) {
-			connectToSpotCoinsInBatches(spotCoins, timeframe);
+			connectToSpotCoins(spotCoins, timeframe);
 		}
 	}
 
 	private void connectToFutureKlines() {
-		List<ExchangeCoin> futureCoins = exchangeCoinRepository.findByExchangeNameAndTypeAndIsActiveAndEnableDetection(
+		List<ExchangeCoin> futureCoins = exchangeCoinService.getDetectableExchangeCoins(
 			"binance", Exchange.Type.future);
 
 		List<String> timeframes = timeframeRepository.findAll().stream()
@@ -66,11 +68,11 @@ public class BinanceKlineWebSocketService {
 			.toList();
 
 		for (String timeframe : timeframes) {
-			connectToFutureCoinsInBatches(futureCoins, timeframe);
+			connectToFutureCoins(futureCoins, timeframe);
 		}
 	}
 
-	private void connectToSpotCoinsInBatches(List<ExchangeCoin> coins, String timeframe) {
+	private void connectToSpotCoins(List<ExchangeCoin> coins, String timeframe) {
 		if (!coins.isEmpty()) {
 			String streamUrl = buildSpotStreamUrl(coins, timeframe);
 			String sessionKey = "spot-" + timeframe;
@@ -79,7 +81,7 @@ public class BinanceKlineWebSocketService {
 		}
 	}
 
-	private void connectToFutureCoinsInBatches(List<ExchangeCoin> coins, String timeframe) {
+	private void connectToFutureCoins(List<ExchangeCoin> coins, String timeframe) {
 		if (!coins.isEmpty()) {
 			String streamUrl = buildFutureStreamUrl(coins, timeframe);
 			String sessionKey = "future-" + timeframe;
@@ -155,10 +157,10 @@ public class BinanceKlineWebSocketService {
 
 						Integer expected = expectedCoinCount.get(sessionKey);
 						if (expected != null && buffer.size() >= expected) {
-							List<KlineData> toSave = new java.util.ArrayList<>(buffer);
+							List<KlineData> toSave = new ArrayList<>(buffer);
 							buffer.clear();
-							klineDetectionService.saveOhlcvDataBatch(toSave, isFuture ?
-								Exchange.Type.future : Exchange.Type.spot);
+							ohlcvService.saveKlineData(toSave,
+								isFuture ? Exchange.Type.future : Exchange.Type.spot);
 						}
 					}
 				}

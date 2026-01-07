@@ -1,11 +1,13 @@
 package com.coinsensor.ohlcvs.service;
 
-import com.coinsensor.ohlcvs.dto.response.OhlcvResponse;
 import java.util.List;
 
+import com.coinsensor.exchange.entity.Exchange;
+import com.coinsensor.websocket.dto.KlineData;
+
 public interface OhlcvService {
-    
-    List<OhlcvResponse> getOhlcvByExchangeCoinId(Long exchangeCoinId);
-    
-    long cleanupOldData(int years);
+
+	void saveKlineData(List<KlineData> klineDataList, Exchange.Type exchangeType);
+
+	long cleanupOldData(int years);
 }

@@ -37,7 +37,7 @@ public class CustomExchangeCoinRepositoryImpl implements CustomExchangeCoinRepos
 	}
 
 	@Override
-	public List<ExchangeCoin> findByExchangeNameAndTypeAndIsActiveAndEnableDetection(String exchangeName,
+	public List<ExchangeCoin> getDetectableExchangeCoins(String exchangeName,
 		Exchange.Type type) {
 		return queryFactory
 			.selectFrom(exchangeCoin)

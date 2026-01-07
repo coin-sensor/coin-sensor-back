@@ -11,4 +11,6 @@ public interface DetectionService {
 		String timeframe);
 
 	DetectionChartResponse getDetectionChart(String timeframe, LocalDateTime startTime, LocalDateTime endTime);
+
+	void detectByTimeframe(String timeframeName);
 }

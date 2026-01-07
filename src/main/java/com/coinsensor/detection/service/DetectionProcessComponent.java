@@ -1,4 +1,4 @@
-package com.coinsensor.websocket.service;
+package com.coinsensor.detection.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,14 +9,11 @@ import java.util.List;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.coinsensor.common.exception.CustomException;
-import com.coinsensor.common.exception.ErrorCode;
 import com.coinsensor.common.util.SummaryUtil;
 import com.coinsensor.conditions.entity.Condition;
-import com.coinsensor.conditions.repository.ConditionRepository;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.detectedcoin.repository.DetectedCoinRepository;
@@ -24,113 +21,27 @@ import com.coinsensor.detection.dto.response.DetectionInfoResponse;
 import com.coinsensor.detection.entity.Detection;
 import com.coinsensor.detection.repository.DetectionRepository;
 import com.coinsensor.exchange.entity.Exchange;
+import com.coinsensor.exchangecoin.dto.response.TopBottomCoinResponse;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
-import com.coinsensor.exchangecoin.repository.ExchangeCoinRepository;
 import com.coinsensor.exchangecoin.service.ExchangeCoinService;
 import com.coinsensor.ohlcvs.entity.Ohlcv;
 import com.coinsensor.ohlcvs.repository.OhlcvRepository;
-import com.coinsensor.timeframe.entity.Timeframe;
-import com.coinsensor.timeframe.repository.TimeframeRepository;
-import com.coinsensor.websocket.dto.KlineData;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
-public class KlineDetectionService {
-
+@Component
+@Transactional
+@RequiredArgsConstructor
+public class DetectionProcessComponent {
 	private final OhlcvRepository ohlcvRepository;
-	private final ExchangeCoinRepository exchangeCoinRepository;
-	private final TimeframeRepository timeframeRepository;
-	private final ConditionRepository conditionRepository;
 	private final DetectionRepository detectionRepository;
 	private final DetectedCoinRepository detectedCoinRepository;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final ExchangeCoinService exchangeCoinService;
 
-	@Transactional
-	public void saveOhlcvDataBatch(List<KlineData> klineDataList, Exchange.Type exchangeType) {
-		try {
-			if (klineDataList.isEmpty())
-				return;
-
-			// Timeframe 미리 조회 (모든 데이터가 같은 timeframe)
-			String timeframeName = klineDataList.get(0).getKline().getInterval();
-			Timeframe timeframe = timeframeRepository.findByName(timeframeName).orElse(null);
-			if (timeframe == null)
-				return;
-
-			// ExchangeCoin 일괄 조회
-			List<ExchangeCoin> exchangeCoins = exchangeCoinRepository
-				.findByExchangeNameAndTypeAndIsActiveAndEnableDetection("binance", exchangeType);
-
-			java.util.Map<String, ExchangeCoin> coinMap = exchangeCoins.stream()
-				.collect(java.util.stream.Collectors.toMap(
-					ec -> ec.getCoin().getCoinTicker(),
-					ec -> ec
-				));
-
-			List<Ohlcv> ohlcvList = new ArrayList<>();
-			for (KlineData klineData : klineDataList) {
-				ExchangeCoin exchangeCoin = coinMap.get(klineData.getSymbol());
-				if (exchangeCoin == null)
-					continue;
-
-				KlineData.KlineInfo kline = klineData.getKline();
-				Ohlcv ohlcv = Ohlcv.from(kline, exchangeCoin, timeframe);
-				ohlcvList.add(ohlcv);
-			}
-
-			if (!ohlcvList.isEmpty()) {
-				ohlcvRepository.saveAll(ohlcvList);
-				log.info("OHLCV 배치 저장 완료: {} {} - {} 건", exchangeType, timeframeName, ohlcvList.size());
-			}
-		} catch (Exception e) {
-			log.error("OHLCV 배치 저장 오류: {}", e.getMessage());
-		}
-	}
-
-	private BigDecimal calculateChangeX(Ohlcv previousCandle1) {
-		if (previousCandle1.getLow().compareTo(BigDecimal.ZERO) == 0) {
-			return BigDecimal.ZERO;
-		}
-
-		// 고점과 저점의 변동률 계산 (high/low - 1) * 100
-		return previousCandle1.getHigh().divide(previousCandle1.getLow(), 4, RoundingMode.HALF_UP)
-			.subtract(BigDecimal.ONE)
-			.multiply(BigDecimal.valueOf(100));
-	}
-
-	private BigDecimal calculateVolumeX(Ohlcv previousCandle2, Ohlcv previousCandle1) {
-		if (previousCandle2.getVolume().compareTo(BigDecimal.ZERO) == 0) {
-			return BigDecimal.ZERO;
-		}
-
-		return previousCandle1.getVolume()
-			.divide(previousCandle2.getVolume(), 2, RoundingMode.HALF_UP);
-	}
-
-	private boolean isDetectionConditionMet(Condition condition, BigDecimal changeX, BigDecimal volumeX) {
-		return changeX.doubleValue() >= condition.getChangeX().doubleValue() &&
-			volumeX.compareTo(condition.getVolumeX()) >= 0;
-	}
-
-	public void detectByTimeframe(String timeframeName) {
-		// 해당 조건들 조회
-		List<Condition> conditions = conditionRepository.findByTimeframeName(timeframeName)
-			.orElseThrow(() -> new CustomException(ErrorCode.CONDITION_NOT_FOUND));
-
-		// 모든 조건에 대해 비동기 탐지 실행
-		for (Condition condition : conditions) {
-			processConditionDetection(condition, Exchange.Type.spot);
-			processConditionDetection(condition, Exchange.Type.future);
-		}
-	}
-
 	@Async
-	@Transactional
 	public void processConditionDetection(Condition condition, Exchange.Type exchangeType) {
 		String timeframeName = condition.getTimeframe().getName();
 
@@ -140,8 +51,8 @@ public class KlineDetectionService {
 		LocalDateTime previousCandleTime2 = previousCandleTime1.minus(getTimeframeDuration(timeframeName));
 
 		// 해당 거래소의 모든 코인 조회
-		List<ExchangeCoin> exchangeCoins = exchangeCoinRepository
-			.findByExchangeNameAndTypeAndIsActiveAndEnableDetection("binance", exchangeType);
+		List<ExchangeCoin> exchangeCoins = exchangeCoinService
+			.getDetectableExchangeCoins("binance", exchangeType);
 
 		List<DetectedCoin> detectedCoins = new ArrayList<>();
 		BigDecimal totalChangeX = BigDecimal.ZERO;
@@ -194,7 +105,7 @@ public class KlineDetectionService {
 				Detection.to(condition, exchange, SummaryUtil.create(exchange, condition, detectedCoins),
 					(long)detectedCoins.size(), avgChangeX, avgVolumeX));
 
-			// DetectedCoin들에 Detection 연결 및 저장
+			// DetectedCoin 들에 Detection 연결 및 저장
 			detectedCoins = detectedCoins.stream()
 				.map(coin -> coin.withDetection(detection))
 				.toList();
@@ -206,6 +117,66 @@ public class KlineDetectionService {
 			log.info("탐지 완료: {} {} - {}개 코인, 평균 변동률: {}%, 평균 거래량: {}배",
 				exchangeType, timeframeName, detectedCoins.size(), avgChangeX, avgVolumeX);
 		}
+	}
+
+	private Duration getTimeframeDuration(String timeframe) {
+		return switch (timeframe) {
+			case "1m" -> Duration.ofMinutes(1);
+			case "5m" -> Duration.ofMinutes(5);
+			case "15m" -> Duration.ofMinutes(15);
+			case "1h" -> Duration.ofHours(1);
+			case "4h" -> Duration.ofHours(4);
+			case "1d" -> Duration.ofDays(1);
+			default -> Duration.ZERO;
+		};
+	}
+
+	private BigDecimal calculateChangeX(Ohlcv previousCandle1) {
+		if (previousCandle1.getLow().compareTo(BigDecimal.ZERO) == 0) {
+			return BigDecimal.ZERO;
+		}
+
+		// 고점과 저점의 변동률 계산 (high/low - 1) * 100
+		return previousCandle1.getHigh().divide(previousCandle1.getLow(), 4, RoundingMode.HALF_UP)
+			.subtract(BigDecimal.ONE)
+			.multiply(BigDecimal.valueOf(100));
+	}
+
+	private BigDecimal calculateVolumeX(Ohlcv previousCandle2, Ohlcv previousCandle1) {
+		if (previousCandle2.getVolume().compareTo(BigDecimal.ZERO) == 0) {
+			return BigDecimal.ZERO;
+		}
+
+		return previousCandle1.getVolume()
+			.divide(previousCandle2.getVolume(), 2, RoundingMode.HALF_UP);
+	}
+
+	private boolean isDetectionConditionMet(Condition condition, BigDecimal changeX, BigDecimal volumeX) {
+		return changeX.doubleValue() >= condition.getChangeX().doubleValue() &&
+			volumeX.compareTo(condition.getVolumeX()) >= 0;
+	}
+
+	private List<DetectedCoin> filterCoinsByCategory(List<DetectedCoin> detectedCoins,
+		String category, String exchangeType) {
+		return switch (category) {
+			case "top20" -> {
+				List<String> top20Tickers = exchangeCoinService.getTopCoins(exchangeType).stream()
+					.map(TopBottomCoinResponse::getSymbol)
+					.toList();
+				yield detectedCoins.stream()
+					.filter(coin -> top20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
+					.toList();
+			}
+			case "bottom20" -> {
+				List<String> bottom20Tickers = exchangeCoinService.getBottomCoins(exchangeType).stream()
+					.map(TopBottomCoinResponse::getSymbol)
+					.toList();
+				yield detectedCoins.stream()
+					.filter(coin -> bottom20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
+					.toList();
+			}
+			default -> detectedCoins;
+		};
 	}
 
 	private void sendDetectionNotification(Detection detection, List<DetectedCoin> detectedCoins) {
@@ -230,40 +201,5 @@ public class KlineDetectionService {
 				messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, responses));
 			}
 		}
-	}
-
-	private Duration getTimeframeDuration(String timeframe) {
-		return switch (timeframe) {
-			case "1m" -> Duration.ofMinutes(1);
-			case "5m" -> Duration.ofMinutes(5);
-			case "15m" -> Duration.ofMinutes(15);
-			case "1h" -> Duration.ofHours(1);
-			case "4h" -> Duration.ofHours(4);
-			case "1d" -> Duration.ofDays(1);
-			default -> Duration.ZERO;
-		};
-	}
-
-	private List<DetectedCoin> filterCoinsByCategory(List<DetectedCoin> detectedCoins,
-		String category, String exchangeType) {
-		return switch (category) {
-			case "top20" -> {
-				List<String> top20Tickers = exchangeCoinService.getTopCoins(exchangeType).stream()
-					.map(coin -> coin.getSymbol())
-					.toList();
-				yield detectedCoins.stream()
-					.filter(coin -> top20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
-					.toList();
-			}
-			case "bottom20" -> {
-				List<String> bottom20Tickers = exchangeCoinService.getBottomCoins(exchangeType).stream()
-					.map(coin -> coin.getSymbol())
-					.toList();
-				yield detectedCoins.stream()
-					.filter(coin -> bottom20Tickers.contains(coin.getExchangeCoin().getCoin().getCoinTicker()))
-					.toList();
-			}
-			default -> detectedCoins;
-		};
 	}
 }

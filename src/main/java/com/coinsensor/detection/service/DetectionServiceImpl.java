@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.coinsensor.common.exception.CustomException;
+import com.coinsensor.common.exception.ErrorCode;
+import com.coinsensor.conditions.entity.Condition;
+import com.coinsensor.conditions.repository.ConditionRepository;
 import com.coinsensor.detection.dto.response.DetectionChartResponse;
 import com.coinsensor.detection.dto.response.DetectionInfoResponse;
 import com.coinsensor.detection.entity.Detection;
@@ -23,7 +27,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DetectionServiceImpl implements DetectionService {
 	private final DetectionRepository detectionRepository;
+	private final ConditionRepository conditionRepository;
 	private final ExchangeCoinService exchangeCoinService;
+	private final DetectionProcessComponent klineDetectionService;
 
 	@Override
 	public List<DetectionInfoResponse> getDetectionInfos(String exchange, String exchangeType, String coinCategory,
@@ -90,6 +96,18 @@ public class DetectionServiceImpl implements DetectionService {
 			default -> DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 		};
 		return dateTime.format(formatter);
+	}
+
+	public void detectByTimeframe(String timeframeName) {
+		// 해당 조건들 조회
+		List<Condition> conditions = conditionRepository.findByTimeframeName(timeframeName)
+			.orElseThrow(() -> new CustomException(ErrorCode.CONDITION_NOT_FOUND));
+
+		// 모든 조건에 대해 비동기 탐지 실행
+		for (Condition condition : conditions) {
+			klineDetectionService.processConditionDetection(condition, Exchange.Type.spot);
+			klineDetectionService.processConditionDetection(condition, Exchange.Type.future);
+		}
 	}
 
 }

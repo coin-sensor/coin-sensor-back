@@ -2,11 +2,13 @@ package com.coinsensor.exchangecoin.service;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.coinsensor.common.exception.CustomException;
 import com.coinsensor.common.exception.ErrorCode;
+import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.dto.response.ExchangeCoinResponse;
 import com.coinsensor.exchangecoin.dto.response.TopBottomCoinResponse;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
@@ -51,5 +53,12 @@ public class ExchangeCoinServiceImpl implements ExchangeCoinService {
 			.orElseThrow(() -> new CustomException(ErrorCode.EXCHANGE_COIN_NOT_FOUND));
 
 		exchangeCoin.setEnableDetection(!exchangeCoin.getEnableDetection());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "detectableExchangeCoins", key = "#exchangeName + '-' + #type", cacheManager = "cacheManager")
+	public List<ExchangeCoin> getDetectableExchangeCoins(String exchangeName, Exchange.Type type) {
+		return exchangeCoinRepository.getDetectableExchangeCoins(exchangeName, type);
 	}
 }

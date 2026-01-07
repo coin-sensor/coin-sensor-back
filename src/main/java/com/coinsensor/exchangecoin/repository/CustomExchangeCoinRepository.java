@@ -11,7 +11,7 @@ public interface CustomExchangeCoinRepository {
 	Optional<ExchangeCoin> findByExchangeNameAndTypeAndCoinTicker(String exchangeName, Exchange.Type type,
 		String coinTicker);
 
-	List<ExchangeCoin> findByExchangeNameAndTypeAndIsActiveAndEnableDetection(String exchangeName, Exchange.Type type);
+	List<ExchangeCoin> getDetectableExchangeCoins(String exchangeName, Exchange.Type type);
 
 	List<ExchangeCoin> findExchangeCoins();
 }
