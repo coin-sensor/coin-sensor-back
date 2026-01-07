@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "ohlcvs", indexes = {
-	@Index(name = "idx_ohlcv_exchange_timeframe_starttime", 
-		   columnList = "exchange_coin_id, timeframe_id, start_time DESC")
+	@Index(name = "idx_ohlcv_exchange_timeframe_starttime",
+		columnList = "exchange_coin_id, timeframe_id, start_time DESC")
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -60,7 +60,7 @@ public class Ohlcv {
 	@Column(nullable = false, precision = 20, scale = 8)
 	private BigDecimal close;
 
-	@Column(nullable = false, precision = 20, scale = 8)
+	@Column(nullable = false, precision = 30, scale = 8)
 	private BigDecimal volume;
 
 	@Column(name = "created_at", nullable = false)
