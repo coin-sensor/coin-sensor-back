@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.coinsensor.userreaction.dto.request.UserReactionRequest;
 import com.coinsensor.userreaction.dto.response.CoinReactionResponse;
 import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
+import com.coinsensor.userreaction.dto.response.ReactionTrendDataResponse;
 import com.coinsensor.userreaction.service.UserReactionService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,8 @@ public class UserReactionController {
 	private final UserReactionService userReactionService;
 
 	@PostMapping
-	public ResponseEntity<List<ReactionCountResponse>> toggleReaction(@RequestHeader String uuid, @RequestBody UserReactionRequest request) {
+	public ResponseEntity<List<ReactionCountResponse>> toggleReaction(@RequestHeader String uuid,
+		@RequestBody UserReactionRequest request) {
 		List<ReactionCountResponse> updatedCounts = userReactionService.toggleReaction(uuid, request);
 		return ResponseEntity.ok(updatedCounts);
 	}
@@ -42,22 +44,22 @@ public class UserReactionController {
 	@GetMapping("/topLiked")
 	public ResponseEntity<List<CoinReactionResponse>> getTopLikedCoins(
 		@RequestParam(defaultValue = "1") int days,
-		@RequestParam(defaultValue = "10") int limit) {
+		@RequestParam(defaultValue = "5") int limit) {
 		return ResponseEntity.ok(userReactionService.getTopLikedCoins(days, limit));
 	}
 
 	@GetMapping("/topDisliked")
 	public ResponseEntity<List<CoinReactionResponse>> getTopDislikedCoins(
 		@RequestParam(defaultValue = "1") int days,
-		@RequestParam(defaultValue = "10") int limit) {
+		@RequestParam(defaultValue = "5") int limit) {
 		return ResponseEntity.ok(userReactionService.getTopDislikedCoins(days, limit));
 	}
 
-	// @GetMapping("/trend")
-	// public ResponseEntity<List<ReactionTrendDataResponse>> getReactionsTrendData(
-	// 	@RequestParam(defaultValue = "1") int days,
-	// 	@RequestParam(defaultValue = "10") int limit) {
-	// 	return ResponseEntity.ok(userReactionService.getReactionsTrendData(days, limit));
-	// }
+	@GetMapping("/trend")
+	public ResponseEntity<List<ReactionTrendDataResponse>> getReactionsTrendData(
+		@RequestParam(defaultValue = "1") int days,
+		@RequestParam(defaultValue = "5") int limit) {
+		return ResponseEntity.ok(userReactionService.getReactionsTrendData(days, limit));
+	}
 
 }

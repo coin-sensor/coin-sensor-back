@@ -6,21 +6,24 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class ReactionTrendDataResponse {
-	private final Long coinId;
-	private final String coinTicker;
-	private final String baseAsset;
-	private final List<TrendDataPoint> likeData;
-	private final List<TrendDataPoint> dislikeData;
+	private Long coinId;
+	private String coinTicker;
+	private String baseAsset;
+	private List<TrendDataPoint> likeData;
+	private List<TrendDataPoint> dislikeData;
 
 	@Getter
+	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class TrendDataPoint {
-		private final LocalDateTime timestamp;
-		private final Long reactionCount;
+		private LocalDateTime timestamp;
+		private Long reactionCount;
 	}
 }
