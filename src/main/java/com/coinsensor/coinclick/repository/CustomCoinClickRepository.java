@@ -1,6 +1,5 @@
 package com.coinsensor.coinclick.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,8 +11,8 @@ public interface CustomCoinClickRepository {
 
 	Optional<CoinClick> findByUuidAndDetectedCoinId(String uuid, Long detectedCoinId);
 
-	List<CoinViewCountResponse> findTopViewedCoins(LocalDateTime startTime, int limit);
+	List<CoinViewCountResponse> findTopViewedCoins(int days, int limit);
 
-	List<CoinTrendDataResponse> findCoinsTrendData(LocalDateTime startTime, int limit);
+	List<CoinTrendDataResponse> findCoinsTrendData(int days, int limit);
 
 }

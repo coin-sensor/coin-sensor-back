@@ -37,7 +37,8 @@ public class CustomCoinClickRepositoryImpl implements CustomCoinClickRepository 
 	}
 
 	@Override
-	public List<CoinViewCountResponse> findTopViewedCoins(LocalDateTime startTime, int limit) {
+	public List<CoinViewCountResponse> findTopViewedCoins(int days, int limit) {
+		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
 		return queryFactory
 			.select(Projections.constructor(CoinViewCountResponse.class,
 				coin.coinId,
@@ -56,7 +57,9 @@ public class CustomCoinClickRepositoryImpl implements CustomCoinClickRepository 
 	}
 
 	@Override
-	public List<CoinTrendDataResponse> findCoinsTrendData(LocalDateTime startTime, int limit) {
+	public List<CoinTrendDataResponse> findCoinsTrendData(int days, int limit) {
+		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
+
 		List<Tuple> topCoins = queryFactory
 			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
 			.from(coinClick)

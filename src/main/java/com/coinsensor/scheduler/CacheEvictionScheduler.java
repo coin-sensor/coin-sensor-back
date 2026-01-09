@@ -25,4 +25,15 @@ public class CacheEvictionScheduler {
 			log.error("detectableExchangeCoins 캐시 삭제 실패: {}", e.getMessage());
 		}
 	}
+
+	@Scheduled(cron = "0 0 * * * *")
+	public void evictCoinClickCache() {
+		try {
+			Objects.requireNonNull(cacheManager.getCache("topViewedCoins")).clear();
+			Objects.requireNonNull(cacheManager.getCache("coinsTrendData")).clear();
+			log.info("코인 클릭 캐시 삭제 완료");
+		} catch (Exception e) {
+			log.error("코인 클릭 캐시 삭제 실패: {}", e.getMessage());
+		}
+	}
 }

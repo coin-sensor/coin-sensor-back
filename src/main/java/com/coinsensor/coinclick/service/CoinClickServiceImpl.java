@@ -1,8 +1,8 @@
 package com.coinsensor.coinclick.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +20,15 @@ public class CoinClickServiceImpl implements CoinClickService {
 	private final CoinClickRepository coinClickRepository;
 
 	@Override
+	@Cacheable(value = "topViewedCoins", key = "#days + '_' + #limit")
 	public List<CoinViewCountResponse> getTopViewedCoins(int days, int limit) {
-		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
-		return coinClickRepository.findTopViewedCoins(startTime, limit);
+		return coinClickRepository.findTopViewedCoins(days, limit);
 	}
 
 	@Override
+	@Cacheable(value = "coinsTrendData", key = "#days + '_' + #limit")
 	public List<CoinTrendDataResponse> getCoinsTrendData(int days, int limit) {
-		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
-		return coinClickRepository.findCoinsTrendData(startTime, limit);
+		return coinClickRepository.findCoinsTrendData(days, limit);
 	}
 
 }
