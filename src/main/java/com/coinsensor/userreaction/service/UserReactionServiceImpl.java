@@ -100,9 +100,15 @@ public class UserReactionServiceImpl implements UserReactionService {
 	}
 
 	@Override
-	public List<ReactionTrendDataResponse> getReactionsTrendData(int days, int limit) {
+	public List<ReactionTrendDataResponse> getLikeTrendData(int days, int limit) {
 		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
-		return userReactionRepository.findReactionsTrendData(startTime, limit);
+		return userReactionRepository.findLikeTrendData(startTime, limit);
+	}
+
+	@Override
+	public List<ReactionTrendDataResponse> getDislikeTrendData(int days, int limit) {
+		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
+		return userReactionRepository.findDislikeTrendData(startTime, limit);
 	}
 
 	private void updateReactionCount(String targetType, Long targetId, Reaction reaction, int delta) {

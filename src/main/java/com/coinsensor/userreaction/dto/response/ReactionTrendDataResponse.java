@@ -16,8 +16,7 @@ public class ReactionTrendDataResponse {
 	private Long coinId;
 	private String coinTicker;
 	private String baseAsset;
-	private List<TrendDataPoint> likeData;
-	private List<TrendDataPoint> dislikeData;
+	private List<TrendDataPoint> data;
 
 	@Getter
 	@NoArgsConstructor

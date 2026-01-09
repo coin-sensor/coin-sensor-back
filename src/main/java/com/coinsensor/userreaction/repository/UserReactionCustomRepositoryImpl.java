@@ -83,81 +83,66 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 	}
 
 	@Override
-	public List<ReactionTrendDataResponse> findReactionsTrendData(LocalDateTime startTime, int limit) {
-		// 좋아요 상위 코인
+	public List<ReactionTrendDataResponse> findLikeTrendData(LocalDateTime startTime, int limit) {
 		List<Tuple> topCoins = queryFactory
 			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.from(detectedCoin)
+			.from(userReaction)
+			.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
 			.join(exchangeCoin.coin, coin)
-			.where(detectedCoin.detectedAt.goe(startTime)
-				.and(detectedCoin.likeCount.gt(0L)))
+			.where(userReaction.createdAt.goe(startTime)
+				.and(userReaction.targetType.eq("detected_coins"))
+				.and(userReaction.reaction.name.eq("like")))
 			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.orderBy(detectedCoin.likeCount.sum().desc())
+			.orderBy(userReaction.count().desc())
 			.limit(limit)
 			.fetch();
 
-		// 싫어요 상위 코인
-		List<Tuple> bottomCoins = queryFactory
-			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.from(detectedCoin)
-			.join(detectedCoin.exchangeCoin, exchangeCoin)
-			.join(exchangeCoin.coin, coin)
-			.where(detectedCoin.detectedAt.goe(startTime)
-				.and(detectedCoin.dislikeCount.gt(0L)))
-			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
-			.orderBy(detectedCoin.dislikeCount.sum().desc())
-			.limit(limit)
-			.fetch();
-
-		// topCoins 처리
-		List<ReactionTrendDataResponse> topResults = topCoins.stream()
+		return topCoins.stream()
 			.map(coinTuple -> {
 				Long coinId = coinTuple.get(coin.coinId);
 				String coinTicker = coinTuple.get(coin.coinTicker);
 				String baseAsset = coinTuple.get(coin.baseAsset);
 
-				// Like 데이터 조회 (topCoins에서)
 				List<Tuple> likeData = queryFactory
 					.select(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt),
-						detectedCoin.likeCount.sum())
-					.from(detectedCoin)
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt),
+						userReaction.count())
+					.from(userReaction)
+					.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
 					.join(detectedCoin.exchangeCoin, exchangeCoin)
 					.where(exchangeCoin.coin.coinId.eq(coinId)
-						.and(detectedCoin.detectedAt.goe(startTime))
-						.and(detectedCoin.likeCount.gt(0L)))
+						.and(userReaction.createdAt.goe(startTime))
+						.and(userReaction.targetType.eq("detected_coins"))
+						.and(userReaction.reaction.name.eq("like")))
 					.groupBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt))
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt))
 					.orderBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt)
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt)
 							.asc())
 					.fetch();
 
-				// Like 데이터 처리
 				Map<String, Long> likeDataMap = likeData.stream()
 					.collect(Collectors.toMap(
 						tuple -> tuple.get(0, String.class),
 						tuple -> tuple.get(1, Long.class)));
 
-				// 시작 시간부터 현재 시간까지 모든 시간대 생성
 				LocalDateTime now = LocalDateTime.now();
-				List<ReactionTrendDataResponse.TrendDataPoint> likeTrendDataList = new ArrayList<>();
+				List<ReactionTrendDataResponse.TrendDataPoint> trendDataList = new ArrayList<>();
 
-				// 시간별 데이터 생성 및 누적 계산
-				long likeCumulativeSum = 0;
+				long cumulativeSum = 0;
 				LocalDateTime current = startTime.withMinute(0).withSecond(0).withNano(0);
 
 				while (!current.isAfter(now)) {
 					String timeKey = current.toString().replace("T", " ") + ":00";
-					Long likeCount = likeDataMap.getOrDefault(timeKey, 0L);
-					likeCumulativeSum += likeCount;
+					Long count = likeDataMap.getOrDefault(timeKey, 0L);
+					cumulativeSum += count;
 
-					likeTrendDataList.add(new ReactionTrendDataResponse.TrendDataPoint(current, likeCumulativeSum));
+					trendDataList.add(new ReactionTrendDataResponse.TrendDataPoint(current, cumulativeSum));
 
 					if (current.withMinute(0).withSecond(0).withNano(0)
 						.equals(now.withMinute(0).withSecond(0).withNano(0)) && now.getMinute() > 0) {
-						likeTrendDataList.add(new ReactionTrendDataResponse.TrendDataPoint(now, likeCumulativeSum));
+						trendDataList.add(new ReactionTrendDataResponse.TrendDataPoint(now, cumulativeSum));
 					}
 
 					current = current.plusHours(1);
@@ -167,60 +152,73 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 					.coinId(coinId)
 					.baseAsset(baseAsset)
 					.coinTicker(coinTicker)
-					.likeData(likeTrendDataList)
-					.dislikeData(new ArrayList<>()) // topCoins에서는 dislike 데이터 없음
+					.data(trendDataList)
 					.build();
 			})
-			.collect(Collectors.toList());
+			.toList();
+	}
 
-		// bottomCoins 처리 추가
-		List<ReactionTrendDataResponse> bottomResults = bottomCoins.stream()
+	@Override
+	public List<ReactionTrendDataResponse> findDislikeTrendData(LocalDateTime startTime, int limit) {
+		List<Tuple> bottomCoins = queryFactory
+			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
+			.from(userReaction)
+			.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
+			.join(detectedCoin.exchangeCoin, exchangeCoin)
+			.join(exchangeCoin.coin, coin)
+			.where(userReaction.createdAt.goe(startTime)
+				.and(userReaction.targetType.eq("detected_coins"))
+				.and(userReaction.reaction.name.eq("dislike")))
+			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
+			.orderBy(userReaction.count().desc())
+			.limit(limit)
+			.fetch();
+
+		return bottomCoins.stream()
 			.map(coinTuple -> {
 				Long coinId = coinTuple.get(coin.coinId);
 				String coinTicker = coinTuple.get(coin.coinTicker);
 				String baseAsset = coinTuple.get(coin.baseAsset);
 
-				// Dislike 데이터 조회 (bottomCoins에서)
 				List<Tuple> dislikeData = queryFactory
 					.select(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt),
-						detectedCoin.dislikeCount.sum())
-					.from(detectedCoin)
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt),
+						userReaction.count())
+					.from(userReaction)
+					.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
 					.join(detectedCoin.exchangeCoin, exchangeCoin)
 					.where(exchangeCoin.coin.coinId.eq(coinId)
-						.and(detectedCoin.detectedAt.goe(startTime))
-						.and(detectedCoin.dislikeCount.gt(0L)))
+						.and(userReaction.createdAt.goe(startTime))
+						.and(userReaction.targetType.eq("detected_coins"))
+						.and(userReaction.reaction.name.eq("dislike")))
 					.groupBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt))
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt))
 					.orderBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", detectedCoin.detectedAt)
+						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt)
 							.asc())
 					.fetch();
 
-				// Dislike 데이터 처리
 				Map<String, Long> dislikeDataMap = dislikeData.stream()
 					.collect(Collectors.toMap(
 						tuple -> tuple.get(0, String.class),
 						tuple -> tuple.get(1, Long.class)));
 
-				// 시작 시간부터 현재 시간까지 모든 시간대 생성
 				LocalDateTime now = LocalDateTime.now();
-				List<ReactionTrendDataResponse.TrendDataPoint> dislikeTrendDataList = new ArrayList<>();
+				List<ReactionTrendDataResponse.TrendDataPoint> trendDataList = new ArrayList<>();
 
-				// 시간별 데이터 생성 및 누적 계산
-				long dislikeCumulativeSum = 0;
+				long cumulativeSum = 0;
 				LocalDateTime current = startTime.withMinute(0).withSecond(0).withNano(0);
 
 				while (!current.isAfter(now)) {
 					String timeKey = current.toString().replace("T", " ") + ":00";
-					Long dislikeCount = dislikeDataMap.getOrDefault(timeKey, 0L);
-					dislikeCumulativeSum += dislikeCount;
+					Long count = dislikeDataMap.getOrDefault(timeKey, 0L);
+					cumulativeSum += count;
 
-					dislikeTrendDataList.add(new ReactionTrendDataResponse.TrendDataPoint(current, dislikeCumulativeSum));
+					trendDataList.add(new ReactionTrendDataResponse.TrendDataPoint(current, cumulativeSum));
 
 					if (current.withMinute(0).withSecond(0).withNano(0)
 						.equals(now.withMinute(0).withSecond(0).withNano(0)) && now.getMinute() > 0) {
-						dislikeTrendDataList.add(new ReactionTrendDataResponse.TrendDataPoint(now, dislikeCumulativeSum));
+						trendDataList.add(new ReactionTrendDataResponse.TrendDataPoint(now, cumulativeSum));
 					}
 
 					current = current.plusHours(1);
@@ -230,17 +228,10 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 					.coinId(coinId)
 					.baseAsset(baseAsset)
 					.coinTicker(coinTicker)
-					.likeData(new ArrayList<>()) // bottomCoins에서는 like 데이터 없음
-					.dislikeData(dislikeTrendDataList)
+					.data(trendDataList)
 					.build();
 			})
-			.collect(Collectors.toList());
-
-		// 두 결과 합치기
-		List<ReactionTrendDataResponse> result = new ArrayList<>();
-		result.addAll(topResults);
-		result.addAll(bottomResults);
-		return result;
+			.toList();
 	}
 
 }

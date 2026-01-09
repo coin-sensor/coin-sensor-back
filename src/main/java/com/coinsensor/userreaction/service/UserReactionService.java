@@ -17,5 +17,7 @@ public interface UserReactionService {
 
     List<CoinReactionResponse> getTopDislikedCoins(int days, int limit);
 
-    List<ReactionTrendDataResponse> getReactionsTrendData(int days, int limit);
+    List<ReactionTrendDataResponse> getLikeTrendData(int days, int limit);
+
+    List<ReactionTrendDataResponse> getDislikeTrendData(int days, int limit);
 }

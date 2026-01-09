@@ -17,5 +17,7 @@ public interface UserReactionCustomRepository {
 
     List<CoinReactionResponse> findTopDislikedCoins(LocalDateTime startTime, int limit);
 
-    List<ReactionTrendDataResponse> findReactionsTrendData(LocalDateTime startTime, int limit);
+    List<ReactionTrendDataResponse> findLikeTrendData(LocalDateTime startTime, int limit);
+
+    List<ReactionTrendDataResponse> findDislikeTrendData(LocalDateTime startTime, int limit);
 }

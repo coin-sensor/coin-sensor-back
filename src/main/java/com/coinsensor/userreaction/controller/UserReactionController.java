@@ -55,11 +55,18 @@ public class UserReactionController {
 		return ResponseEntity.ok(userReactionService.getTopDislikedCoins(days, limit));
 	}
 
-	@GetMapping("/trend")
-	public ResponseEntity<List<ReactionTrendDataResponse>> getReactionsTrendData(
+	@GetMapping("/trend/like")
+	public ResponseEntity<List<ReactionTrendDataResponse>> getLikeTrendData(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "5") int limit) {
-		return ResponseEntity.ok(userReactionService.getReactionsTrendData(days, limit));
+		return ResponseEntity.ok(userReactionService.getLikeTrendData(days, limit));
+	}
+
+	@GetMapping("/trend/dislike")
+	public ResponseEntity<List<ReactionTrendDataResponse>> getDislikeTrendData(
+		@RequestParam(defaultValue = "1") int days,
+		@RequestParam(defaultValue = "5") int limit) {
+		return ResponseEntity.ok(userReactionService.getDislikeTrendData(days, limit));
 	}
 
 }
