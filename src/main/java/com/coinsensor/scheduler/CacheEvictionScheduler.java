@@ -1,5 +1,6 @@
 package com.coinsensor.scheduler;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.cache.CacheManager;
@@ -26,14 +27,19 @@ public class CacheEvictionScheduler {
 		}
 	}
 
-	@Scheduled(cron = "0 0 * * * *")
+	@Scheduled(cron = "0 */5 * * * *")
 	public void evictCoinClickCache() {
-		try {
-			Objects.requireNonNull(cacheManager.getCache("topViewedCoins")).clear();
-			Objects.requireNonNull(cacheManager.getCache("coinsTrendData")).clear();
-			log.info("코인 클릭 캐시 삭제 완료");
-		} catch (Exception e) {
-			log.error("코인 클릭 캐시 삭제 실패: {}", e.getMessage());
+		List<String> cacheNames = List.of("topViewedCoins", "coinsTrendData", "topLikedCoins", "topDislikedCoins",
+			"likeTrendData", "dislikeTrendData");
+
+		for (String cacheName : cacheNames) {
+			try {
+				Objects.requireNonNull(cacheManager.getCache(cacheName)).clear();
+				log.info("{} 캐시 삭제 완료", cacheName);
+			} catch (Exception e) {
+				log.error("{} 캐시 삭제 실패: {}", cacheName, e.getMessage());
+			}
 		}
 	}
+
 }

@@ -33,14 +33,6 @@ public class UserReactionController {
 		return ResponseEntity.ok(updatedCounts);
 	}
 
-	@GetMapping("/counts")
-	public ResponseEntity<List<ReactionCountResponse>> getReactionCounts(
-		@RequestParam String targetType,
-		@RequestParam Long targetId) {
-		List<ReactionCountResponse> counts = userReactionService.getReactionCounts(targetType, targetId);
-		return ResponseEntity.ok(counts);
-	}
-
 	@GetMapping("/topLiked")
 	public ResponseEntity<List<CoinReactionResponse>> getTopLikedCoins(
 		@RequestParam(defaultValue = "1") int days,

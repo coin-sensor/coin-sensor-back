@@ -3,6 +3,7 @@ package com.coinsensor.userreaction.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +44,7 @@ public class UserReactionServiceImpl implements UserReactionService {
 
 		// 기존 리액션 조회
 		UserReaction userReaction = userReactionRepository.findByUserAndTargetTypeAndTargetId(user,
-			request.getTargetType(),
-			request.getTargetId()).orElse(null);
+			request.getTargetType(), request.getTargetId()).orElse(null);
 
 		// 기존 리액션이 있는 경우
 		if (userReaction != null) {
@@ -76,7 +76,7 @@ public class UserReactionServiceImpl implements UserReactionService {
 			// detected_coins의 경우 엔티티 필드에서 직접 조회
 			DetectedCoin detectedCoin = detectedCoinRepository.findById(targetId)
 				.orElseThrow(() -> new CustomException(ErrorCode.DETECTED_COIN_NOT_FOUND));
-			
+
 			return List.of(
 				new ReactionCountResponse("like", detectedCoin.getLikeCount()),
 				new ReactionCountResponse("dislike", detectedCoin.getDislikeCount())
@@ -88,24 +88,28 @@ public class UserReactionServiceImpl implements UserReactionService {
 	}
 
 	@Override
+	@Cacheable(value = "topLikedCoins", key = "#days + '_' + #limit", cacheManager = "cacheManager")
 	public List<CoinReactionResponse> getTopLikedCoins(int days, int limit) {
 		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
 		return userReactionRepository.findTopLikedCoins(startTime, limit);
 	}
 
 	@Override
+	@Cacheable(value = "topDislikedCoins", key = "#days + '_' + #limit", cacheManager = "cacheManager")
 	public List<CoinReactionResponse> getTopDislikedCoins(int days, int limit) {
 		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
 		return userReactionRepository.findTopDislikedCoins(startTime, limit);
 	}
 
 	@Override
+	@Cacheable(value = "likeTrendData", key = "#days + '_' + #limit", cacheManager = "cacheManager")
 	public List<ReactionTrendDataResponse> getLikeTrendData(int days, int limit) {
 		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
 		return userReactionRepository.findLikeTrendData(startTime, limit);
 	}
 
 	@Override
+	@Cacheable(value = "dislikeTrendData", key = "#days + '_' + #limit", cacheManager = "cacheManager")
 	public List<ReactionTrendDataResponse> getDislikeTrendData(int days, int limit) {
 		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
 		return userReactionRepository.findDislikeTrendData(startTime, limit);
