@@ -80,4 +80,20 @@ public class CustomDetectionRepositoryImpl implements CustomDetectionRepository 
 			.filter(Objects::nonNull)
 			.toList();
 	}
+
+	@Override
+	public List<Detection> findByTimeframeBetween(String timeframeName, LocalDateTime startTime,
+		LocalDateTime endTime) {
+		return queryFactory
+			.selectFrom(detection)
+			.join(detection.condition, condition).fetchJoin()
+			.join(condition.timeframe, timeframe).fetchJoin()
+			.where(
+				timeframe.name.eq(timeframeName)
+					.and(detection.detectedAt.goe(startTime))
+					.and(detection.detectedAt.loe(endTime))
+			)
+			.orderBy(detection.detectedAt.asc())
+			.fetch();
+	}
 }
