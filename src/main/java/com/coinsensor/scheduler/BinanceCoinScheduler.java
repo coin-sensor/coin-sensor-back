@@ -31,7 +31,7 @@ public class BinanceCoinScheduler {
 	private final WebClient webClient;
 	private final ObjectMapper objectMapper;
 	private final Set<String> disabledDetectionTickers = Set.of("FLOWUSDT", "BTTCUSDT", "1000SATSUSDT", "ALICEUSDT",
-		"DYDXUSDT", "GTCUSDT", "CELOUSDT");
+		"DYDXUSDT", "GTCUSDT", "CELOUSDT", "ALICEUSDT");
 
 	@Scheduled(cron = "0 1 * * * *")
 	@Transactional
