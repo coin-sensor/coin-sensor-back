@@ -60,48 +60,69 @@ public class CustomCoinClickRepositoryImpl implements CustomCoinClickRepository 
 	public List<CoinTrendDataResponse> findCoinsTrendData(int days, int limit) {
 		LocalDateTime startTime = LocalDateTime.now().minusDays(days);
 
-		List<Tuple> topCoins = queryFactory
-			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
+		// 1. 상위 코인들 조회
+		List<Long> topCoinIds = queryFactory
+			.select(coin.coinId)
 			.from(coinClick)
 			.join(coinClick.detectedCoin, detectedCoin)
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
 			.join(exchangeCoin.coin, coin)
 			.where(coinClick.clickedAt.goe(startTime))
-			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
+			.groupBy(coin.coinId)
 			.orderBy(coinClick.count.sum().desc())
 			.limit(limit)
 			.fetch();
 
-		return topCoins.stream()
-			.map(coinTuple -> {
-				Long coinId = coinTuple.get(coin.coinId);
-				String coinTicker = coinTuple.get(coin.coinTicker);
-				String baseAsset = coinTuple.get(coin.baseAsset);
+		if (topCoinIds.isEmpty()) {
+			return new ArrayList<>();
+		}
 
-				List<Tuple> rawTrendData = queryFactory
-					.select(Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt),
-						coinClick.count.sum())
-					.from(coinClick)
-					.join(coinClick.detectedCoin, detectedCoin)
-					.join(detectedCoin.exchangeCoin, exchangeCoin)
-					.where(exchangeCoin.coin.coinId.eq(coinId)
-						.and(coinClick.clickedAt.goe(startTime)))
-					.groupBy(Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt))
-					.orderBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt).asc())
-					.fetch();
+		// 2. 모든 데이터를 한 번에 조회
+		List<Tuple> allData = queryFactory
+			.select(
+				coin.coinId,
+				coin.coinTicker,
+				coin.baseAsset,
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt),
+				coinClick.count.sum())
+			.from(coinClick)
+			.join(coinClick.detectedCoin, detectedCoin)
+			.join(detectedCoin.exchangeCoin, exchangeCoin)
+			.join(exchangeCoin.coin, coin)
+			.where(exchangeCoin.coin.coinId.in(topCoinIds)
+				.and(coinClick.clickedAt.goe(startTime)))
+			.groupBy(
+				coin.coinId,
+				coin.coinTicker,
+				coin.baseAsset,
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt))
+			.orderBy(coin.coinId.asc(),
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", coinClick.clickedAt).asc())
+			.fetch();
 
-				// 시간별 데이터를 맵으로 변환
-				Map<String, Long> dataMap = rawTrendData.stream()
+		// 3. 데이터 그룹핑 및 변환
+		Map<Long, List<Tuple>> groupedData = allData.stream()
+			.collect(Collectors.groupingBy(tuple -> tuple.get(coin.coinId)));
+
+		return topCoinIds.stream()
+			.map(coinId -> {
+				List<Tuple> coinData = groupedData.getOrDefault(coinId, new ArrayList<>());
+				if (coinData.isEmpty()) {
+					return null;
+				}
+
+				Tuple firstTuple = coinData.get(0);
+				String coinTicker = firstTuple.get(coin.coinTicker);
+				String baseAsset = firstTuple.get(coin.baseAsset);
+
+				Map<String, Long> dataMap = coinData.stream()
 					.collect(Collectors.toMap(
-						tuple -> tuple.get(0, String.class),
-						tuple -> tuple.get(1, Long.class)));
+						tuple -> tuple.get(3, String.class),
+						tuple -> tuple.get(4, Long.class)));
 
-				// 시작 시간부터 현재 시간까지 모든 시간대 생성
 				LocalDateTime now = LocalDateTime.now();
 				List<CoinTrendDataResponse.TrendDataPoint> trendDataList = new ArrayList<>();
 
-				// 시간별 데이터 생성 및 누적 계산
 				long cumulativeSum = 0;
 				LocalDateTime current = startTime.withMinute(0).withSecond(0).withNano(0);
 
@@ -112,10 +133,7 @@ public class CustomCoinClickRepositoryImpl implements CustomCoinClickRepository 
 
 					trendDataList.add(new CoinTrendDataResponse.TrendDataPoint(current, cumulativeSum));
 
-					// 마지막 시간이면 현재 시간도 추가
-					if (current.withMinute(0)
-						.withSecond(0)
-						.withNano(0)
+					if (current.withMinute(0).withSecond(0).withNano(0)
 						.equals(now.withMinute(0).withSecond(0).withNano(0)) && now.getMinute() > 0) {
 						trendDataList.add(new CoinTrendDataResponse.TrendDataPoint(now, cumulativeSum));
 					}
@@ -130,6 +148,7 @@ public class CustomCoinClickRepositoryImpl implements CustomCoinClickRepository 
 					.data(trendDataList)
 					.build();
 			})
+			.filter(response -> response != null)
 			.toList();
 	}
 
