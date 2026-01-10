@@ -2,11 +2,13 @@ package com.coinsensor.userreaction.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class CoinReactionResponse {
-	private final String coinTicker;
-	private final String baseAsset;
-	private final Long reactionCount;
+	private String coinTicker;
+	private String baseAsset;
+	private Long reactionCount;
 }
