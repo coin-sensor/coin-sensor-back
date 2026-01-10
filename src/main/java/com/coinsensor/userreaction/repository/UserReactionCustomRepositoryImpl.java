@@ -84,8 +84,9 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 
 	@Override
 	public List<ReactionTrendDataResponse> findLikeTrendData(LocalDateTime startTime, int limit) {
-		List<Tuple> topCoins = queryFactory
-			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
+		// 1. 상위 코인들 조회
+		List<Long> topCoinIds = queryFactory
+			.select(coin.coinId)
 			.from(userReaction)
 			.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
@@ -93,39 +94,59 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 			.where(userReaction.createdAt.goe(startTime)
 				.and(userReaction.targetType.eq("detected_coins"))
 				.and(userReaction.reaction.name.eq("like")))
-			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
+			.groupBy(coin.coinId)
 			.orderBy(userReaction.count().desc())
 			.limit(limit)
 			.fetch();
 
-		return topCoins.stream()
-			.map(coinTuple -> {
-				Long coinId = coinTuple.get(coin.coinId);
-				String coinTicker = coinTuple.get(coin.coinTicker);
-				String baseAsset = coinTuple.get(coin.baseAsset);
+		if (topCoinIds.isEmpty()) {
+			return new ArrayList<>();
+		}
 
-				List<Tuple> likeData = queryFactory
-					.select(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt),
-						userReaction.count())
-					.from(userReaction)
-					.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
-					.join(detectedCoin.exchangeCoin, exchangeCoin)
-					.where(exchangeCoin.coin.coinId.eq(coinId)
-						.and(userReaction.createdAt.goe(startTime))
-						.and(userReaction.targetType.eq("detected_coins"))
-						.and(userReaction.reaction.name.eq("like")))
-					.groupBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt))
-					.orderBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt)
-							.asc())
-					.fetch();
+		// 2. 모든 데이터를 한 번에 조회
+		List<Tuple> allData = queryFactory
+			.select(
+				coin.coinId,
+				coin.coinTicker,
+				coin.baseAsset,
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt),
+				userReaction.count())
+			.from(userReaction)
+			.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
+			.join(detectedCoin.exchangeCoin, exchangeCoin)
+			.join(exchangeCoin.coin, coin)
+			.where(exchangeCoin.coin.coinId.in(topCoinIds)
+				.and(userReaction.createdAt.goe(startTime))
+				.and(userReaction.targetType.eq("detected_coins"))
+				.and(userReaction.reaction.name.eq("like")))
+			.groupBy(
+				coin.coinId,
+				coin.coinTicker,
+				coin.baseAsset,
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt))
+			.orderBy(coin.coinId.asc(),
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt).asc())
+			.fetch();
 
-				Map<String, Long> likeDataMap = likeData.stream()
+		// 3. 데이터 그룹핑 및 변환
+		Map<Long, List<Tuple>> groupedData = allData.stream()
+			.collect(Collectors.groupingBy(tuple -> tuple.get(coin.coinId)));
+
+		return topCoinIds.stream()
+			.map(coinId -> {
+				List<Tuple> coinData = groupedData.getOrDefault(coinId, new ArrayList<>());
+				if (coinData.isEmpty()) {
+					return null;
+				}
+
+				Tuple firstTuple = coinData.get(0);
+				String coinTicker = firstTuple.get(coin.coinTicker);
+				String baseAsset = firstTuple.get(coin.baseAsset);
+
+				Map<String, Long> likeDataMap = coinData.stream()
 					.collect(Collectors.toMap(
-						tuple -> tuple.get(0, String.class),
-						tuple -> tuple.get(1, Long.class)));
+						tuple -> tuple.get(3, String.class),
+						tuple -> tuple.get(4, Long.class)));
 
 				LocalDateTime now = LocalDateTime.now();
 				List<ReactionTrendDataResponse.TrendDataPoint> trendDataList = new ArrayList<>();
@@ -155,13 +176,15 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 					.data(trendDataList)
 					.build();
 			})
+			.filter(response -> response != null)
 			.toList();
 	}
 
 	@Override
 	public List<ReactionTrendDataResponse> findDislikeTrendData(LocalDateTime startTime, int limit) {
-		List<Tuple> bottomCoins = queryFactory
-			.select(coin.coinId, coin.coinTicker, coin.baseAsset)
+		// 1. 상위 코인들 조회
+		List<Long> topCoinIds = queryFactory
+			.select(coin.coinId)
 			.from(userReaction)
 			.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
 			.join(detectedCoin.exchangeCoin, exchangeCoin)
@@ -169,39 +192,59 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 			.where(userReaction.createdAt.goe(startTime)
 				.and(userReaction.targetType.eq("detected_coins"))
 				.and(userReaction.reaction.name.eq("dislike")))
-			.groupBy(coin.coinId, coin.coinTicker, coin.baseAsset)
+			.groupBy(coin.coinId)
 			.orderBy(userReaction.count().desc())
 			.limit(limit)
 			.fetch();
 
-		return bottomCoins.stream()
-			.map(coinTuple -> {
-				Long coinId = coinTuple.get(coin.coinId);
-				String coinTicker = coinTuple.get(coin.coinTicker);
-				String baseAsset = coinTuple.get(coin.baseAsset);
+		if (topCoinIds.isEmpty()) {
+			return new ArrayList<>();
+		}
 
-				List<Tuple> dislikeData = queryFactory
-					.select(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt),
-						userReaction.count())
-					.from(userReaction)
-					.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
-					.join(detectedCoin.exchangeCoin, exchangeCoin)
-					.where(exchangeCoin.coin.coinId.eq(coinId)
-						.and(userReaction.createdAt.goe(startTime))
-						.and(userReaction.targetType.eq("detected_coins"))
-						.and(userReaction.reaction.name.eq("dislike")))
-					.groupBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt))
-					.orderBy(
-						Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt)
-							.asc())
-					.fetch();
+		// 2. 모든 데이터를 한 번에 조회
+		List<Tuple> allData = queryFactory
+			.select(
+				coin.coinId,
+				coin.coinTicker,
+				coin.baseAsset,
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt),
+				userReaction.count())
+			.from(userReaction)
+			.join(detectedCoin).on(userReaction.targetId.eq(detectedCoin.detectedCoinId))
+			.join(detectedCoin.exchangeCoin, exchangeCoin)
+			.join(exchangeCoin.coin, coin)
+			.where(exchangeCoin.coin.coinId.in(topCoinIds)
+				.and(userReaction.createdAt.goe(startTime))
+				.and(userReaction.targetType.eq("detected_coins"))
+				.and(userReaction.reaction.name.eq("dislike")))
+			.groupBy(
+				coin.coinId,
+				coin.coinTicker,
+				coin.baseAsset,
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt))
+			.orderBy(coin.coinId.asc(),
+				Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d %H:00:00')", userReaction.createdAt).asc())
+			.fetch();
 
-				Map<String, Long> dislikeDataMap = dislikeData.stream()
+		// 3. 데이터 그룹핑 및 변환
+		Map<Long, List<Tuple>> groupedData = allData.stream()
+			.collect(Collectors.groupingBy(tuple -> tuple.get(coin.coinId)));
+
+		return topCoinIds.stream()
+			.map(coinId -> {
+				List<Tuple> coinData = groupedData.getOrDefault(coinId, new ArrayList<>());
+				if (coinData.isEmpty()) {
+					return null;
+				}
+
+				Tuple firstTuple = coinData.get(0);
+				String coinTicker = firstTuple.get(coin.coinTicker);
+				String baseAsset = firstTuple.get(coin.baseAsset);
+
+				Map<String, Long> dislikeDataMap = coinData.stream()
 					.collect(Collectors.toMap(
-						tuple -> tuple.get(0, String.class),
-						tuple -> tuple.get(1, Long.class)));
+						tuple -> tuple.get(3, String.class),
+						tuple -> tuple.get(4, Long.class)));
 
 				LocalDateTime now = LocalDateTime.now();
 				List<ReactionTrendDataResponse.TrendDataPoint> trendDataList = new ArrayList<>();
@@ -231,6 +274,7 @@ public class UserReactionCustomRepositoryImpl implements UserReactionCustomRepos
 					.data(trendDataList)
 					.build();
 			})
+			.filter(response -> response != null)
 			.toList();
 	}
 
