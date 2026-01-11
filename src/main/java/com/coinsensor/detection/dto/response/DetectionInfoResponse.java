@@ -20,6 +20,7 @@ public class DetectionInfoResponse {
 	private String exchangeName;
 	private String exchangeType;
 	private String timeframeName;
+	private String summary;
 	private BigDecimal conditionChangeX;
 	private BigDecimal conditionVolumeX;
 	private LocalDateTime detectedAt;
@@ -30,6 +31,7 @@ public class DetectionInfoResponse {
 			.exchangeName(detection.getExchange().getName())
 			.exchangeType(detection.getExchange().getType().name())
 			.timeframeName(detection.getCondition().getTimeframe().getName())
+			.summary(detection.getSummary())
 			.conditionChangeX(detection.getCondition().getChangeX())
 			.conditionVolumeX(detection.getCondition().getVolumeX())
 			.detectedAt(detection.getDetectedAt())
