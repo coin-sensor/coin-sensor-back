@@ -26,27 +26,27 @@ public class ApiResponse<T> {
 	private static final String ERROR_STATUS = "error";
 
 	private String status;
-	private T data;
+	private T result;
 	private String message;
 
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
 	private LocalDateTime serverTime = LocalDateTime.now();
 
 	// 생성자
-	public ApiResponse(String status, T data, String message) {
+	public ApiResponse(String status, T result, String message) {
 		this.status = status;
-		this.data = data;
+		this.result = result;
 		this.message = message;
 	}
 
 	// success 응답 반환
-	public static <T> ResponseEntity<ApiResponse<T>> createSuccess(T data, String message) {
-		ApiResponse<T> response = new ApiResponse<>(SUCCESS_STATUS, data, message);
+	public static <T> ResponseEntity<ApiResponse<T>> createSuccess(T result, String message) {
+		ApiResponse<T> response = new ApiResponse<>(SUCCESS_STATUS, result, message);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	public static <T> ResponseEntity<ApiResponse<T>> createSuccess(T data) {
-		ApiResponse<T> response = new ApiResponse<>(SUCCESS_STATUS, data, null);
+	public static <T> ResponseEntity<ApiResponse<T>> createSuccess(T result) {
+		ApiResponse<T> response = new ApiResponse<>(SUCCESS_STATUS, result, null);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
