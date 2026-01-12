@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coinsensor.coin.dto.response.CoinResponse;
 import com.coinsensor.coin.service.CoinService;
+import com.coinsensor.common.dto.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,12 +22,12 @@ public class CoinController {
 	private final CoinService coinService;
 
 	@GetMapping
-	public ResponseEntity<List<CoinResponse>> getAllCoins() {
-		return ResponseEntity.ok(coinService.getAllCoins());
+	public ResponseEntity<ApiResponse<List<CoinResponse>>> getAllCoins() {
+		return ApiResponse.createSuccess(coinService.getAllCoins());
 	}
 
 	@GetMapping("/{coinId}")
-	public ResponseEntity<CoinResponse> getCoinById(@PathVariable Long coinId) {
-		return ResponseEntity.ok(coinService.getCoinById(coinId));
+	public ResponseEntity<ApiResponse<CoinResponse>> getCoinById(@PathVariable Long coinId) {
+		return ApiResponse.createSuccess(coinService.getCoinById(coinId));
 	}
 }

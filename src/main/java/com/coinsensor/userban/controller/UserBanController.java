@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coinsensor.common.dto.ApiResponse;
 import com.coinsensor.userban.dto.request.UserBanRequest;
 import com.coinsensor.userban.dto.response.UserBanResponse;
 import com.coinsensor.userban.service.UserBanService;
@@ -26,31 +27,31 @@ public class UserBanController {
 	private final UserBanService userBanService;
 
 	@PostMapping
-	public ResponseEntity<UserBanResponse> banUser(@RequestBody UserBanRequest request) {
+	public ResponseEntity<ApiResponse<UserBanResponse>> banUser(@RequestBody UserBanRequest request) {
 		UserBanResponse response = userBanService.banUser(request);
-		return ResponseEntity.ok(response);
+		return ApiResponse.createSuccess(response);
 	}
 
 	@GetMapping
-	public ResponseEntity<List<UserBanResponse>> getAllBannedUsers() {
+	public ResponseEntity<ApiResponse<List<UserBanResponse>>> getAllBannedUsers() {
 		List<UserBanResponse> responses = userBanService.getAllBannedUsers();
-		return ResponseEntity.ok(responses);
+		return ApiResponse.createSuccess(responses);
 	}
 
 	@GetMapping("/users/{userId}")
-	public ResponseEntity<List<UserBanResponse>> getUserBans(@PathVariable Long userId) {
+	public ResponseEntity<ApiResponse<List<UserBanResponse>>> getUserBans(@PathVariable Long userId) {
 		List<UserBanResponse> responses = userBanService.getUserBans(userId);
-		return ResponseEntity.ok(responses);
+		return ApiResponse.createSuccess(responses);
 	}
 
 	@GetMapping("/active")
-	public ResponseEntity<UserBanResponse> getActiveBan(@RequestHeader String uuid) {
+	public ResponseEntity<ApiResponse<UserBanResponse>> getActiveBan(@RequestHeader String uuid) {
 		UserBanResponse response = userBanService.getActiveBanByUuid(uuid);
-		return ResponseEntity.ok(response);
+		return ApiResponse.createSuccess(response);
 	}
 
 	@DeleteMapping("/{userBanId}")
-	public ResponseEntity<Void> unbanUser(@PathVariable Long userBanId) {
+	public ResponseEntity<ApiResponse<Void>> unbanUser(@PathVariable Long userBanId) {
 		userBanService.unbanUser(userBanId);
 		return ResponseEntity.ok().build();
 	}

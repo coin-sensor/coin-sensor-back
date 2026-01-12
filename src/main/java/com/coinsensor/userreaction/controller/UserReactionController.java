@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coinsensor.common.dto.ApiResponse;
 import com.coinsensor.userreaction.dto.request.UserReactionRequest;
 import com.coinsensor.userreaction.dto.response.CoinReactionResponse;
 import com.coinsensor.userreaction.dto.response.ReactionCountResponse;
@@ -27,38 +28,38 @@ public class UserReactionController {
 	private final UserReactionService userReactionService;
 
 	@PostMapping
-	public ResponseEntity<List<ReactionCountResponse>> toggleReaction(@RequestHeader String uuid,
+	public ResponseEntity<ApiResponse<List<ReactionCountResponse>>> toggleReaction(@RequestHeader String uuid,
 		@RequestBody UserReactionRequest request) {
 		List<ReactionCountResponse> updatedCounts = userReactionService.toggleReaction(uuid, request);
-		return ResponseEntity.ok(updatedCounts);
+		return ApiResponse.createSuccess(updatedCounts);
 	}
 
 	@GetMapping("/topLiked")
-	public ResponseEntity<List<CoinReactionResponse>> getTopLikedCoins(
+	public ResponseEntity<ApiResponse<List<CoinReactionResponse>>> getTopLikedCoins(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "5") int limit) {
-		return ResponseEntity.ok(userReactionService.getTopLikedCoins(days, limit));
+		return ApiResponse.createSuccess(userReactionService.getTopLikedCoins(days, limit));
 	}
 
 	@GetMapping("/topDisliked")
-	public ResponseEntity<List<CoinReactionResponse>> getTopDislikedCoins(
+	public ResponseEntity<ApiResponse<List<CoinReactionResponse>>> getTopDislikedCoins(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "5") int limit) {
-		return ResponseEntity.ok(userReactionService.getTopDislikedCoins(days, limit));
+		return ApiResponse.createSuccess(userReactionService.getTopDislikedCoins(days, limit));
 	}
 
 	@GetMapping("/trend/like")
-	public ResponseEntity<List<ReactionTrendDataResponse>> getLikeTrendData(
+	public ResponseEntity<ApiResponse<List<ReactionTrendDataResponse>>> getLikeTrendData(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "5") int limit) {
-		return ResponseEntity.ok(userReactionService.getLikeTrendData(days, limit));
+		return ApiResponse.createSuccess(userReactionService.getLikeTrendData(days, limit));
 	}
 
 	@GetMapping("/trend/dislike")
-	public ResponseEntity<List<ReactionTrendDataResponse>> getDislikeTrendData(
+	public ResponseEntity<ApiResponse<List<ReactionTrendDataResponse>>> getDislikeTrendData(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "5") int limit) {
-		return ResponseEntity.ok(userReactionService.getDislikeTrendData(days, limit));
+		return ApiResponse.createSuccess(userReactionService.getDislikeTrendData(days, limit));
 	}
 
 }

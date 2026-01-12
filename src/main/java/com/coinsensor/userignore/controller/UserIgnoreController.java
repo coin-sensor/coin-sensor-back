@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coinsensor.common.dto.ApiResponse;
 import com.coinsensor.userignore.dto.request.UserIgnoreRequest;
 import com.coinsensor.userignore.service.UserIgnoreService;
 
@@ -21,13 +22,14 @@ public class UserIgnoreController {
 	private final UserIgnoreService userIgnoreService;
 
 	@PostMapping
-	public ResponseEntity<Void> ignoreUser(@RequestHeader("uuid") String uuid, @RequestBody UserIgnoreRequest request) {
+	public ResponseEntity<ApiResponse<Void>> ignoreUser(@RequestHeader("uuid") String uuid,
+		@RequestBody UserIgnoreRequest request) {
 		userIgnoreService.ignoreUser(uuid, request.getUserId());
 		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping
-	public ResponseEntity<Void> unignoreUser(@RequestHeader("uuid") String uuid,
+	public ResponseEntity<ApiResponse<Void>> unignoreUser(@RequestHeader("uuid") String uuid,
 		@RequestBody UserIgnoreRequest request) {
 		userIgnoreService.unignoreUser(uuid, request.getUserId());
 		return ResponseEntity.ok().build();

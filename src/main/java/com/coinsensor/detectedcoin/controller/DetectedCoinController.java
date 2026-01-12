@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coinsensor.common.dto.ApiResponse;
 import com.coinsensor.detectedcoin.service.DetectedCoinService;
 import com.coinsensor.detection.dto.response.TopDetectedCoinResponse;
 
@@ -26,16 +27,17 @@ public class DetectedCoinController {
 	private final DetectedCoinService detectedCoinService;
 
 	@PostMapping("/{detectedCoinId}/view")
-	public ResponseEntity<Long> viewDetectedCoin(@RequestHeader String uuid, @PathVariable Long detectedCoinId) {
+	public ResponseEntity<ApiResponse<Long>> viewDetectedCoin(@RequestHeader String uuid,
+		@PathVariable Long detectedCoinId) {
 		Long viewCount = detectedCoinService.viewDetectedCoin(uuid, detectedCoinId);
-		return ResponseEntity.ok(viewCount);
+		return ApiResponse.createSuccess(viewCount);
 	}
 
 	@GetMapping("/top10")
-	public ResponseEntity<List<TopDetectedCoinResponse>> getTopDetectedCoins(
+	public ResponseEntity<ApiResponse<List<TopDetectedCoinResponse>>> getTopDetectedCoins(
 		@RequestParam String timeframe,
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
-		return ResponseEntity.ok(detectedCoinService.getTopDetectedCoins(timeframe, startTime, endTime));
+		return ApiResponse.createSuccess(detectedCoinService.getTopDetectedCoins(timeframe, startTime, endTime));
 	}
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.coinsensor.coinclick.dto.response.CoinTrendDataResponse;
 import com.coinsensor.coinclick.dto.response.CoinViewCountResponse;
 import com.coinsensor.coinclick.service.CoinClickService;
+import com.coinsensor.common.dto.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,17 +23,17 @@ public class CoinClickController {
 	private final CoinClickService coinClickService;
 
 	@GetMapping("/top")
-	public ResponseEntity<List<CoinViewCountResponse>> getTopViewedCoins(
+	public ResponseEntity<ApiResponse<List<CoinViewCountResponse>>> getTopViewedCoins(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "3") int limit) {
-		return ResponseEntity.ok(coinClickService.getTopViewedCoins(days, limit));
+		return ApiResponse.createSuccess(coinClickService.getTopViewedCoins(days, limit));
 	}
 
 	@GetMapping("/trend")
-	public ResponseEntity<List<CoinTrendDataResponse>> getCoinsTrendData(
+	public ResponseEntity<ApiResponse<List<CoinTrendDataResponse>>> getCoinsTrendData(
 		@RequestParam(defaultValue = "1") int days,
 		@RequestParam(defaultValue = "10") int limit) {
-		return ResponseEntity.ok(coinClickService.getCoinsTrendData(days, limit));
+		return ApiResponse.createSuccess(coinClickService.getCoinsTrendData(days, limit));
 	}
 
 }

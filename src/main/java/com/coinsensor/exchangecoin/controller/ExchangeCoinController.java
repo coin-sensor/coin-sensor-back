@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coinsensor.common.annotation.AuthorizeRole;
+import com.coinsensor.common.dto.ApiResponse;
 import com.coinsensor.exchangecoin.dto.response.ExchangeCoinResponse;
 import com.coinsensor.exchangecoin.dto.response.TopBottomCoinResponse;
 import com.coinsensor.exchangecoin.service.ExchangeCoinService;
@@ -25,26 +26,26 @@ public class ExchangeCoinController {
 	private final ExchangeCoinService exchangeCoinService;
 
 	@GetMapping("/top")
-	public ResponseEntity<List<TopBottomCoinResponse>> getTopCoins(
+	public ResponseEntity<ApiResponse<List<TopBottomCoinResponse>>> getTopCoins(
 		@RequestParam(defaultValue = "spot") String exchangeType) {
-		return ResponseEntity.ok(exchangeCoinService.getTopCoins(exchangeType));
+		return ApiResponse.createSuccess(exchangeCoinService.getTopCoins(exchangeType));
 	}
 
 	@GetMapping("/bottom")
-	public ResponseEntity<List<TopBottomCoinResponse>> getBottomCoins(
+	public ResponseEntity<ApiResponse<List<TopBottomCoinResponse>>> getBottomCoins(
 		@RequestParam(defaultValue = "spot") String exchangeType) {
-		return ResponseEntity.ok(exchangeCoinService.getBottomCoins(exchangeType));
+		return ApiResponse.createSuccess(exchangeCoinService.getBottomCoins(exchangeType));
 	}
 
 	@AuthorizeRole
 	@GetMapping
-	public ResponseEntity<List<ExchangeCoinResponse>> getExchangeCoins() {
-		return ResponseEntity.ok(exchangeCoinService.getExchangeCoins());
+	public ResponseEntity<ApiResponse<List<ExchangeCoinResponse>>> getExchangeCoins() {
+		return ApiResponse.createSuccess(exchangeCoinService.getExchangeCoins());
 	}
 
 	@AuthorizeRole
 	@PutMapping("/{exchangeCoinId}/detection/toggle")
-	public ResponseEntity<Void> updateExchangeCoinEnableDetection(
+	public ResponseEntity<ApiResponse<Void>> updateExchangeCoinEnableDetection(
 		@PathVariable Long exchangeCoinId) {
 		exchangeCoinService.updateExchangeCoinEnableDetection(exchangeCoinId);
 		return ResponseEntity.ok().build();

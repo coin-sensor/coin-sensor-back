@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coinsensor.common.dto.ApiResponse;
 import com.coinsensor.scheduler.BinanceCoinScheduler;
 
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ public class CoinSyncController {
 	private final BinanceCoinScheduler binanceCoinScheduler;
 
 	@PostMapping("/binanceCoins")
-	public ResponseEntity<String> syncBinanceCoins() {
+	public ResponseEntity<ApiResponse<String>> syncBinanceCoins() {
 		binanceCoinScheduler.syncBinanceCoins();
-		return ResponseEntity.ok("바이낸스 코인 동기화 완료");
+		return ApiResponse.createSuccess("바이낸스 코인 동기화 완료");
 	}
 }

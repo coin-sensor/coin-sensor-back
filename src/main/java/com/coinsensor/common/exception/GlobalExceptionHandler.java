@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.coinsensor.common.dto.ApiResponse;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -15,37 +17,30 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(CustomException.class)
-	public ResponseEntity<ErrorResponse> handleBusinessException(CustomException e) {
-		return ResponseEntity
-			.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			.body(ErrorResponse.of(e.getErrorCode()));
+	public ResponseEntity<ApiResponse<ErrorResponse>> handleBusinessException(CustomException e) {
+		return ApiResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR, ErrorResponse.of(e.getErrorCode()).toString());
 	}
 
 	@ExceptionHandler(ResponseStatusException.class)
-	public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException e) {
-		return ResponseEntity
-			.status(e.getStatusCode())
-			.body(ErrorResponse.of(e.getReason()));
+	public ResponseEntity<ApiResponse<ErrorResponse>> handleResponseStatusException(ResponseStatusException e) {
+		return ApiResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 	}
 
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-	public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException e,
+	public ResponseEntity<ApiResponse<ErrorResponse>> handleMethodNotSupported(HttpRequestMethodNotSupportedException e,
 		jakarta.servlet.http.HttpServletRequest request) {
-		return ResponseEntity
-			.status(HttpStatus.METHOD_NOT_ALLOWED)
-			.body(ErrorResponse.of(String.format("지원하지 않는 API: %s %s", e.getMethod(), request.getRequestURI())));
+		return ApiResponse.createError(HttpStatus.METHOD_NOT_ALLOWED,
+			String.format("지원하지 않는 API: %s %s", e.getMethod(), request.getRequestURI()));
 	}
 
 	@ExceptionHandler(NoResourceFoundException.class)
-	public ResponseEntity<Void> handleNoResourceFoundException(NoResourceFoundException e) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	public ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(NoResourceFoundException e) {
+		return ApiResponse.createError(HttpStatus.NOT_FOUND, "NoResourceFoundException");
 	}
 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorResponse> handleException(Exception e) {
+	public ResponseEntity<ApiResponse<ErrorResponse>> handleException(Exception e) {
 		log.error("Exception: ", e);
-		return ResponseEntity
-			.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			.body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
+		return ApiResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 	}
 }
