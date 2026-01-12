@@ -40,9 +40,10 @@ public class BinanceKlineWebSocketService {
 	private final ConcurrentMap<String, List<KlineData>> klineBuffer = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, Integer> expectedCoinCount = new ConcurrentHashMap<>();
 
+	// TODO: 바이낸스 현물 웹소켓 상태이상으로 임시 비활성화
 	public void initWebSocketConnections() {
 		log.info("WebSocket 연결 초기화 시작");
-		connectToSpotKlines();
+		// connectToSpotKlines();
 		connectToFutureKlines();
 	}
 
