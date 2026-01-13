@@ -5,8 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
-import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.conditions.entity.Condition;
+import com.coinsensor.detectedcoin.entity.DetectedCoin;
 import com.coinsensor.exchange.entity.Exchange;
 
 public class SummaryUtil {
@@ -23,7 +23,7 @@ public class SummaryUtil {
 		StringBuilder summary = new StringBuilder();
 		summary.append(String.format("🚨 %s 🚨%n", timestamp));
 		summary.append(String.format("거래소: [%s-%s]%n", exchange.getName(), exchange.getType().name()));
-		summary.append(String.format("기준 : %s, 기준 변동률 : %.2f%%, 기준 배수 : %.2f배%n%n",
+		summary.append(String.format("기준 : %s, 변동률 : %.2f%%, 거래량 : %.2f배%n%n",
 			condition.getTimeframe().getName(),
 			condition.getChangeX(),
 			condition.getVolumeX()));

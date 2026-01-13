@@ -98,15 +98,14 @@ public class DetectionServiceImpl implements DetectionService {
 		return dateTime.format(formatter);
 	}
 
-	public void detectByTimeframe(String timeframeName) {
+	public void detectByTimeframe(String timeframeName, Exchange.Type exchangeType) {
 		// 해당 조건들 조회
 		List<Condition> conditions = conditionRepository.findByTimeframeName(timeframeName)
 			.orElseThrow(() -> new CustomException(ErrorCode.CONDITION_NOT_FOUND));
 
 		// 모든 조건에 대해 비동기 탐지 실행
 		for (Condition condition : conditions) {
-			klineDetectionService.processConditionDetection(condition, Exchange.Type.spot);
-			klineDetectionService.processConditionDetection(condition, Exchange.Type.future);
+			klineDetectionService.processConditionDetection(condition, exchangeType);
 		}
 	}
 
