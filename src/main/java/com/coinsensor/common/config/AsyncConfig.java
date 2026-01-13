@@ -1,4 +1,4 @@
-package com.coinsensor.config;
+package com.coinsensor.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
