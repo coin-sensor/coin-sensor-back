@@ -43,7 +43,7 @@ public class BinanceKlineWebSocketService {
 	// TODO: 바이낸스 현물 웹소켓 상태이상으로 임시 비활성화
 	public void initWebSocketConnections() {
 		log.info("WebSocket 연결 초기화 시작");
-		// connectToSpotKlines();
+		connectToSpotKlines();
 		connectToFutureKlines();
 	}
 
@@ -99,7 +99,7 @@ public class BinanceKlineWebSocketService {
 			streams.append(coin.getCoin().getCoinTicker().toLowerCase())
 				.append("@kline_").append(timeframe);
 		}
-		return "wss://stream.binance.com:9443/stream?streams=" + streams.toString();
+		return "wss://stream.binance.com:9443/stream?streams=" + streams;
 	}
 
 	private String buildFutureStreamUrl(List<ExchangeCoin> coins, String timeframe) {
