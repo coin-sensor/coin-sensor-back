@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OhlcvServiceImpl implements OhlcvService {
 
+	private static final String BINANCE = "binance";
 	private final OhlcvRepository ohlcvRepository;
 	private final ExchangeCoinService exchangeCoinService;
 	private final TimeframeRepository timeframeRepository;
@@ -36,19 +37,20 @@ public class OhlcvServiceImpl implements OhlcvService {
 
 	@Override
 	public void saveKlineData(List<KlineData> klineDataList, Exchange.Type exchangeType) {
+		String timeframeName = klineDataList.getFirst().getKline().getInterval();
+
 		try {
 			if (klineDataList.isEmpty())
 				return;
 
 			// Timeframe 미리 조회 (모든 데이터가 같은 timeframe)
-			String timeframeName = klineDataList.getFirst().getKline().getInterval();
 			Timeframe timeframe = timeframeRepository.findByName(timeframeName).orElse(null);
 			if (timeframe == null)
 				return;
 
 			// ExchangeCoin 일괄 조회
 			List<ExchangeCoin> exchangeCoins = exchangeCoinService
-				.getDetectableExchangeCoins("binance", exchangeType);
+				.getDetectableExchangeCoins(BINANCE, exchangeType);
 
 			Map<String, ExchangeCoin> coinMap = exchangeCoins.stream()
 				.collect(Collectors.toMap(
@@ -69,13 +71,14 @@ public class OhlcvServiceImpl implements OhlcvService {
 
 			if (!ohlcvList.isEmpty()) {
 				ohlcvRepository.saveAll(ohlcvList);
-				log.info("OHLCV 배치 저장 완료: {} {} - {} 건", exchangeType, timeframeName, ohlcvList.size());
-				
+				log.info("[{}-{}] {} OHLCV 배치 저장 완료: {} 건", BINANCE, exchangeType, timeframeName, ohlcvList.size());
+
 				// 이벤트 발행
-				eventPublisher.publishEvent(new OhlcvDataSavedEvent(timeframeName, exchangeType, ohlcvList.size()));
+				eventPublisher.publishEvent(
+					new OhlcvDataSavedEvent(timeframeName, BINANCE, exchangeType, ohlcvList.size()));
 			}
 		} catch (Exception e) {
-			log.error("OHLCV 배치 저장 오류: {}", e.getMessage());
+			log.error("[{}-{}] {} OHLCV 배치 저장 오류: {}", BINANCE, exchangeType, timeframeName, e.getMessage());
 		}
 	}
 

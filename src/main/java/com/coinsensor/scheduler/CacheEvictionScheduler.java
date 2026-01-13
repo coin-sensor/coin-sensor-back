@@ -1,5 +1,6 @@
 package com.coinsensor.scheduler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,13 +33,24 @@ public class CacheEvictionScheduler {
 		List<String> cacheNames = List.of("topViewedCoins", "coinsTrendData", "topLikedCoins", "topDislikedCoins",
 			"likeTrendData", "dislikeTrendData");
 
+		List<String> evictSuccessCacheNames = new ArrayList<>();
+		List<String> evictFailCacheNames = new ArrayList<>();
+
 		for (String cacheName : cacheNames) {
 			try {
 				Objects.requireNonNull(cacheManager.getCache(cacheName)).clear();
-				log.info("{} 캐시 삭제 완료", cacheName);
+				evictSuccessCacheNames.add(cacheName);
 			} catch (Exception e) {
-				log.error("{} 캐시 삭제 실패: {}", cacheName, e.getMessage());
+				evictFailCacheNames.add(cacheName);
 			}
+		}
+
+		if (!evictSuccessCacheNames.isEmpty()) {
+			log.info("캐시 삭제 완료: {}", evictSuccessCacheNames);
+		}
+
+		if (!evictFailCacheNames.isEmpty()) {
+			log.info("캐시 삭제 실패: {}", evictFailCacheNames);
 		}
 	}
 

@@ -114,8 +114,8 @@ public class DetectionProcessComponent {
 			// 실시간 알림 발송
 			sendDetectionNotification(detection, detectedCoins);
 
-			log.info("탐지 완료: {} {} - {}개 코인, 평균 변동률: {}%, 평균 거래량: {}배",
-				exchangeType, timeframeName, detectedCoins.size(), avgChangeX, avgVolumeX);
+			log.info("[{}-{}] {} 탐지 완료: {}개 코인, 평균 변동률: {}%, 평균 거래량: {}배",
+				exchange.getName(), exchangeType, timeframeName, detectedCoins.size(), avgChangeX, avgVolumeX);
 		}
 	}
 

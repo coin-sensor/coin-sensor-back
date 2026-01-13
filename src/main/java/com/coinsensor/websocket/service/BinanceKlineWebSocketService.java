@@ -130,19 +130,19 @@ public class BinanceKlineWebSocketService {
 			.subscribe(
 				null,
 				error -> {
-					log.warn("{} WebSocket 연결 오류: {}", sessionKey, error.getMessage());
+					log.warn("[binance-{}] WebSocket 연결 오류: {}", sessionKey, error.getMessage());
 					connections.remove(sessionKey);
 					reconnectCombinedStream(streamUrl, sessionKey, isFuture);
 				},
 				() -> {
-					log.info("{} WebSocket 연결 종료", sessionKey);
+					log.info("[binance-{}] WebSocket 연결 종료", sessionKey);
 					connections.remove(sessionKey);
 					reconnectCombinedStream(streamUrl, sessionKey, isFuture);
 				}
 			);
 
 		connections.put(sessionKey, connection);
-		log.info("{} WebSocket 연결 성공", sessionKey);
+		log.info("[binance-{}] WebSocket 연결 성공", sessionKey);
 	}
 
 	private void processKlineMessage(String payload, String sessionKey, boolean isFuture) {
