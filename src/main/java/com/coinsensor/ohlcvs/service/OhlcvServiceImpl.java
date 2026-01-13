@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.coinsensor.event.OhlcvDataSavedEvent;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 import com.coinsensor.exchangecoin.service.ExchangeCoinService;
@@ -30,6 +32,7 @@ public class OhlcvServiceImpl implements OhlcvService {
 	private final OhlcvRepository ohlcvRepository;
 	private final ExchangeCoinService exchangeCoinService;
 	private final TimeframeRepository timeframeRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Override
 	public void saveKlineData(List<KlineData> klineDataList, Exchange.Type exchangeType) {
@@ -67,6 +70,9 @@ public class OhlcvServiceImpl implements OhlcvService {
 			if (!ohlcvList.isEmpty()) {
 				ohlcvRepository.saveAll(ohlcvList);
 				log.info("OHLCV 배치 저장 완료: {} {} - {} 건", exchangeType, timeframeName, ohlcvList.size());
+				
+				// 이벤트 발행
+				eventPublisher.publishEvent(new OhlcvDataSavedEvent(timeframeName, exchangeType, ohlcvList.size()));
 			}
 		} catch (Exception e) {
 			log.error("OHLCV 배치 저장 오류: {}", e.getMessage());
