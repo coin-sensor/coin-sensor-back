@@ -1,5 +1,6 @@
 package com.coinsensor.user.service;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,8 +14,8 @@ import com.coinsensor.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional
+	@CacheEvict(value = "users", key = "#uuid")
 	public UserInfoResponse updateNickname(String uuid, String nickname) {
 		User user = userRepository.findByUuid(uuid)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
