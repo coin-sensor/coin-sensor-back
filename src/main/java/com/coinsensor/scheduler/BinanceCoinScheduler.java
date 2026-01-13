@@ -24,7 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class BinanceCoinScheduler {
-
+	private static final String BINANCE_SPOT = "binance-spot";
+	private static final String BINANCE_FUTURE = "binance-future";
 	private final CoinRepository coinRepository;
 	private final ExchangeCoinRepository exchangeCoinRepository;
 	private final ExchangeRepository exchangeRepository;
@@ -41,8 +42,6 @@ public class BinanceCoinScheduler {
 	}
 
 	private void syncSpotCoins() {
-		log.info("바이낸스 현물 코인 정보 동기화 시작");
-
 		Exchange binanceSpot = exchangeRepository.findByNameAndType("binance", Exchange.Type.spot)
 			.orElseGet(() -> exchangeRepository.save(Exchange.builder()
 				.name("binance")
@@ -108,16 +107,14 @@ public class BinanceCoinScheduler {
 				.toList()
 				.size();
 
-			log.info("바이낸스 현물 코인 정보 동기화 완료: {} 개 신규 추가, {} 개 상폐", newCoins, deactivated);
+			log.info("[{}] 코인 정보 동기화 완료: {} 개 신규 추가, {} 개 상폐", BINANCE_SPOT, newCoins, deactivated);
 
 		} catch (Exception e) {
-			log.error("바이낸스 현물 코인 정보 동기화 실패", e);
+			log.error("[{}] 코인 정보 동기화 실패", BINANCE_SPOT, e);
 		}
 	}
 
 	private void syncFuturesCoins() {
-		log.info("바이낸스 선물 코인 정보 동기화 시작");
-
 		Exchange binanceFuture = exchangeRepository.findByNameAndType("binance", Exchange.Type.future)
 			.orElseGet(() -> exchangeRepository.save(Exchange.builder()
 				.name("binance")
@@ -186,10 +183,10 @@ public class BinanceCoinScheduler {
 				.toList()
 				.size();
 
-			log.info("바이낸스 선물 코인 정보 동기화 완료: {} 개 신규 추가, {} 개 상폐", newCoins, deactivated);
+			log.info("[{}] 코인 정보 동기화 완료: {} 개 신규 추가, {} 개 상폐", BINANCE_FUTURE, newCoins, deactivated);
 
 		} catch (Exception e) {
-			log.error("바이낸스 선물 코인 정보 동기화 실패", e);
+			log.error("[{}] 코인 정보 동기화 실패", BINANCE_FUTURE, e);
 		}
 	}
 }
