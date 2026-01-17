@@ -29,7 +29,7 @@ public class DetectedCoinResponse {
 		return DetectedCoinResponse.builder()
 			.detectedCoinId(detectedCoin.getDetectedCoinId())
 			.exchangeCoinId(detectedCoin.getExchangeCoin().getExchangeCoinId())
-			.coinTicker(detectedCoin.getCoin().getCoinTicker())
+			.coinTicker(detectedCoin.getExchangeCoin().getCoin().getCoinTicker())
 			.changeX(detectedCoin.getChangeX())
 			.volumeX(detectedCoin.getVolumeX())
 			.viewCount(detectedCoin.getViewCount())

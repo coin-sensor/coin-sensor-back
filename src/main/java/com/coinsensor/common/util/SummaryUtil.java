@@ -29,7 +29,7 @@ public class SummaryUtil {
 			condition.getVolumeX()));
 
 		for (DetectedCoin detected : detectedCoins) {
-			summary.append(String.format("종목 : %s%n", detected.getCoin().getCoinTicker()));
+			summary.append(String.format("종목 : %s%n", detected.getExchangeCoin().getCoin().getCoinTicker()));
 			summary.append(
 				String.format("변동률 : %5.2f%%,  거래량 : %5.2f배%n%n", detected.getChangeX(), detected.getVolumeX()));
 		}

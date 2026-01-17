@@ -40,10 +40,6 @@ public class DetectedCoin {
 	private Detection detection;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "coin_id", nullable = false)
-	private Coin coin;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "exchange_coin_id", nullable = false)
 	private ExchangeCoin exchangeCoin;
 
@@ -71,10 +67,10 @@ public class DetectedCoin {
 	@Column(name = "detected_at", nullable = false)
 	private LocalDateTime detectedAt;
 
-	public DetectedCoin(Detection detection, Coin coin, ExchangeCoin exchangeCoin, BigDecimal changeX, BigDecimal volumeX,
+	public DetectedCoin(Detection detection, Coin coin, ExchangeCoin exchangeCoin, BigDecimal changeX,
+		BigDecimal volumeX,
 		BigDecimal high, BigDecimal low, LocalDateTime detectedAt) {
 		this.detection = detection;
-		this.coin = coin;
 		this.exchangeCoin = exchangeCoin;
 		this.changeX = changeX;
 		this.volumeX = volumeX;
@@ -89,7 +85,6 @@ public class DetectedCoin {
 	public static DetectedCoin to(ExchangeCoin exchangeCoin, BigDecimal changeX, BigDecimal volumeX,
 		BigDecimal high, BigDecimal low) {
 		return DetectedCoin.builder()
-			.coin(exchangeCoin.getCoin())
 			.exchangeCoin(exchangeCoin)
 			.changeX(changeX)
 			.volumeX(volumeX)
@@ -105,7 +100,6 @@ public class DetectedCoin {
 	public DetectedCoin withDetection(Detection detection) {
 		return DetectedCoin.builder()
 			.detection(detection)
-			.coin(this.coin)
 			.exchangeCoin(this.exchangeCoin)
 			.changeX(this.changeX)
 			.volumeX(this.volumeX)
