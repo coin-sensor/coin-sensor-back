@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y wget curl unzip
 WORKDIR /app
 
 # JAR 파일 복사
-COPY target/coin-sensor-back-0.0.1-SNAPSHOT.jar coin-sensor-back.jar
+COPY target/coinsensor-back-0.0.1-SNAPSHOT.jar coin-sensor-back.jar
 
 # 애플리케이션 실행
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "coin-sensor-back.jar"]
