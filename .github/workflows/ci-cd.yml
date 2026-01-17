@@ -1,0 +1,91 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: 🔧빌드
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Maven
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Clean with Maven
+        run: mvn clean
+
+      - name: Load .env and Install with Maven
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+          export $(grep -v '^#' .env | xargs)
+          mvn install
+        shell: bash
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      # DockerHub 로그인
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      - name: Build and Push Docker image
+        run: |
+          cd .github/docker
+          if [ "$(curl -s https://www.coinsensor.kr/back/actuator/version)" == "blue" ]; then
+            echo "Blue version is running, building Green";
+            docker-compose -f compose.green-build.yml build
+            docker-compose -f compose.green-build.yml push
+          else
+            echo "Green version is running, building Blue";
+            docker-compose -f compose.blue-build.yml build
+            docker-compose -f compose.blue-build.yml push
+          fi
+
+  server:
+    name: 🚀배포
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Write .env file to temporary file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Send .env to remote server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: ".env"
+          target: "/home/ubuntu/coinsensor"
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd coinsensor/coinsensor-back
+            source deploy.sh
