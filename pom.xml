@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com</groupId>
-    <artifactId>coin-sensor</artifactId>
+    <artifactId>coinsensor-back</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>coin-sensor</name>
-    <description>coin-sensor</description>
+    <name>coinsensor-back</name>
+    <description>coinsensor-back</description>
     <url/>
     <licenses>
         <license/>
