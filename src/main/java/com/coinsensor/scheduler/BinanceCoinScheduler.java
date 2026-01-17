@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.coinsensor.coin.entity.Coin;
 import com.coinsensor.coin.repository.CoinRepository;
+import com.coinsensor.common.annotation.LeaderOnly;
 import com.coinsensor.exchange.entity.Exchange;
 import com.coinsensor.exchange.repository.ExchangeRepository;
 import com.coinsensor.exchangecoin.entity.ExchangeCoin;
@@ -34,6 +35,7 @@ public class BinanceCoinScheduler {
 	private final Set<String> disabledDetectionTickers = Set.of("FLOWUSDT", "BTTCUSDT", "1000SATSUSDT", "ALICEUSDT",
 		"DYDXUSDT", "GTCUSDT", "CELOUSDT", "币安人生USDT");
 
+	@LeaderOnly
 	@Scheduled(cron = "0 1 * * * *")
 	@Transactional
 	public void syncBinanceCoins() {

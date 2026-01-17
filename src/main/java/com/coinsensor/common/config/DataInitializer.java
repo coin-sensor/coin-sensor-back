@@ -12,6 +12,7 @@ import com.coinsensor.bantype.entity.BanType;
 import com.coinsensor.bantype.repository.BanTypeRepository;
 import com.coinsensor.channel.entity.Channel;
 import com.coinsensor.channel.repository.ChannelRepository;
+import com.coinsensor.common.annotation.LeaderOnly;
 import com.coinsensor.conditions.entity.Condition;
 import com.coinsensor.conditions.repository.ConditionRepository;
 import com.coinsensor.exchange.entity.Exchange;
@@ -41,6 +42,7 @@ public class DataInitializer {
 	private final BanTypeRepository banTypeRepository;
 	private final org.springframework.context.ApplicationContext applicationContext;
 
+	@LeaderOnly
 	@EventListener(ApplicationReadyEvent.class)
 	@Transactional
 	public void initData() {
@@ -112,8 +114,8 @@ public class DataInitializer {
 		}
 
 		log.info("[ ** 초기 데이터 생성 완료 ** ]");
-		
-		com.coinsensor.websocket.service.BinanceKlineWebSocketService webSocketService = 
+
+		com.coinsensor.websocket.service.BinanceKlineWebSocketService webSocketService =
 			applicationContext.getBean(com.coinsensor.websocket.service.BinanceKlineWebSocketService.class);
 		webSocketService.initWebSocketConnections();
 	}

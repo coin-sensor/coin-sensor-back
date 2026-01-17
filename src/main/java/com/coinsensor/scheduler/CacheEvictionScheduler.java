@@ -8,6 +8,8 @@ import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.coinsensor.common.annotation.LeaderOnly;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,6 +20,7 @@ public class CacheEvictionScheduler {
 
 	private final CacheManager cacheManager;
 
+	@LeaderOnly
 	@Scheduled(cron = "0 0 * * * *")
 	public void evictDetectableExchangeCoinsCache() {
 		try {
@@ -28,6 +31,7 @@ public class CacheEvictionScheduler {
 		}
 	}
 
+	@LeaderOnly
 	@Scheduled(cron = "0 */5 * * * *")
 	public void evictCoinClickCache() {
 		List<String> cacheNames = List.of("topViewedCoins", "coinsTrendData", "topLikedCoins", "topDislikedCoins",

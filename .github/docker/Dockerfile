@@ -10,4 +10,4 @@ WORKDIR /app
 COPY target/coinsensor-back-0.0.1-SNAPSHOT.jar coinsensor-back.jar
 
 # 애플리케이션 실행
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "coin-sensor-back.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "coinsensor-back.jar"]
