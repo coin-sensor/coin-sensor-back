@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.coinsensor.common.dto.ApiResponse;
-import com.coinsensor.websocket.service.WebSocketSessionService;
+import com.coinsensor.websocket.service.SocketSyncService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,10 +15,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebSocketController {
 
-	private final WebSocketSessionService webSocketSessionService;
+	private final SocketSyncService socketSyncService;
 
 	@GetMapping("/activeUsers")
 	public ResponseEntity<ApiResponse<Integer>> getActiveUserCount() {
-		return ApiResponse.createSuccess(webSocketSessionService.getActiveUserCount());
+		return ApiResponse.createSuccess(socketSyncService.getActiveUserCount());
 	}
 }

@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.coinsensor.common.util.SummaryUtil;
+import com.coinsensor.websocket.service.SocketSyncService;
 import com.coinsensor.conditions.entity.Condition;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
@@ -38,7 +38,7 @@ public class DetectionProcessComponent {
 	private final OhlcvRepository ohlcvRepository;
 	private final DetectionRepository detectionRepository;
 	private final DetectedCoinRepository detectedCoinRepository;
-	private final SimpMessagingTemplate messagingTemplate;
+	private final SocketSyncService socketSyncService;
 	private final ExchangeCoinService exchangeCoinService;
 
 	@Async
@@ -198,7 +198,7 @@ public class DetectionProcessComponent {
 					.map(DetectedCoinResponse::from)
 					.toList();
 
-				messagingTemplate.convertAndSend(topic, DetectionInfoResponse.of(detection, responses));
+				socketSyncService.broadcastMessage(topic, DetectionInfoResponse.of(detection, responses));
 			}
 		}
 	}

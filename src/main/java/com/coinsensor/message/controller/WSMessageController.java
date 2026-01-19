@@ -5,6 +5,7 @@ import com.coinsensor.message.dto.response.MessageResponse;
 import com.coinsensor.message.service.MessageService;
 import com.coinsensor.user.service.UserService;
 import com.coinsensor.userban.service.UserBanService;
+import com.coinsensor.websocket.service.SocketSyncService;
 import com.coinsensor.common.exception.CustomException;
 import com.coinsensor.common.exception.ErrorCode;
 
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Controller;
 public class WSMessageController {
 
     private final MessageService chatMessageService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final SocketSyncService socketSyncService;
     private final UserService userService;
     private final UserBanService userBanService;
 
@@ -33,6 +34,6 @@ public class WSMessageController {
         }
         
         MessageResponse response = chatMessageService.saveMessage(MessageRequest.to(request, uuid));
-        messagingTemplate.convertAndSend("/topic/channels/" + request.getChannelId(), response);
+        socketSyncService.broadcastMessage("/topic/channels/" + request.getChannelId(), response);
     }
 }
