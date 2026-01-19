@@ -2,7 +2,7 @@ package com.coinsensor.websocket.service;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ public class RedisSocketMessageListener implements MessageListener {
 
     @PostConstruct
     public void init() {
-        redisMessageListenerContainer.addMessageListener(this, new ChannelTopic("socket:message:*"));
+        redisMessageListenerContainer.addMessageListener(this, new PatternTopic("socket:message:*"));
     }
 
     @Override
