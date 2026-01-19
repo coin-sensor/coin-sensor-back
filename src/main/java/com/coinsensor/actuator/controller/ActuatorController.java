@@ -24,7 +24,7 @@ public class ActuatorController {
 	@GetMapping("/version")
 	public ResponseEntity<String> backCheckVersion() {
 		String version;
-		if (port == 8101 || port == 8102) {
+		if (port == 8001 || port == 8002) {
 			version = "blue";
 		} else {
 			version = "green";
