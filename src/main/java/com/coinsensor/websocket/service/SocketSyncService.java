@@ -12,30 +12,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SocketSyncService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final SimpMessagingTemplate messagingTemplate;
+	private final RedisTemplate<String, Object> redisTemplate;
+	private final SimpMessagingTemplate messagingTemplate;
 
-    public void broadcastSessionConnect(String sessionId) {
-        redisTemplate.opsForSet().add("active_sessions", sessionId);
-        broadcastMessage("/topic/activeUsers", getActiveUserCount());
-    }
+	public void broadcastSessionConnect(String sessionId) {
+		redisTemplate.opsForSet().add("active_sessions", sessionId);
+		broadcastMessage("/topic/activeUsers", getActiveUserCount());
+	}
 
-    public void broadcastSessionDisconnect(String sessionId) {
-        redisTemplate.opsForSet().remove("active_sessions", sessionId);
-        broadcastMessage("/topic/activeUsers", getActiveUserCount());
-    }
+	public void broadcastSessionDisconnect(String sessionId) {
+		redisTemplate.opsForSet().remove("active_sessions", sessionId);
+		broadcastMessage("/topic/activeUsers", getActiveUserCount());
+	}
 
-    public void broadcastMessage(String destination, Object message) {
-        redisTemplate.convertAndSend("socket:message:" + destination, message);
-        messagingTemplate.convertAndSend(destination, message);
-    }
+	public void broadcastMessage(String destination, Object message) {
+		redisTemplate.convertAndSend("socket:message:" + destination, message);
+	}
 
-    public void handleMessage(String destination, Object message) {
-        messagingTemplate.convertAndSend(destination, message);
-    }
+	public void handleMessage(String destination, Object message) {
+		messagingTemplate.convertAndSend(destination, message);
+	}
 
-    public int getActiveUserCount() {
-        Long count = redisTemplate.opsForSet().size("active_sessions");
-        return count != null ? count.intValue() : 0;
-    }
+	public int getActiveUserCount() {
+		Long count = redisTemplate.opsForSet().size("active_sessions");
+		return count != null ? count.intValue() : 0;
+	}
 }
