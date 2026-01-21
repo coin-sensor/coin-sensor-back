@@ -30,7 +30,7 @@ public class CustomDetectionRepositoryImpl implements CustomDetectionRepository 
 
 	@Override
 	public List<DetectionInfoResponse> getDetectionInfos(String exchangeName, Exchange.Type exchangeType,
-		String timeframeName, LocalDateTime startTime, List<String> targetTickers) {
+		String timeframeName, List<String> targetTickers) {
 
 		// Detection 조회
 		List<Detection> detections = queryFactory
@@ -42,9 +42,9 @@ public class CustomDetectionRepositoryImpl implements CustomDetectionRepository 
 				exchange.name.eq(exchangeName)
 					.and(exchange.type.eq(exchangeType))
 					.and(timeframe.name.eq(timeframeName))
-					.and(detection.detectedAt.goe(startTime))
 			)
 			.orderBy(detection.detectedAt.desc())
+			.limit(20)
 			.fetch();
 
 		if (detections.isEmpty()) {

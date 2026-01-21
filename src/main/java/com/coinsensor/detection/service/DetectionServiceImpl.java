@@ -34,14 +34,14 @@ public class DetectionServiceImpl implements DetectionService {
 	@Override
 	public List<DetectionInfoResponse> getDetectionInfos(String exchange, String exchangeType, String coinCategory,
 		String timeframe) {
-		LocalDateTime startTime = getStartTimeByTimeframe(timeframe);
 		Exchange.Type type = Exchange.Type.valueOf(exchangeType);
 
 		List<String> targetTickers = getTargetTickersByCoinCategory(coinCategory, exchangeType);
 
-		return detectionRepository.getDetectionInfos(exchange, type, timeframe, startTime, targetTickers);
+		return detectionRepository.getDetectionInfos(exchange, type, timeframe, targetTickers);
 	}
 
+	@Deprecated
 	private LocalDateTime getStartTimeByTimeframe(String timeframe) {
 		LocalDateTime now = LocalDateTime.now();
 		return switch (timeframe) {

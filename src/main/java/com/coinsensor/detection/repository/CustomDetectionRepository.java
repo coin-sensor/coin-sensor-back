@@ -10,7 +10,7 @@ import com.coinsensor.exchange.entity.Exchange;
 public interface CustomDetectionRepository {
 
 	List<DetectionInfoResponse> getDetectionInfos(String exchange, Exchange.Type exchangeType,
-		String timeframe, LocalDateTime startTime, List<String> targetTickers);
+		String timeframe, List<String> targetTickers);
 
 	List<Detection> findByTimeframeBetween(String timeframeName, LocalDateTime startTime, LocalDateTime endTime);
 }
