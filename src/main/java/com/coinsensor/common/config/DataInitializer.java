@@ -74,12 +74,14 @@ public class DataInitializer {
 			Timeframe tf15m = timeframeRepository.findByName("15m").orElseThrow();
 			Timeframe tf1h = timeframeRepository.findByName("1h").orElseThrow();
 			Timeframe tf4h = timeframeRepository.findByName("4h").orElseThrow();
+			Timeframe tf1d = timeframeRepository.findByName("1d").orElseThrow();
 
 			conditionRepository.save(new Condition(tf1m, BigDecimal.valueOf(1.00), BigDecimal.valueOf(2.00)));
 			conditionRepository.save(new Condition(tf5m, BigDecimal.valueOf(1.00), BigDecimal.valueOf(2.00)));
 			conditionRepository.save(new Condition(tf15m, BigDecimal.valueOf(2.00), BigDecimal.valueOf(2.00)));
 			conditionRepository.save(new Condition(tf1h, BigDecimal.valueOf(3.00), BigDecimal.valueOf(2.00)));
 			conditionRepository.save(new Condition(tf4h, BigDecimal.valueOf(5.00), BigDecimal.valueOf(2.00)));
+			conditionRepository.save(new Condition(tf4h, BigDecimal.valueOf(10.00), BigDecimal.valueOf(2.00)));
 
 			log.info("초기 감지 조건 데이터 생성 완료");
 		}
