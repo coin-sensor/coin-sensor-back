@@ -81,7 +81,7 @@ public class DataInitializer {
 			conditionRepository.save(new Condition(tf15m, BigDecimal.valueOf(2.00), BigDecimal.valueOf(2.00)));
 			conditionRepository.save(new Condition(tf1h, BigDecimal.valueOf(3.00), BigDecimal.valueOf(2.00)));
 			conditionRepository.save(new Condition(tf4h, BigDecimal.valueOf(5.00), BigDecimal.valueOf(2.00)));
-			conditionRepository.save(new Condition(tf4h, BigDecimal.valueOf(10.00), BigDecimal.valueOf(2.00)));
+			conditionRepository.save(new Condition(tf1d, BigDecimal.valueOf(10.00), BigDecimal.valueOf(2.00)));
 
 			log.info("초기 감지 조건 데이터 생성 완료");
 		}
