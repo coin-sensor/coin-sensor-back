@@ -1,7 +1,6 @@
 package com.coinsensor.user.filter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,7 +27,13 @@ public class UserFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 		throws IOException, ServletException {
 
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		HttpServletRequest httpRequest = (HttpServletRequest)request;
+
+		// /actuator 경로는 필터 제외
+		if (httpRequest.getRequestURI().startsWith("/api/actuator")) {
+			chain.doFilter(request, response);
+			return;
+		}
 
 		// OPTIONS 요청(CORS preflight)은 UUID 검증 건너뛰기
 		if ("OPTIONS".equals(httpRequest.getMethod())) {
