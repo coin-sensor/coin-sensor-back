@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LeaderElectionManager {
 
-	private static final String LOCK_KEY = "backend:leader";
+	private static final String LOCK_KEY = "coin-sensor:leader";
 	private static final Duration LOCK_TTL = Duration.ofSeconds(50); // 락 유지 시간 (스케줄 간격보다 약간 짧게)
 	private final RedisTemplate<String, Object> leaderRedisTemplate;
 	@Value("${spring.application.name}")
