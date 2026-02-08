@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.coinsensor.exchangecoin.dto.response.TopBottomCoinResponse;
@@ -34,16 +33,10 @@ public class BinanceWebSocketService {
 	private Disposable spotConnection;
 	private Disposable futuresConnection;
 
-	@Value("${server.port}")
-	private String port;
-
 	@PostConstruct
 	public void connect() {
-		if ("3001".equals(port) || "3003".equals(port)) {
-			connectToSpotWebSocket();
-			connectToFuturesWebSocket();
-		}
-
+		connectToSpotWebSocket();
+		connectToFuturesWebSocket();
 	}
 
 	private void connectToSpotWebSocket() {
