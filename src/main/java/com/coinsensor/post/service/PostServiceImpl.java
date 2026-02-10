@@ -1,5 +1,7 @@
 package com.coinsensor.post.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +11,7 @@ import com.coinsensor.common.exception.CustomException;
 import com.coinsensor.common.exception.ErrorCode;
 import com.coinsensor.post.dto.request.PostCreateRequest;
 import com.coinsensor.post.dto.request.PostUpdateRequest;
+import com.coinsensor.post.dto.response.PostListResponse;
 import com.coinsensor.post.dto.response.PostResponse;
 import com.coinsensor.post.entity.Post;
 import com.coinsensor.post.repository.PostRepository;
@@ -61,6 +64,15 @@ public class PostServiceImpl implements PostService {
 		}
 
 		return PostResponse.from(post);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<PostListResponse> getPostsByCategoryName(String categoryName) {
+		List<Post> posts = postRepository.findByCategoryNameOrderByCreatedAtDesc(categoryName);
+		return posts.stream()
+			.map(PostListResponse::from)
+			.toList();
 	}
 
 	@Override
