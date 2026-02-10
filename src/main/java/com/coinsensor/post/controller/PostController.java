@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coinsensor.common.annotation.AuthorizeRole;
 import com.coinsensor.common.dto.ApiResponse;
 import com.coinsensor.post.dto.request.PostCreateRequest;
 import com.coinsensor.post.dto.request.PostUpdateRequest;
@@ -30,6 +31,7 @@ public class PostController {
 
 	private final PostService postService;
 
+	@AuthorizeRole
 	@PostMapping
 	public ResponseEntity<ApiResponse<PostResponse>> createPost(
 		@RequestBody PostCreateRequest request, @RequestHeader String uuid) {
@@ -49,6 +51,7 @@ public class PostController {
 		return ApiResponse.createSuccess(response);
 	}
 
+	@AuthorizeRole
 	@PutMapping("/{postId}")
 	public ResponseEntity<ApiResponse<PostResponse>> updatePost(
 		@PathVariable Long postId, @RequestBody PostUpdateRequest request, @RequestHeader String uuid) {
@@ -56,6 +59,7 @@ public class PostController {
 		return ApiResponse.createSuccess(response);
 	}
 
+	@AuthorizeRole
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<ApiResponse<Void>> deletePost(
 		@PathVariable Long postId, @RequestHeader String uuid) {
