@@ -28,7 +28,10 @@ public enum ErrorCode {
 	TABLE_NOT_FOUND("테이블을 찾을 수 없습니다."),
 	BAN_TYPE_NOT_FOUND("금지 유형을 찾을 수 없습니다."),
 	CONDITION_NOT_FOUND("조건을 찾을 수 없습니다."),
+	POST_NOT_FOUND("게시글을 찾을 수 없습니다."),
+	CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다."),
 
+	UNAUTHORIZED_ACCESS("접근 권한이 없습니다."),
 	ALREADY_EXISTS("이미 존재합니다."),
 	FAVORITE_COIN_ALREADY_EXISTS("이미 존재하는 즐겨찾기 코인 입니다."),
 	REACTION_ALREADY_EXISTS("이미 존재하는 리액션입니다."),

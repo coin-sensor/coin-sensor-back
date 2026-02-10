@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.coinsensor.bantype.entity.BanType;
 import com.coinsensor.bantype.repository.BanTypeRepository;
+import com.coinsensor.category.entity.Category;
+import com.coinsensor.category.repository.CategoryRepository;
 import com.coinsensor.channel.entity.Channel;
 import com.coinsensor.channel.repository.ChannelRepository;
 import com.coinsensor.common.annotation.LeaderOnly;
@@ -40,6 +42,7 @@ public class DataInitializer {
 	private final ChannelRepository channelRepository;
 	private final ReactionRepository reactionRepository;
 	private final BanTypeRepository banTypeRepository;
+	private final CategoryRepository categoryRepository;
 	private final org.springframework.context.ApplicationContext applicationContext;
 
 	@LeaderOnly
@@ -113,6 +116,13 @@ public class DataInitializer {
 			banTypeRepository.save(new BanType("심각한 규정 위반", 36500L));
 
 			log.info("초기 차단 유형 데이터 생성 완료");
+		}
+
+		if (categoryRepository.count() == 0) {
+			categoryRepository.save(new Category("공지사항"));
+			categoryRepository.save(new Category("트레이더"));
+			categoryRepository.save(new Category("자유게시판"));
+			categoryRepository.save(new Category("정보게시판"));
 		}
 
 		log.info("[ ** 초기 데이터 생성 완료 ** ]");
