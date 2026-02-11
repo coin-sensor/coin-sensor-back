@@ -13,6 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -21,7 +22,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "posts", indexes = {
+    @Index(name = "idx_posts_category_created_deleted", columnList = "category_id, created_at DESC, deleted_at")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
@@ -55,6 +58,9 @@ public class Post {
     @Column(name = "view_count", nullable = false)
     private Long viewCount = 0L;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public static Post to(Category category, User user, String title, String content, String writer) {
         Post post = new Post();
         post.category = category;
@@ -72,5 +78,9 @@ public class Post {
 
     public void incrementViewCount() {
         this.viewCount++;
+    }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

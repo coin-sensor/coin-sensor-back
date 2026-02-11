@@ -49,7 +49,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PostResponse getPost(Long postId, String uuid) {
-		Post post = postRepository.findById(postId)
+		Post post = postRepository.getByPostId(postId)
 			.orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
 		User user = userRepository.findByUuid(uuid)
@@ -98,6 +98,6 @@ public class PostServiceImpl implements PostService {
 			throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
 		}
 
-		postRepository.delete(post);
+		post.delete();
 	}
 }

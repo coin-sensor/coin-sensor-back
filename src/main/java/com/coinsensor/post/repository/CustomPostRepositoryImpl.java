@@ -4,6 +4,7 @@ import static com.coinsensor.category.entity.QCategory.*;
 import static com.coinsensor.post.entity.QPost.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,7 +27,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
 		List<Post> content = queryFactory
 			.selectFrom(post)
 			.join(post.category, category).fetchJoin()
-			.where(category.name.eq(categoryName))
+			.where(category.name.eq(categoryName).and(post.deletedAt.isNull()))
 			.orderBy(post.createdAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -36,9 +37,19 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
 			.select(post.count())
 			.from(post)
 			.join(post.category, category)
-			.where(category.name.eq(categoryName))
+			.where(category.name.eq(categoryName).and(post.deletedAt.isNull()))
 			.fetchOne();
 
 		return new PageImpl<>(content, pageable, total != null ? total : 0L);
+	}
+
+	@Override
+	public Optional<Post> getByPostId(Long postId) {
+		Post result = queryFactory
+			.selectFrom(post)
+			.where(post.postId.eq(postId).and(post.deletedAt.isNull()))
+			.fetchOne();
+
+		return Optional.ofNullable(result);
 	}
 }
