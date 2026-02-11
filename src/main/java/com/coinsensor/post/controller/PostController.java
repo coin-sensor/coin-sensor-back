@@ -1,7 +1,7 @@
 package com.coinsensor.post.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coinsensor.common.annotation.AuthorizeRole;
 import com.coinsensor.common.dto.ApiResponse;
+import com.coinsensor.common.dto.PageResponse;
 import com.coinsensor.post.dto.request.PostCreateRequest;
 import com.coinsensor.post.dto.request.PostUpdateRequest;
 import com.coinsensor.post.dto.response.PostListResponse;
@@ -40,8 +41,9 @@ public class PostController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<PostListResponse>>> getPosts(@RequestParam String categoryName) {
-		List<PostListResponse> response = postService.getPostsByCategoryName(categoryName);
+	public ResponseEntity<ApiResponse<PageResponse<PostListResponse>>> getPosts(
+		@RequestParam String categoryName, @PageableDefault(size = 10) Pageable pageable) {
+		PageResponse<PostListResponse> response = postService.getPostsByCategoryName(categoryName, pageable);
 		return ApiResponse.createSuccess(response);
 	}
 

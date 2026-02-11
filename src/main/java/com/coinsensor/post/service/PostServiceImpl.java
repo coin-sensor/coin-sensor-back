@@ -1,12 +1,13 @@
 package com.coinsensor.post.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.coinsensor.category.entity.Category;
 import com.coinsensor.category.repository.CategoryRepository;
+import com.coinsensor.common.dto.PageResponse;
 import com.coinsensor.common.exception.CustomException;
 import com.coinsensor.common.exception.ErrorCode;
 import com.coinsensor.post.dto.request.PostCreateRequest;
@@ -68,11 +69,10 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<PostListResponse> getPostsByCategoryName(String categoryName) {
-		List<Post> posts = postRepository.findByCategoryNameOrderByCreatedAtDesc(categoryName);
-		return posts.stream()
-			.map(PostListResponse::from)
-			.toList();
+	public PageResponse<PostListResponse> getPostsByCategoryName(String categoryName, Pageable pageable) {
+		Page<Post> posts = postRepository.getPostsByCategoryName(categoryName, pageable);
+		Page<PostListResponse> postResponses = posts.map(PostListResponse::from);
+		return PageResponse.of(postResponses);
 	}
 
 	@Override

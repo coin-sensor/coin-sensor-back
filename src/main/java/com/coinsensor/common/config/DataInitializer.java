@@ -119,10 +119,10 @@ public class DataInitializer {
 		}
 
 		if (categoryRepository.count() == 0) {
-			categoryRepository.save(new Category("공지사항"));
-			categoryRepository.save(new Category("트레이더"));
-			categoryRepository.save(new Category("자유게시판"));
-			categoryRepository.save(new Category("정보게시판"));
+			categoryRepository.save(new Category("notice"));
+			categoryRepository.save(new Category("trader"));
+			categoryRepository.save(new Category("free"));
+			categoryRepository.save(new Category("info"));
 		}
 
 		log.info("[ ** 초기 데이터 생성 완료 ** ]");

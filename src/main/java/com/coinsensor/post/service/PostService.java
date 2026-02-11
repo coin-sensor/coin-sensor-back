@@ -1,7 +1,8 @@
 package com.coinsensor.post.service;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
+import com.coinsensor.common.dto.PageResponse;
 import com.coinsensor.post.dto.request.PostCreateRequest;
 import com.coinsensor.post.dto.request.PostUpdateRequest;
 import com.coinsensor.post.dto.response.PostListResponse;
@@ -13,7 +14,7 @@ public interface PostService {
 
 	PostResponse getPost(Long postId, String uuid);
 
-	List<PostListResponse> getPostsByCategoryName(String categoryName);
+	PageResponse<PostListResponse> getPostsByCategoryName(String categoryName, Pageable pageable);
 
 	PostResponse updatePost(Long postId, PostUpdateRequest request, String uuid);
 
