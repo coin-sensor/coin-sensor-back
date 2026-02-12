@@ -32,4 +32,10 @@ logging:
   file:
     path: ./logs
 
+telegram:
+  bot:
+    token: ${TELEGRAM_BINANCE_FUTURE_BOT_API}
+  chat:
+    id: ${TELEGRAM_CHAT_ID}
+
 

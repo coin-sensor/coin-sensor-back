@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.coinsensor.common.util.SummaryUtil;
-import com.coinsensor.websocket.service.SocketSyncService;
 import com.coinsensor.conditions.entity.Condition;
 import com.coinsensor.detectedcoin.dto.response.DetectedCoinResponse;
 import com.coinsensor.detectedcoin.entity.DetectedCoin;
@@ -26,6 +25,8 @@ import com.coinsensor.exchangecoin.entity.ExchangeCoin;
 import com.coinsensor.exchangecoin.service.ExchangeCoinService;
 import com.coinsensor.ohlcvs.entity.Ohlcv;
 import com.coinsensor.ohlcvs.repository.OhlcvRepository;
+import com.coinsensor.telegram.service.TelegramService;
+import com.coinsensor.websocket.service.SocketSyncService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ public class DetectionProcessComponent {
 	private final DetectedCoinRepository detectedCoinRepository;
 	private final SocketSyncService socketSyncService;
 	private final ExchangeCoinService exchangeCoinService;
+	private final TelegramService telegramService;
 
 	@Async
 	public void processConditionDetection(Condition condition, Exchange.Type exchangeType) {
@@ -199,7 +201,13 @@ public class DetectionProcessComponent {
 					.toList();
 
 				socketSyncService.broadcastMessage(topic, DetectionInfoResponse.of(detection, responses));
+
+				String filteringCoinMessage = SummaryUtil.create(detection.getExchange(), detection.getCondition(),
+					filteredCoins);
+				telegramService.sendTelegramNotification(detection, coinCategory, filteringCoinMessage);
+
 			}
 		}
 	}
+
 }
