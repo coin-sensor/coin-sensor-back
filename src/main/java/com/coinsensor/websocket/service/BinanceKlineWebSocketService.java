@@ -110,7 +110,7 @@ public class BinanceKlineWebSocketService {
 			streams.append(coin.getCoin().getCoinTicker().toLowerCase())
 				.append("@kline_").append(timeframe);
 		}
-		return "wss://fstream.binance.com/stream?streams=" + streams;
+		return "wss://fstream.binance.com/market/stream?streams=" + streams;
 	}
 
 	private void connectToCombinedStream(String streamUrl, String sessionKey, boolean isFuture) {
