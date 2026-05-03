@@ -75,7 +75,7 @@ public class BinanceWebSocketService {
 	private void connectToFuturesWebSocket() {
 		futuresConnection = HttpClient.create()
 			.websocket()
-			.uri("wss://fstream.binance.com/ws/!ticker@arr")
+			.uri("wss://fstream.binance.com/market/ws/!ticker@arr")
 			.handle((inbound, outbound) -> {
 				// WebSocket 연결 후 파이프라인 수정
 				inbound.withConnection(conn -> {
