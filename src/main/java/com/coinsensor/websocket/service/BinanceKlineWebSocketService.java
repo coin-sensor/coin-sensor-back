@@ -153,13 +153,17 @@ public class BinanceKlineWebSocketService {
 
 				if (klineData.getKline().getIsClosed()) {
 					List<KlineData> buffer = klineBuffer.get(sessionKey);
-					if (buffer != null) {
-						buffer.add(klineData);
-
-						Integer expected = expectedCoinCount.get(sessionKey);
-						if (expected != null && buffer.size() >= expected) {
-							List<KlineData> toSave = new ArrayList<>(buffer);
-							buffer.clear();
+					Integer expected = expectedCoinCount.get(sessionKey);
+					if (buffer != null && expected != null) {
+						List<KlineData> toSave = null;
+						synchronized (buffer) {
+							buffer.add(klineData);
+							if (buffer.size() >= expected) {
+								toSave = new ArrayList<>(buffer);
+								buffer.clear();
+							}
+						}
+						if (toSave != null) {
 							ohlcvService.saveKlineData(toSave,
 								isFuture ? Exchange.Type.future : Exchange.Type.spot);
 						}

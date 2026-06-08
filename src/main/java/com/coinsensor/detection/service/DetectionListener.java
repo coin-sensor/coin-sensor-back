@@ -20,7 +20,8 @@ public class DetectionListener {
 	public void executeDetectionAsync(OhlcvDataSavedEvent event) {
 		try {
 			log.info("[{}-{}] {} 탐지 시작", event.getExchangeName(), event.getExchangeType(), event.getTimeframeName());
-			detectionService.detectByTimeframe(event.getTimeframeName(), event.getExchangeType());
+			detectionService.detectByTimeframe(event.getTimeframeName(), event.getExchangeType(),
+				event.getCandleStartTime());
 		} catch (Exception e) {
 			log.error("{} 탐지 실패", event.getTimeframeName(), e);
 		}

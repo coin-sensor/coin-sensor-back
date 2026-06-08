@@ -44,12 +44,11 @@ public class DetectionProcessComponent {
 	private final TelegramService telegramService;
 
 	@Async
-	public void processConditionDetection(Condition condition, Exchange.Type exchangeType) {
+	public void processConditionDetection(Condition condition, Exchange.Type exchangeType, LocalDateTime candleStartTime) {
 		String timeframeName = condition.getTimeframe().getName();
 
-		// 현재 시간을 타임프레임 시작 시간으로 정렬
-		LocalDateTime currentTime = LocalDateTime.now().withSecond(0).withNano(0);
-		LocalDateTime previousCandleTime1 = currentTime.minus(getTimeframeDuration(timeframeName));
+		// 이벤트에서 전달받은 실제 캔들 시작 시간 사용 (LocalDateTime.now() 타이밍 이슈 방지)
+		LocalDateTime previousCandleTime1 = candleStartTime;
 		LocalDateTime previousCandleTime2 = previousCandleTime1.minus(getTimeframeDuration(timeframeName));
 
 		// 해당 거래소의 모든 코인 조회

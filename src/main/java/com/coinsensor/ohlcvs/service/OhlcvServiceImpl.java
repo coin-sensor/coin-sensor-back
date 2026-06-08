@@ -73,9 +73,12 @@ public class OhlcvServiceImpl implements OhlcvService {
 				ohlcvRepository.saveAll(ohlcvList);
 				log.info("[{}-{}] {} OHLCV 배치 저장 완료: {} 건", BINANCE, exchangeType, timeframeName, ohlcvList.size());
 
+				// 캔들 시작 시간 추출 (첫 번째 ohlcv 기준)
+				LocalDateTime candleStartTime = ohlcvList.getFirst().getStartTime();
+
 				// 이벤트 발행
 				eventPublisher.publishEvent(
-					new OhlcvDataSavedEvent(timeframeName, BINANCE, exchangeType, ohlcvList.size()));
+					new OhlcvDataSavedEvent(timeframeName, BINANCE, exchangeType, ohlcvList.size(), candleStartTime));
 			}
 		} catch (Exception e) {
 			log.error("[{}-{}] {} OHLCV 배치 저장 오류: {}", BINANCE, exchangeType, timeframeName, e.getMessage());
