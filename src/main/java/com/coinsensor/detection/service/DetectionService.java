@@ -13,5 +13,5 @@ public interface DetectionService {
 
 	DetectionChartResponse getDetectionChart(String timeframe, LocalDateTime startTime, LocalDateTime endTime);
 
-	void detectByTimeframe(String timeframeName, Exchange.Type exchangeType, LocalDateTime candleStartTime);
+	void detectByTimeframe(String timeframeName, Exchange.Type exchangeType);
 }
