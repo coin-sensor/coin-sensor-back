@@ -204,7 +204,7 @@ public class DetectionProcessComponent {
 
 				String filteringCoinMessage = SummaryUtil.create(detection.getExchange(), detection.getCondition(),
 					filteredCoins);
-				telegramService.sendTelegramNotification(detection, coinCategory, filteringCoinMessage);
+				//telegramService.sendTelegramNotification(detection, coinCategory, filteringCoinMessage);
 
 			}
 		}
